@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "UWPCoreApp (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "UWPCoreApp (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}
