@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "WASForCoreApp (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "WASForCoreApp (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}
