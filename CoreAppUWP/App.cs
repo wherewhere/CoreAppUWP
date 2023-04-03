@@ -9,7 +9,7 @@ using Windows.UI.Core;
 using Windows.UI.Popups;
 using Windows.UI.ViewManagement;
 
-namespace WASForCoreApp
+namespace CoreAppUWP
 {
     public class App : IFrameworkViewSource, IFrameworkView
     {

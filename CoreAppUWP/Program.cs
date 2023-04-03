@@ -1,7 +1,7 @@
 ﻿using Windows.ApplicationModel.Core;
 using WinRT;
 
-namespace WASForCoreApp
+namespace CoreAppUWP
 {
     public class Program
     {

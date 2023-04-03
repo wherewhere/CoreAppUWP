@@ -1,9 +1,9 @@
 {
   "profiles": {
-    "WASForCoreApp (Package)": {
+    "CoreAppUWP (Package)": {
       "commandName": "MsixPackage"
     },
-    "WASForCoreApp (Unpackaged)": {
+    "CoreAppUWP (Unpackaged)": {
       "commandName": "Project"
     }
   }

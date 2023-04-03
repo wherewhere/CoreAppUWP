@@ -1,25 +1,33 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <BuiltInComInteropSupport>True</BuiltInComInteropSupport>
+    <DefineConstants>DISABLE_XAML_GENERATED_MAIN</DefineConstants>
+    <EnableMsixTooling>true</EnableMsixTooling>
     <OutputType>WinExe</OutputType>
+    <Platforms>x86;x64;ARM64</Platforms>
+    <RepositoryUrl>https://github.com/wherewhere/CoreAppUWP</RepositoryUrl>
+    <RootNamespace>WASForCoreApp</RootNamespace>
+    <RuntimeIdentifiers>win10-x86;win10-x64;win10-arm64</RuntimeIdentifiers>
     <TargetFramework>net6.0-windows10.0.19041.0</TargetFramework>
     <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
-    <RootNamespace>WASForCoreApp</RootNamespace>
-    <ApplicationManifest>app.manifest</ApplicationManifest>
-    <Platforms>x86;x64;ARM64</Platforms>
-    <RuntimeIdentifiers>win10-x86;win10-x64;win10-arm64</RuntimeIdentifiers>
     <PublishProfile>win10-$(Platform).pubxml</PublishProfile>
     <UseWinUI>true</UseWinUI>
-    <EnableMsixTooling>true</EnableMsixTooling>
-    <DefineConstants>DISABLE_XAML_GENERATED_MAIN</DefineConstants>
-    <GenerateAppInstallerFile>False</GenerateAppInstallerFile>
-    <AppxPackageSigningEnabled>True</AppxPackageSigningEnabled>
-    <PackageCertificateThumbprint>0CDF4A03E9BE9DD789894BB3C7AD3DEDECD9AB25</PackageCertificateThumbprint>
-    <AppxPackageSigningTimestampDigestAlgorithm>SHA256</AppxPackageSigningTimestampDigestAlgorithm>
+  </PropertyGroup>
+
+  <PropertyGroup>
     <AppxAutoIncrementPackageRevision>False</AppxAutoIncrementPackageRevision>
-    <AppxSymbolPackageEnabled>False</AppxSymbolPackageEnabled>
-    <GenerateTestArtifacts>True</GenerateTestArtifacts>
     <AppxBundle>Never</AppxBundle>
+    <AppxBundlePlatforms>x64</AppxBundlePlatforms>
+    <AppxPackageDir>AppPackages</AppxPackageDir>
+    <AppxPackageSigningEnabled>True</AppxPackageSigningEnabled>
+    <AppxPackageSigningTimestampDigestAlgorithm>SHA256</AppxPackageSigningTimestampDigestAlgorithm>
+    <AppxSymbolPackageEnabled>True</AppxSymbolPackageEnabled>
+    <GenerateAppInstallerFile>False</GenerateAppInstallerFile>
+    <GenerateTemporaryStoreCertificate>True</GenerateTemporaryStoreCertificate>
+    <GenerateTestArtifacts>False</GenerateTestArtifacts>
     <HoursBetweenUpdateChecks>0</HoursBetweenUpdateChecks>
+    <PackageCertificateThumbprint>0CDF4A03E9BE9DD789894BB3C7AD3DEDECD9AB25</PackageCertificateThumbprint>
   </PropertyGroup>
 
   <ItemGroup>

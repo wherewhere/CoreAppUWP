@@ -1,2 +1,2 @@
-# UWP-For-Core-App
+# CoreAppUWP
 UWP running on .net core app
