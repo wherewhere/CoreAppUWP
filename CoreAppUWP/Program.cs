@@ -1,4 +1,13 @@
-﻿using Windows.ApplicationModel.Core;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using Windows.ApplicationModel;
+using Windows.ApplicationModel.Core;
+using Windows.Data.Xml.Dom;
+using Windows.Management.Deployment;
+using Windows.Storage;
 using WinRT;
 
 namespace CoreAppUWP
@@ -7,8 +16,31 @@ namespace CoreAppUWP
     {
         private static void Main(string[] args)
         {
-            ComWrappersSupport.InitializeComWrappers();
-            CoreApplication.Run(new App());
+            try
+            {
+                ComWrappersSupport.InitializeComWrappers();
+                CoreApplication.Run(new App());
+            }
+            catch
+            {
+                StartCoreApplication();
+            }
+        }
+
+        private static async void StartCoreApplication()
+        {
+            PackageManager manager = new();
+            string basePath = AppDomain.CurrentDomain.BaseDirectory;
+            XmlDocument manifest = await XmlDocument.LoadFromFileAsync(await StorageFile.GetFileFromPathAsync(Path.Combine(basePath, "AppxManifest.xml")));
+            IXmlNode identity = manifest.GetElementsByTagName("Identity").FirstOrDefault();
+            string name = identity.Attributes.FirstOrDefault((x) => x.NodeName == "Name")?.InnerText;
+            IXmlNode application = manifest.GetElementsByTagName("Application").FirstOrDefault();
+            string id = application.Attributes.FirstOrDefault((x) => x.NodeName == "Id")?.InnerText;
+            IEnumerable<Package> packages = manager.FindPackagesForUser("").Where((x) => x.Id.FamilyName.StartsWith(name));
+            if (packages.Any())
+            {
+                Process.Start("explorer.exe", $"shell:AppsFolder\\{packages.FirstOrDefault().Id.FamilyName}!{id}");
+            }
         }
     }
 }

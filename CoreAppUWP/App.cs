@@ -57,10 +57,12 @@ namespace CoreAppUWP
             _root.Children.InsertAtTop(child);
             _window.SizeChanged += (sender, args) => child.Size = new Vector2((float)args.Size.Width, (float)args.Size.Height);
 
-            StringBuilder builder = new();
-            builder.AppendLine(RuntimeInformation.FrameworkDescription);
-            builder.AppendLine(RuntimeInformation.OSDescription);
-            builder.Append($"ProcessArchitecture: {RuntimeInformation.ProcessArchitecture.ToString()}");
+            Tiles.UpdateTile();
+
+            StringBuilder builder = new StringBuilder()
+                .AppendLine(RuntimeInformation.FrameworkDescription)
+                .AppendLine(RuntimeInformation.OSDescription)
+                .Append($"ProcessArchitecture: {RuntimeInformation.ProcessArchitecture}");
             MessageDialog dialog = new(builder.ToString(), "Hello World!");
             _ = dialog.ShowAsync();
         }
