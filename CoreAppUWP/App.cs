@@ -1,6 +1,7 @@
 ﻿using System.Numerics;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Windows.Forms;
 using Windows.ApplicationModel.Activation;
 using Windows.ApplicationModel.Core;
 using Windows.UI;
@@ -59,12 +60,29 @@ namespace CoreAppUWP
 
             Tiles.UpdateTile();
 
-            StringBuilder builder = new StringBuilder()
-                .AppendLine(RuntimeInformation.FrameworkDescription)
-                .AppendLine(RuntimeInformation.OSDescription)
-                .Append($"ProcessArchitecture: {RuntimeInformation.ProcessArchitecture}");
-            MessageDialog dialog = new(builder.ToString(), "Hello World!");
-            _ = dialog.ShowAsync();
+            Application.EnableVisualStyles();
+
+            Form form = new() { Text = "Form" };
+
+            Button button = new()
+            {
+                Text = "Show Dialog",
+                Parent = form,
+                Height = 48,
+                Width = 200
+            };
+            button.Click += (sender, args) =>
+            {
+                StringBuilder builder = new StringBuilder()
+                    .AppendLine(RuntimeInformation.FrameworkDescription)
+                    .AppendLine(RuntimeInformation.OSDescription)
+                    .Append($"ProcessArchitecture: {RuntimeInformation.ProcessArchitecture}");
+                MessageDialog dialog = new(builder.ToString(), "Hello World!");
+                _ = dialog.ShowAsync();
+            };
+
+            form.Show();
+            form.Activate();
         }
 
         private static void ExtendViewIntoTitleBar(bool extendViewIntoTitleBar)

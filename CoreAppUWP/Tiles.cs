@@ -7,12 +7,9 @@ namespace CoreAppUWP
 {
     public static class Tiles
     {
-        public static void UpdateTile()
-        {
-            UpdateTitle(CreateTile());
-        }
+        public static void UpdateTile() => CreateTile().UpdateTitle();
 
-        private static void UpdateTitle(TileContent tileContent)
+        private static void UpdateTitle(this TileContent tileContent)
         {
             TileUpdater tileUpdater = TileUpdateManager.CreateTileUpdaterForApplication();
             tileUpdater.Clear();
@@ -138,6 +135,5 @@ namespace CoreAppUWP
                 }
             };
         }
-
     }
 }
