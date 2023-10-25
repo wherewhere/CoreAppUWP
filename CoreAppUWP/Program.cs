@@ -1,8 +1,11 @@
-﻿using System;
+﻿using Microsoft.UI.Dispatching;
+using Microsoft.UI.Xaml;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Core;
 using Windows.Data.Xml.Dom;
@@ -12,19 +15,18 @@ using WinRT;
 
 namespace CoreAppUWP
 {
-    public class Program
+    public partial class Program
     {
+        [MTAThread]
         private static void Main(string[] args)
         {
-            try
+            ComWrappersSupport.InitializeComWrappers();
+            Application.Start((p) =>
             {
-                ComWrappersSupport.InitializeComWrappers();
-                CoreApplication.Run(new App());
-            }
-            catch
-            {
-                StartCoreApplication();
-            }
+                DispatcherQueueSynchronizationContext context = new DispatcherQueueSynchronizationContext(DispatcherQueue.GetForCurrentThread());
+                SynchronizationContext.SetSynchronizationContext(context);
+                _ = new App();
+            });
         }
 
         private static async void StartCoreApplication()

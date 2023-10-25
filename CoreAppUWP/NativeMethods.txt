@@ -1,4 +1,1 @@
 ﻿ICoreWindowInterop
-
-GetParent
-SetParent
