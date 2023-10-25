@@ -3,9 +3,9 @@ using System;
 using System.Runtime.InteropServices;
 using Windows.UI.Notifications;
 
-namespace CoreAppUWP
+namespace CoreAppUWP.Helpers
 {
-    public static class Tiles
+    public static class TilesHelper
     {
         public static void UpdateTile() => CreateTile().UpdateTitle();
 

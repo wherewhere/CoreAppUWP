@@ -54,7 +54,10 @@ namespace CoreAppUWP
             // 只需确保窗口处于活动状态
             if (window.Content is not Frame rootFrame)
             {
-                CoreApplication.GetCurrentView().TitleBar.ExtendViewIntoTitleBar = true;
+                if (SettingsHelper.Get<bool>(SettingsHelper.IsExtendsTitleBar))
+                {
+                    CoreApplication.GetCurrentView().TitleBar.ExtendViewIntoTitleBar = true;
+                }
 
                 // 创建要充当导航上下文的框架，并导航到第一页
                 rootFrame = new Frame();
@@ -106,11 +109,16 @@ namespace CoreAppUWP
 
         private void Application_UnhandledException(object sender, Microsoft.UI.Xaml.UnhandledExceptionEventArgs e)
         {
+            SettingsHelper.LogManager?.GetLogger("Unhandled Exception - Application").Error(e.Exception.ExceptionToMessage(), e.Exception);
             e.Handled = true;
         }
 
         private void CurrentDomain_UnhandledException(object sender, System.UnhandledExceptionEventArgs e)
         {
+            if (e.ExceptionObject is Exception Exception)
+            {
+                SettingsHelper.LogManager?.GetLogger("Unhandled Exception - CurrentDomain").Error(Exception.ExceptionToMessage(), Exception);
+            }
         }
 
         /// <summary>
@@ -125,6 +133,7 @@ namespace CoreAppUWP
 
         private void SynchronizationContext_UnhandledException(object sender, Common.UnhandledExceptionEventArgs e)
         {
+            SettingsHelper.LogManager?.GetLogger("Unhandled Exception - SynchronizationContext").Error(e.Exception.ExceptionToMessage(), e.Exception);
             e.Handled = true;
         }
 

@@ -6,10 +6,11 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls" />
-                <!--  Other merged dictionaries here  -->
+                <!--  Add resource dictionaries here  -->
+                <ResourceDictionary Source="ms-appx:///Themes/CustomStyles.xaml" />
             </ResourceDictionary.MergedDictionaries>
             <!--  Other app resources here  -->
-            
+
             <!--  Breakpoints  -->
             <x:Double x:Key="Breakpoint640Plus">641</x:Double>
 

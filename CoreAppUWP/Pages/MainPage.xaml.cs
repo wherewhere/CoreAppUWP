@@ -1,4 +1,5 @@
-﻿using CoreAppUWP.Pages.SettingsPages;
+﻿using CoreAppUWP.Helpers;
+using CoreAppUWP.Pages.SettingsPages;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media.Animation;
@@ -26,8 +27,9 @@ namespace CoreAppUWP.Pages
 
         public MainPage()
         {
-            Tiles.UpdateTile();
             InitializeComponent();
+            TilesHelper.UpdateTile();
+            SettingsHelper.CreateLogManager();
             NavigationView.PaneDisplayMode = NavigationViewPaneDisplayMode.Left;
         }
 

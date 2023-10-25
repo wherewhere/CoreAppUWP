@@ -16,6 +16,7 @@ namespace CoreAppUWP.Helpers
     {
         public const string UpdateDate = nameof(UpdateDate);
         public const string SelectedAppTheme = nameof(SelectedAppTheme);
+        public const string IsExtendsTitleBar = nameof(IsExtendsTitleBar);
 
         public static Type Get<Type>(string key) => LocalObject.Read<Type>(key);
         public static void Set<Type>(string key, Type value) => LocalObject.Save(key, value);
@@ -32,25 +33,29 @@ namespace CoreAppUWP.Helpers
             {
                 LocalObject.Save(SelectedAppTheme, ElementTheme.Default);
             }
+            if (!LocalObject.KeyExists(IsExtendsTitleBar))
+            {
+                LocalObject.Save(IsExtendsTitleBar, true);
+            }
         }
     }
 
     public static partial class SettingsHelper
     {
-        public static readonly UISettings UISettings = new();
-        public static readonly ILogManager LogManager = LogManagerFactory.CreateLogManager(GetDefaultReleaseConfiguration());
+        public static UISettings UISettings { get; } = new();
+        public static ILogManager LogManager { get; private set; }
         public static OSVersion OperatingSystemVersion => SystemInformation.Instance.OperatingSystemVersion;
-        private static readonly ApplicationDataStorageHelper LocalObject = ApplicationDataStorageHelper.GetCurrent(new SystemTextJsonObjectSerializer());
+        public static ApplicationDataStorageHelper LocalObject { get; } = ApplicationDataStorageHelper.GetCurrent(new SystemTextJsonObjectSerializer());
 
         static SettingsHelper() => SetDefaultSettings();
 
-        private static LoggingConfiguration GetDefaultReleaseConfiguration()
+        public static void CreateLogManager()
         {
             string path = Path.Combine(ApplicationData.Current.LocalFolder.Path, "MetroLogs");
             if (!Directory.Exists(path)) { Directory.CreateDirectory(path); }
             LoggingConfiguration loggingConfiguration = new();
             loggingConfiguration.AddTarget(LogLevel.Info, LogLevel.Fatal, new StreamingFileTarget(path, 7));
-            return loggingConfiguration;
+            LogManager = LogManagerFactory.CreateLogManager(loggingConfiguration);
         }
     }
 

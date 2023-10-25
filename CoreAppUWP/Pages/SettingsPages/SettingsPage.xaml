@@ -2,12 +2,334 @@
     x:Class="CoreAppUWP.Pages.SettingsPages.SettingsPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:CoreAppUWP.Pages.SettingsPages"
+    xmlns:animatedvisuals="using:Microsoft.UI.Xaml.Controls.AnimatedVisuals"
+    xmlns:common="using:CoreAppUWP.Common"
+    xmlns:controls="using:CoreAppUWP.Controls"
+    xmlns:cwuc="using:CommunityToolkit.WinUI.UI.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:interopservices="using:System.Runtime.InteropServices"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:settingspages="using:CoreAppUWP.ViewModels.SettingsPages"
+    d:DataContext="{d:DesignInstance Type=settingspages:SettingsViewModel}"
+    DataContext="{x:Bind Provider, Mode=OneWay}"
     mc:Ignorable="d">
+    <Grid
+        x:Name="RootGrid"
+        Padding="20,20,0,0"
+        RowSpacing="24">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <TextBlock
+            x:Name="Header"
+            HorizontalAlignment="Stretch"
+            VerticalAlignment="Stretch"
+            AutomationProperties.HeadingLevel="1"
+            Style="{StaticResource TitleTextBlockStyle}"
+            Text="Settings" />
+        <ScrollViewer Grid.Row="1">
+            <StackPanel Padding="0,0,20,48">
+                <StackPanel.ChildrenTransitions>
+                    <TransitionCollection>
+                        <ReorderThemeTransition />
+                    </TransitionCollection>
+                </StackPanel.ChildrenTransitions>
+                <controls:SettingsGroup Margin="0,-28,0,0" Header="Display">
+                    <controls:Setting Header="Theme" Icon="&#xE790;">
+                        <controls:Setting.Description>
+                            <HyperlinkButton
+                                Click="HyperlinkButton_Click"
+                                Content="Windows Color Settings"
+                                Tag="WindowsColor" />
+                        </controls:Setting.Description>
+                        <ComboBox SelectedIndex="{x:Bind Provider.SelectedTheme, Mode=TwoWay}">
+                            <ComboBoxItem Content="Dark" />
+                            <ComboBoxItem Content="Light" />
+                            <ComboBoxItem Content="Windows Default" />
+                        </ComboBox>
+                    </controls:Setting>
+                    <controls:Setting
+                        Description="Extends content into titlebar."
+                        Header="TitleBar"
+                        Icon="&#xE737;">
+                        <ToggleSwitch IsOn="{x:Bind Provider.IsExtendsTitleBar, Mode=TwoWay}" Style="{StaticResource ToggleSwitchSettingStyle}" />
+                    </controls:Setting>
+                </controls:SettingsGroup>
+                <controls:SettingsGroup Header="Window">
+                    <controls:Setting
+                        Description="Enter or exit compact overlay."
+                        Header="Compact Overlay"
+                        Icon="&#xE944;">
+                        <StackPanel
+                            Margin="0,2"
+                            Orientation="Horizontal"
+                            Spacing="4">
+                            <Button
+                                Click="Button_Click"
+                                Content="Enter Compact Overlay"
+                                Tag="EnterPIP" />
+                            <Button
+                                x:Uid="/TestPage/OutPIP"
+                                Click="Button_Click"
+                                Content="Exit" />
+                        </StackPanel>
+                    </controls:Setting>
+                    <controls:Setting
+                        ActionIcon="&#xE8A7;"
+                        Click="Button_Click"
+                        Description="Create a new window."
+                        Header="Multiple Window"
+                        Icon="&#xE78B;"
+                        IsClickEnabled="True"
+                        Tag="NewWindow" />
+                    <controls:Setting
+                        x:Name="SettingsFlyoutSettings"
+                        x:Load="{x:Bind common:SettingsPaneRegister.IsSettingsPaneSupported}"
+                        Click="Button_Click"
+                        Description="Show settings charm pane."
+                        Header="Open Settings"
+                        IsClickEnabled="True"
+                        Tag="SettingsFlyout">
+                        <controls:Setting.Icon>
+                            <AnimatedIcon>
+                                <AnimatedIcon.Source>
+                                    <animatedvisuals:AnimatedSettingsVisualSource />
+                                </AnimatedIcon.Source>
+                                <AnimatedIcon.FallbackIconSource>
+                                    <FontIconSource FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE713;" />
+                                </AnimatedIcon.FallbackIconSource>
+                            </AnimatedIcon>
+                        </controls:Setting.Icon>
+                    </controls:Setting>
+                    <controls:Setting
+                        x:Name="SearchFlyoutSettings"
+                        x:Load="{x:Bind common:SettingsPaneRegister.IsSearchPaneSupported}"
+                        Click="Button_Click"
+                        Description="Show search charm pane."
+                        Header="Open Search"
+                        IsClickEnabled="True"
+                        Tag="SearchFlyout">
+                        <controls:Setting.Icon>
+                            <AnimatedIcon>
+                                <AnimatedIcon.Source>
+                                    <animatedvisuals:AnimatedFindVisualSource />
+                                </AnimatedIcon.Source>
+                                <AnimatedIcon.FallbackIconSource>
+                                    <FontIconSource FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE721;" />
+                                </AnimatedIcon.FallbackIconSource>
+                            </AnimatedIcon>
+                        </controls:Setting.Icon>
+                    </controls:Setting>
+                </controls:SettingsGroup>
+                <controls:SettingsGroup Header="Configs">
+                    <controls:Setting
+                        Description="Reset settings of this application."
+                        Header="Reset application"
+                        Icon="&#xE777;">
+                        <Button Name="Reset" Content="Reset">
+                            <Button.Flyout>
+                                <Flyout>
+                                    <StackPanel>
+                                        <TextBlock
+                                            Margin="0,0,0,12"
+                                            Style="{ThemeResource BaseTextBlockStyle}"
+                                            Text="Are you sure you want to reset the app?" />
+                                        <Button
+                                            Click="Button_Click"
+                                            Content="Yes"
+                                            Tag="Reset" />
+                                    </StackPanel>
+                                </Flyout>
+                            </Button.Flyout>
+                        </Button>
+                    </controls:Setting>
+                    <controls:SettingExpander
+                        Description="Information about the frameworks of this app."
+                        Header="Framework Information"
+                        Icon="&#xE950;">
+                        <Grid Style="{StaticResource SettingExpanderContentGridStyle}">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
 
-    <Grid>
+                            <TextBlock
+                                Grid.Row="0"
+                                Grid.Column="0"
+                                Padding="0,0,0,8"
+                                Foreground="{ThemeResource SettingCardForeground}"
+                                Text="Device Family" />
+                            <TextBlock
+                                Grid.Row="0"
+                                Grid.Column="1"
+                                Padding="32,0,0,8"
+                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                Text="{Binding DeviceFamily}"
+                                TextWrapping="WrapWholeWords" />
 
+                            <TextBlock
+                                Grid.Row="1"
+                                Grid.Column="0"
+                                Padding="0,0,0,8"
+                                Foreground="{ThemeResource SettingCardForeground}"
+                                Text="Framework" />
+                            <TextBlock
+                                Grid.Row="1"
+                                Grid.Column="1"
+                                Padding="32,0,0,8"
+                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                Text="{x:Bind interopservices:RuntimeInformation.FrameworkDescription}"
+                                TextWrapping="WrapWholeWords" />
+
+                            <TextBlock
+                                Grid.Row="2"
+                                Grid.Column="0"
+                                Padding="0,0,0,8"
+                                Foreground="{ThemeResource SettingCardForeground}"
+                                Text="CS/WinRT" />
+                            <TextBlock
+                                Grid.Row="2"
+                                Grid.Column="1"
+                                Padding="32,0,0,8"
+                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                Text="{Binding WinRTVersion}"
+                                TextWrapping="WrapWholeWords" />
+
+                            <TextBlock
+                                Grid.Row="3"
+                                Grid.Column="0"
+                                Padding="0,0,0,8"
+                                Foreground="{ThemeResource SettingCardForeground}"
+                                Text="Windows SDK" />
+                            <TextBlock
+                                Grid.Row="3"
+                                Grid.Column="1"
+                                Padding="32,0,0,8"
+                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                Text="{Binding SDKVersion}"
+                                TextWrapping="WrapWholeWords" />
+
+                            <TextBlock
+                                Grid.Row="4"
+                                Grid.Column="0"
+                                Padding="0,0,0,8"
+                                Foreground="{ThemeResource SettingCardForeground}"
+                                Text="Windows App SDK" />
+                            <TextBlock
+                                Grid.Row="4"
+                                Grid.Column="1"
+                                Padding="32,0,0,8"
+                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                Text="{Binding WASVersion}"
+                                TextWrapping="WrapWholeWords" />
+
+                            <TextBlock
+                                Grid.Row="5"
+                                Grid.Column="0"
+                                Padding="0,0,0,8"
+                                Foreground="{ThemeResource SettingCardForeground}"
+                                Text="Community Toolkit" />
+                            <TextBlock
+                                Grid.Row="5"
+                                Grid.Column="1"
+                                Padding="32,0,0,8"
+                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                Text="{Binding ToolkitVersion}"
+                                TextWrapping="WrapWholeWords" />
+
+                            <TextBlock
+                                Grid.Row="6"
+                                Grid.Column="0"
+                                Padding="0,0,0,8"
+                                Foreground="{ThemeResource SettingCardForeground}"
+                                Text="OS Platform" />
+                            <TextBlock
+                                Grid.Row="6"
+                                Grid.Column="1"
+                                Padding="32,0,0,8"
+                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                Text="{x:Bind interopservices:RuntimeInformation.OSDescription}"
+                                TextWrapping="WrapWholeWords" />
+
+                            <TextBlock
+                                Grid.Row="7"
+                                Grid.Column="0"
+                                Padding="0,0,0,8"
+                                Foreground="{ThemeResource SettingCardForeground}"
+                                Text="OS Architecture" />
+                            <TextBlock
+                                Grid.Row="7"
+                                Grid.Column="1"
+                                Padding="32,0,0,8"
+                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                Text="{x:Bind interopservices:RuntimeInformation.OSArchitecture}"
+                                TextWrapping="WrapWholeWords" />
+                        </Grid>
+                    </controls:SettingExpander>
+                </controls:SettingsGroup>
+                <controls:SettingsGroup Header="About">
+                    <controls:SettingExpander Header="{x:Bind Provider.VersionTextBlockText, Mode=OneWay}" Icon="&#xE117;">
+                        <controls:SettingExpander.Description>
+                            <ScrollViewer
+                                HorizontalScrollBarVisibility="Hidden"
+                                HorizontalScrollMode="Auto"
+                                VerticalScrollBarVisibility="Disabled"
+                                VerticalScrollMode="Disabled">
+                                <StackPanel Orientation="Horizontal" Spacing="4">
+                                    <HyperlinkButton
+                                        Content="Feedback"
+                                        NavigateUri="https://github.com/wherewhere/CoreAppUWP/issues"
+                                        ToolTipService.ToolTip="{Binding NavigateUri, RelativeSource={RelativeSource Mode=Self}}" />
+                                    <HyperlinkButton
+                                        Click="HyperlinkButton_Click"
+                                        Content="LogFolder"
+                                        Tag="Log Folder" />
+                                    <HyperlinkButton
+                                        Content="Release Notes"
+                                        NavigateUri="https://github.com/wherewhere/CoreAppUWP/releases/latest"
+                                        ToolTipService.ToolTip="{Binding NavigateUri, RelativeSource={RelativeSource Mode=Self}}" />
+                                </StackPanel>
+                            </ScrollViewer>
+                        </controls:SettingExpander.Description>
+                        <Grid Style="{StaticResource SettingExpanderContentGridStyle}">
+                            <cwuc:MarkdownTextBlock
+                                HorizontalAlignment="Left"
+                                Background="{ThemeResource SystemControlTransparentBrush}"
+                                LinkClicked="MarkdownText_LinkClicked"
+                                LinkForeground="{ThemeResource HyperlinkForeground}"
+                                Text="{Binding AboutTextBlockText, Mode=OneWay}" />
+                        </Grid>
+                    </controls:SettingExpander>
+                </controls:SettingsGroup>
+            </StackPanel>
+        </ScrollViewer>
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup>
+                <VisualState>
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="0" />
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="RootGrid.Padding" Value="20,52,0,0" />
+                    </VisualState.Setters>
+                </VisualState>
+                <VisualState>
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="{StaticResource Breakpoint640Plus}" />
+                    </VisualState.StateTriggers>
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
     </Grid>
 </Page>
