@@ -7,7 +7,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Windows.ApplicationModel.Core;
-using Windows.Foundation.Metadata;
 using Windows.UI.Core;
 
 // To learn more about WinUI, the WinUI project structure,
@@ -25,7 +24,12 @@ namespace CoreAppUWP.Pages
             ("Home", typeof(HomePage))
         ];
 
-        public MainPage() => InitializeComponent();
+        public MainPage()
+        {
+            Tiles.UpdateTile();
+            InitializeComponent();
+            NavigationView.PaneDisplayMode = NavigationViewPaneDisplayMode.Left;
+        }
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
@@ -33,7 +37,6 @@ namespace CoreAppUWP.Pages
             NavigationView_Navigate("Home", new EntranceNavigationTransitionInfo());
             SystemNavigationManager.GetForCurrentView().BackRequested += System_BackRequested;
             CoreApplication.GetCurrentView().TitleBar.LayoutMetricsChanged += TitleBar_LayoutMetricsChanged;
-            Tiles.UpdateTile();
         }
 
         protected override void OnNavigatedFrom(NavigationEventArgs e)
@@ -46,6 +49,14 @@ namespace CoreAppUWP.Pages
         private void TitleBar_LayoutMetricsChanged(CoreApplicationViewTitleBar sender, object args)
         {
             UpdateAppTitle(sender);
+        }
+
+        private void NavigationView_Loaded(object sender, RoutedEventArgs e)
+        {
+            // Add handler for ContentFrame navigation.
+            NavigationViewFrame.Navigated += On_Navigated;
+            NavigationView.SelectedItem = NavigationView.MenuItems[0];
+            NavigationView.PaneDisplayMode = NavigationViewPaneDisplayMode.Auto;
         }
 
         private void NavigationView_Navigate(string NavItemTag, NavigationTransitionInfo TransitionInfo, object vs = null)
@@ -132,15 +143,17 @@ namespace CoreAppUWP.Pages
 
         private void UpdateLeftPaddingColumn()
         {
-            LeftPaddingColumn.Width = NavigationView.DisplayMode == NavigationViewDisplayMode.Minimal
-                ? NavigationView.IsPaneOpen ? new GridLength(72)
-                : NavigationView.IsPaneToggleButtonVisible
-                    ? NavigationView.IsBackButtonVisible != NavigationViewBackButtonVisible.Collapsed
-                    ? new GridLength(88) : new GridLength(48)
-                        : NavigationView.IsBackButtonVisible != NavigationViewBackButtonVisible.Collapsed
-                        ? new GridLength(48) : new GridLength(0)
-                            : NavigationView.IsBackButtonVisible != NavigationViewBackButtonVisible.Collapsed
-                                ? new GridLength(48) : new GridLength(0);
+            LeftPaddingColumn.Width = NavigationView.IsBackButtonVisible == NavigationViewBackButtonVisible.Collapsed
+                ? NavigationView.DisplayMode == NavigationViewDisplayMode.Minimal
+                    ? NavigationView.IsPaneToggleButtonVisible
+                        ? new GridLength(32)
+                        : new GridLength(0)
+                    : new GridLength(0)
+                : NavigationView.DisplayMode == NavigationViewDisplayMode.Minimal
+                    ? NavigationView.IsPaneToggleButtonVisible
+                        ? new GridLength(72)
+                        : new GridLength(32)
+                    : NavigationView.IsPaneOpen ? new GridLength(32) : new GridLength(48);
         }
 
         private void NavigationViewControl_DisplayModeChanged(NavigationView sender, NavigationViewDisplayModeChangedEventArgs args)

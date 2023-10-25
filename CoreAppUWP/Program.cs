@@ -7,7 +7,6 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using Windows.ApplicationModel;
-using Windows.ApplicationModel.Core;
 using Windows.Data.Xml.Dom;
 using Windows.Management.Deployment;
 using Windows.Storage;
@@ -23,7 +22,7 @@ namespace CoreAppUWP
             ComWrappersSupport.InitializeComWrappers();
             Application.Start((p) =>
             {
-                DispatcherQueueSynchronizationContext context = new DispatcherQueueSynchronizationContext(DispatcherQueue.GetForCurrentThread());
+                DispatcherQueueSynchronizationContext context = new(DispatcherQueue.GetForCurrentThread());
                 SynchronizationContext.SetSynchronizationContext(context);
                 _ = new App();
             });

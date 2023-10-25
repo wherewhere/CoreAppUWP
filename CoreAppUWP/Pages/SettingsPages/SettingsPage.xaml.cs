@@ -10,9 +10,6 @@ namespace CoreAppUWP.Pages.SettingsPages
     /// </summary>
     public sealed partial class SettingsPage : Page
     {
-        public SettingsPage()
-        {
-            this.InitializeComponent();
-        }
+        public SettingsPage() => InitializeComponent();
     }
 }

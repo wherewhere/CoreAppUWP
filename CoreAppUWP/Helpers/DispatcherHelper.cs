@@ -158,7 +158,7 @@ namespace CoreAppUWP.Helpers
                 }
             }
 
-            TaskCompletionSource<object> taskCompletionSource = new TaskCompletionSource<object>();
+            TaskCompletionSource<object> taskCompletionSource = new();
 
             _ = dispatcher.RunAsync(priority, () =>
             {
@@ -206,7 +206,7 @@ namespace CoreAppUWP.Helpers
                 }
             }
 
-            TaskCompletionSource<T> taskCompletionSource = new TaskCompletionSource<T>();
+            TaskCompletionSource<T> taskCompletionSource = new();
 
             _ = dispatcher.RunAsync(priority, () =>
             {
@@ -256,7 +256,7 @@ namespace CoreAppUWP.Helpers
                 }
             }
 
-            TaskCompletionSource<object> taskCompletionSource = new TaskCompletionSource<object>();
+            TaskCompletionSource<object> taskCompletionSource = new();
 
             _ = dispatcher.RunAsync(priority, async () =>
             {
@@ -313,7 +313,7 @@ namespace CoreAppUWP.Helpers
                 }
             }
 
-            TaskCompletionSource<T> taskCompletionSource = new TaskCompletionSource<T>();
+            TaskCompletionSource<T> taskCompletionSource = new();
 
             _ = dispatcher.RunAsync(priority, async () =>
             {

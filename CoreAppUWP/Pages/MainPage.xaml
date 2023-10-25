@@ -63,6 +63,7 @@
             IsTabStop="False"
             IsTitleBarAutoPaddingEnabled="False"
             ItemInvoked="NavigationView_ItemInvoked"
+            Loaded="NavigationView_Loaded"
             PaneClosing="NavigationViewControl_PaneClosing"
             PaneOpening="NavigationViewControl_PaneOpening">
             <NavigationView.MenuItems>
