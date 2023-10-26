@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Windows.ApplicationModel;
@@ -18,7 +19,7 @@ using WinRT;
 
 namespace CoreAppUWP
 {
-    public partial class Program
+    public static class Program
     {
         private static unsafe bool IsPackagedApp
         {
@@ -62,6 +63,7 @@ namespace CoreAppUWP
             {
                 if (IsSupportCoreWindow)
                 {
+                    XamlCheckProcessRequirements();
                     Application.Start(p =>
                     {
                         DispatcherQueueSynchronizationContext context = new(DispatcherQueue.GetForCurrentThread());
@@ -95,5 +97,8 @@ namespace CoreAppUWP
                 }
             }
         }
+
+        [DllImport("Microsoft.UI.Xaml.dll")]
+        private static extern void XamlCheckProcessRequirements();
     }
 }
