@@ -1,20 +1,37 @@
-﻿using Microsoft.Toolkit.Uwp.Notifications;
+﻿using CoreAppUWP.Common;
+using Microsoft.Toolkit.Uwp.Notifications;
 using System;
+using System.Linq;
 using System.Runtime.InteropServices;
+using Windows.Data.Xml.Dom;
 using Windows.UI.Notifications;
 
 namespace CoreAppUWP.Helpers
 {
     public static class TilesHelper
     {
-        public static void UpdateTile() => CreateTile().UpdateTitle();
+        public static void UpdateTile() => CreateTile().GetXmlDocument().UpdateTitle();
 
-        private static void UpdateTitle(this TileContent tileContent)
+        private static void UpdateTitle(this XmlDocument xmlDocument)
         {
             TileUpdater tileUpdater = TileUpdateManager.CreateTileUpdaterForApplication();
             tileUpdater.Clear();
-            TileNotification tileNotification = new(tileContent.GetXml());
+            TileNotification tileNotification = new(xmlDocument);
             tileUpdater.Update(tileNotification);
+        }
+
+        private static XmlDocument GetXmlDocument(this TileContent tileContent)
+        {
+            XmlDocument xmlDocument = tileContent.GetXml();
+            int i = 1;
+            xmlDocument.GetElementsByTagName("binding")
+                       .FirstOrDefault(x => x.Attributes?.GetNamedItem("template")?.InnerText == "TileWide").ChildNodes
+                       .Where(x => x.NodeName == "text" && x.Attributes?.GetNamedItem("hint-style")?.InnerText == "captionSubtle")
+                       .OfType<XmlElement>()
+                       .Take(3)
+                       .ToArray()
+                       .ForEach(x => x.SetAttribute("id", $"{i++}"));
+            return xmlDocument;
         }
 
         private static TileContent CreateTile()

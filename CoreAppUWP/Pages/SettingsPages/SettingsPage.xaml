@@ -279,7 +279,10 @@
                     </controls:SettingExpander>
                 </controls:SettingsGroup>
                 <controls:SettingsGroup Header="About">
-                    <controls:SettingExpander Header="{x:Bind Provider.VersionTextBlockText, Mode=OneWay}" Icon="&#xE117;">
+                    <controls:SettingExpander Header="{x:Bind Provider.VersionTextBlockText, Mode=OneWay}">
+                        <controls:SettingExpander.Icon>
+                            <controls:AppLogo FontFamily="{StaticResource ContentControlThemeFontFamily}" />
+                        </controls:SettingExpander.Icon>
                         <controls:SettingExpander.Description>
                             <ScrollViewer
                                 HorizontalScrollBarVisibility="Hidden"

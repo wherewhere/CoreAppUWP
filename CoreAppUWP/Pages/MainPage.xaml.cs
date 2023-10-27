@@ -148,14 +148,14 @@ namespace CoreAppUWP.Pages
             LeftPaddingColumn.Width = NavigationView.IsBackButtonVisible == NavigationViewBackButtonVisible.Collapsed
                 ? NavigationView.DisplayMode == NavigationViewDisplayMode.Minimal
                     ? NavigationView.IsPaneToggleButtonVisible
-                        ? new GridLength(32)
+                        ? new GridLength(48)
                         : new GridLength(0)
                     : new GridLength(0)
                 : NavigationView.DisplayMode == NavigationViewDisplayMode.Minimal
                     ? NavigationView.IsPaneToggleButtonVisible
-                        ? new GridLength(72)
-                        : new GridLength(32)
-                    : NavigationView.IsPaneOpen ? new GridLength(32) : new GridLength(48);
+                        ? new GridLength(88)
+                        : new GridLength(44)
+                    : NavigationView.IsPaneOpen ? new GridLength(44) : new GridLength(60);
         }
 
         private void NavigationViewControl_DisplayModeChanged(NavigationView sender, NavigationViewDisplayModeChangedEventArgs args)
