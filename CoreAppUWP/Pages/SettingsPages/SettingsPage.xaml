@@ -12,6 +12,7 @@
     xmlns:settingspages="using:CoreAppUWP.ViewModels.SettingsPages"
     d:DataContext="{d:DesignInstance Type=settingspages:SettingsViewModel}"
     DataContext="{x:Bind Provider, Mode=OneWay}"
+    NavigationCacheMode="Enabled"
     mc:Ignorable="d">
     <Grid
         x:Name="RootGrid"
@@ -296,8 +297,8 @@
                                         ToolTipService.ToolTip="{Binding NavigateUri, RelativeSource={RelativeSource Mode=Self}}" />
                                     <HyperlinkButton
                                         Click="HyperlinkButton_Click"
-                                        Content="LogFolder"
-                                        Tag="Log Folder" />
+                                        Content="Log Folder"
+                                        Tag="LogFolder" />
                                     <HyperlinkButton
                                         Content="Release Notes"
                                         NavigateUri="https://github.com/wherewhere/CoreAppUWP/releases/latest"

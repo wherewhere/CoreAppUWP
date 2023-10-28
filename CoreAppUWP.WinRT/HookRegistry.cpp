@@ -4,8 +4,8 @@
 
 namespace winrt::CoreAppUWP::WinRT::implementation
 {
-	bool HookRegistry::IsHooked()
-	{
-		return true;
-	}
+    bool HookRegistry::IsHooked()
+    {
+        return true;
+    }
 }

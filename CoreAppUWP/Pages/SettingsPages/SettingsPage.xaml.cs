@@ -54,7 +54,6 @@ namespace CoreAppUWP.Pages.SettingsPages
         {
             base.OnNavigatedTo(e);
             Provider ??= SettingsViewModel.Caches.TryGetValue(DispatcherQueue, out SettingsViewModel provider) ? provider : new SettingsViewModel(DispatcherQueue);
-            DataContext = Provider;
             _ = Refresh();
         }
 

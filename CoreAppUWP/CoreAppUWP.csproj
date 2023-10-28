@@ -71,8 +71,4 @@
   <ItemGroup>
     <ProjectReference Include="..\CoreAppUWP.WinRT\CoreAppUWP.WinRT.vcxproj" />
   </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="Registry.dat" />
-  </ItemGroup>
 </Project>
