@@ -5,6 +5,8 @@ VisualStudioVersion = 17.4.33006.217
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CoreAppUWP", "CoreAppUWP\CoreAppUWP.csproj", "{86F40308-5864-4E45-98A4-336A5C404BC9}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CoreAppUWP.WinRT", "CoreAppUWP.WinRT\CoreAppUWP.WinRT.vcxproj", "{2F7E9384-91BE-4751-8322-C504B0F61AF2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|ARM64 = Debug|ARM64
@@ -33,6 +35,18 @@ Global
 		{86F40308-5864-4E45-98A4-336A5C404BC9}.Release|x86.ActiveCfg = Release|x86
 		{86F40308-5864-4E45-98A4-336A5C404BC9}.Release|x86.Build.0 = Release|x86
 		{86F40308-5864-4E45-98A4-336A5C404BC9}.Release|x86.Deploy.0 = Release|x86
+		{2F7E9384-91BE-4751-8322-C504B0F61AF2}.Debug|ARM64.ActiveCfg = Debug|ARM64EC
+		{2F7E9384-91BE-4751-8322-C504B0F61AF2}.Debug|ARM64.Build.0 = Debug|ARM64EC
+		{2F7E9384-91BE-4751-8322-C504B0F61AF2}.Debug|x64.ActiveCfg = Debug|x64
+		{2F7E9384-91BE-4751-8322-C504B0F61AF2}.Debug|x64.Build.0 = Debug|x64
+		{2F7E9384-91BE-4751-8322-C504B0F61AF2}.Debug|x86.ActiveCfg = Debug|Win32
+		{2F7E9384-91BE-4751-8322-C504B0F61AF2}.Debug|x86.Build.0 = Debug|Win32
+		{2F7E9384-91BE-4751-8322-C504B0F61AF2}.Release|ARM64.ActiveCfg = Release|ARM64
+		{2F7E9384-91BE-4751-8322-C504B0F61AF2}.Release|ARM64.Build.0 = Release|ARM64
+		{2F7E9384-91BE-4751-8322-C504B0F61AF2}.Release|x64.ActiveCfg = Release|x64
+		{2F7E9384-91BE-4751-8322-C504B0F61AF2}.Release|x64.Build.0 = Release|x64
+		{2F7E9384-91BE-4751-8322-C504B0F61AF2}.Release|x86.ActiveCfg = Release|Win32
+		{2F7E9384-91BE-4751-8322-C504B0F61AF2}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

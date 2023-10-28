@@ -12,7 +12,7 @@
 | [CS/WinRT for UWP](https://github.com/gus33000/CsUWP "CsUWP") | [Gustave Monce](https://github.com/gus33000 "@gus33000") |
 | [Windows.SDK.NET.Ref for UWP](https://github.com/dongle-the-gadget/CsWinRTProjectionForWindows "CsWinRTProjectionForWindows") | [Dongle](https://github.com/dongle-the-gadget "@dongle-the-gadget") |
 | [XAML build tool for UWP](https://www.nuget.org/packages/WindowsXaml.ModernDotNet.BuildTools "WindowsXaml.ModernDotNet.BuildTools") | [Ahmed Walid](https://github.com/ahmed605 "@ahmed605") |
-| [Windows App SDK on UWP](https://github.com/driver1998/NetCoreApp "NetCoreApp") | [初生之鸟](https://github.com/driver1998 "@driver1998") |
+| [Windows App SDK on UWP](https://github.com/driver1998/HookCoreAppWinUI "HookCoreAppWinUI") | [初生之鸟](https://github.com/driver1998 "@driver1998") |
 
 ##### Contributors
 - [wherewhere](https://github.com/wherewhere)

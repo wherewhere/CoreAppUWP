@@ -1,4 +1,5 @@
-﻿using Microsoft.UI.Dispatching;
+﻿using CoreAppUWP.WinRT;
+using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.Win32;
 using System;
@@ -46,7 +47,7 @@ namespace CoreAppUWP
                 try
                 {
                     RegistryKey registryKey = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\WinUI\Xaml");
-                    return registryKey.GetValue("EnableUWPWindow") is int value && value > 0;
+                    return registryKey?.GetValue("EnableUWPWindow") is int value && value > 0;
                 }
                 catch
                 {
@@ -61,7 +62,7 @@ namespace CoreAppUWP
             ComWrappersSupport.InitializeComWrappers();
             if (IsPackagedApp)
             {
-                if (IsSupportCoreWindow)
+                if (IsSupportCoreWindow || HookRegistry.IsHooked)
                 {
                     XamlCheckProcessRequirements();
                     Application.Start(p =>
