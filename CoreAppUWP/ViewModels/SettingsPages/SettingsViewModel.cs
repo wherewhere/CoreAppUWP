@@ -9,7 +9,6 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
@@ -95,7 +94,7 @@ namespace CoreAppUWP.ViewModels.SettingsPages
 
         protected static async void RaisePropertyChangedEvent(params string[] names)
         {
-            if (names?.Any() == true)
+            if (names != null)
             {
                 foreach (KeyValuePair<DispatcherQueue, SettingsViewModel> cache in Caches)
                 {

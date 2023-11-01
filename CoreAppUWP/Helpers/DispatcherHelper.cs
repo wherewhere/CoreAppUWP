@@ -136,10 +136,7 @@ namespace CoreAppUWP.Helpers
         /// <remarks>If the current thread has UI access, <paramref name="function"/> will be invoked directly.</remarks>
         public static Task AwaitableRunAsync(this CoreDispatcher dispatcher, Action function, CoreDispatcherPriority priority = CoreDispatcherPriority.Normal)
         {
-            if (function is null)
-            {
-                throw new ArgumentNullException(nameof(function));
-            }
+            ArgumentNullException.ThrowIfNull(function);
 
             /* Run the function directly when we have thread access.
              * Also reuse Task.CompletedTask in case of success,
@@ -188,10 +185,7 @@ namespace CoreAppUWP.Helpers
         /// <remarks>If the current thread has UI access, <paramref name="function"/> will be invoked directly.</remarks>
         public static Task<T> AwaitableRunAsync<T>(this CoreDispatcher dispatcher, Func<T> function, CoreDispatcherPriority priority = CoreDispatcherPriority.Normal)
         {
-            if (function is null)
-            {
-                throw new ArgumentNullException(nameof(function));
-            }
+            ArgumentNullException.ThrowIfNull(function);
 
             // Skip the dispatch, if possible
             if (dispatcher.HasThreadAccess)
@@ -233,10 +227,7 @@ namespace CoreAppUWP.Helpers
         /// <remarks>If the current thread has UI access, <paramref name="function"/> will be invoked directly.</remarks>
         public static Task AwaitableRunAsync(this CoreDispatcher dispatcher, Func<Task> function, CoreDispatcherPriority priority = CoreDispatcherPriority.Normal)
         {
-            if (function is null)
-            {
-                throw new ArgumentNullException(nameof(function));
-            }
+            ArgumentNullException.ThrowIfNull(function);
 
             /* If we have thread access, we can retrieve the task directly.
              * We don't use ConfigureAwait(false) in this case, in order
@@ -293,10 +284,7 @@ namespace CoreAppUWP.Helpers
         /// <remarks>If the current thread has UI access, <paramref name="function"/> will be invoked directly.</remarks>
         public static Task<T> AwaitableRunAsync<T>(this CoreDispatcher dispatcher, Func<Task<T>> function, CoreDispatcherPriority priority = CoreDispatcherPriority.Normal)
         {
-            if (function is null)
-            {
-                throw new ArgumentNullException(nameof(function));
-            }
+            ArgumentNullException.ThrowIfNull(function);
 
             // Skip the dispatch, if possible
             if (dispatcher.HasThreadAccess)

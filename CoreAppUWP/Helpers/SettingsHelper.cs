@@ -14,7 +14,6 @@ namespace CoreAppUWP.Helpers
 {
     public static partial class SettingsHelper
     {
-        public const string UpdateDate = nameof(UpdateDate);
         public const string SelectedAppTheme = nameof(SelectedAppTheme);
         public const string IsExtendsTitleBar = nameof(IsExtendsTitleBar);
 
@@ -25,10 +24,6 @@ namespace CoreAppUWP.Helpers
 
         public static void SetDefaultSettings()
         {
-            if (!LocalObject.KeyExists(UpdateDate))
-            {
-                LocalObject.Save(UpdateDate, new DateTime());
-            }
             if (!LocalObject.KeyExists(SelectedAppTheme))
             {
                 LocalObject.Save(SelectedAppTheme, ElementTheme.Default);
@@ -61,8 +56,16 @@ namespace CoreAppUWP.Helpers
 
     public class SystemTextJsonObjectSerializer : IObjectSerializer
     {
-        public string Serialize<T>(T value) => JsonSerializer.Serialize(value);
+        public string Serialize<T>(T value)
+        {
+            try { return JsonSerializer.Serialize(value); }
+            catch { return string.Empty; }
+        }
 
-        public T Deserialize<T>(string value) => JsonSerializer.Deserialize<T>(value);
+        public T Deserialize<T>(string value)
+        {
+            try { return JsonSerializer.Deserialize<T>(value); }
+            catch { return default; }
+        }
     }
 }
