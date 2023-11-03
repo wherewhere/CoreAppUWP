@@ -79,15 +79,11 @@ namespace CoreAppUWP.ViewModels.SettingsPages
             {
                 foreach (KeyValuePair<DispatcherQueue, SettingsViewModel> cache in Caches)
                 {
-                    try
+                    if (cache.Key?.HasThreadAccess == false)
                     {
-                        if (cache.Key is DispatcherQueue dispatcher && dispatcher?.HasThreadAccess != false)
-                        {
-                            await cache.Key.ResumeForegroundAsync();
-                        }
-                        cache.Value.PropertyChanged?.Invoke(cache.Value, new PropertyChangedEventArgs(name));
+                        await cache.Key.ResumeForegroundAsync();
                     }
-                    catch { }
+                    cache.Value.PropertyChanged?.Invoke(cache.Value, new PropertyChangedEventArgs(name));
                 }
             }
         }
@@ -98,15 +94,11 @@ namespace CoreAppUWP.ViewModels.SettingsPages
             {
                 foreach (KeyValuePair<DispatcherQueue, SettingsViewModel> cache in Caches)
                 {
-                    try
+                    if (cache.Key?.HasThreadAccess == false)
                     {
-                        if (cache.Key?.HasThreadAccess == false)
-                        {
-                            await cache.Key.ResumeForegroundAsync();
-                        }
-                        names.ForEach(name => cache.Value.PropertyChanged?.Invoke(cache.Value, new PropertyChangedEventArgs(name)));
+                        await cache.Key.ResumeForegroundAsync();
                     }
-                    catch { }
+                    names.ForEach(name => cache.Value.PropertyChanged?.Invoke(cache.Value, new PropertyChangedEventArgs(name)));
                 }
             }
         }

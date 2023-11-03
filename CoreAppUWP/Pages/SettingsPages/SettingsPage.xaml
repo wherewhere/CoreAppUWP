@@ -312,7 +312,7 @@
                                 Background="{ThemeResource SystemControlTransparentBrush}"
                                 LinkClicked="MarkdownText_LinkClicked"
                                 LinkForeground="{ThemeResource HyperlinkForeground}"
-                                Text="{Binding AboutTextBlockText, Mode=OneWay}" />
+                                Text="{x:Bind Provider.AboutTextBlockText, Mode=OneWay}" />
                         </Grid>
                     </controls:SettingExpander>
                 </controls:SettingsGroup>
