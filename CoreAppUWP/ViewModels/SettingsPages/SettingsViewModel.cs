@@ -81,7 +81,7 @@ namespace CoreAppUWP.ViewModels.SettingsPages
                 {
                     try
                     {
-                        if (cache.Key is DispatcherQueue dispatcher && dispatcher?.HasThreadAccess != false)
+                        if (cache.Key is DispatcherQueue dispatcher && dispatcher?.HasThreadAccess == false)
                         {
                             await cache.Key.ResumeForegroundAsync();
                         }
