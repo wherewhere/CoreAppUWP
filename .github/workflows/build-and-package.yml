@@ -3,12 +3,11 @@ name: build and package
 on:
   push:
     branches: [main]
-    paths:
-    - 'CoreAppUWP**'
   pull_request:
     branches: [main]
     paths:
-    - 'CoreAppUWP**'
+      - '.github/workflows/build-and-package.yml'
+      - 'CoreAppUWP**'
   workflow_dispatch:
 
 env:

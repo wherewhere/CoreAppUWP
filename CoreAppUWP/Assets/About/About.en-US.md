@@ -15,7 +15,8 @@
 | [Windows App SDK on UWP](https://github.com/driver1998/HookCoreAppWinUI "HookCoreAppWinUI") | [初生之鸟](https://github.com/driver1998 "@driver1998") |
 
 ##### Contributors
-- [wherewhere](https://github.com/wherewhere)
+- [wherewhere](https://github.com/wherewhere "@wherewhere")
+- [Claris](https://github.com/Clrs17 "@Clrs17")
 
 ##### Citations and References
 - [MetroLog](https://github.com/novotnyllc/MetroLog "MetroLog")
