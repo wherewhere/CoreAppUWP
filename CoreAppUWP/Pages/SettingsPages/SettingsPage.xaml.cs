@@ -2,6 +2,7 @@ using CommunityToolkit.WinUI.UI.Controls;
 using CoreAppUWP.Common;
 using CoreAppUWP.Helpers;
 using CoreAppUWP.ViewModels.SettingsPages;
+using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media.Animation;
@@ -89,6 +90,13 @@ namespace CoreAppUWP.Pages.SettingsPages
                         ThemeHelper.Initialize(window);
                         _ = _frame.Navigate(typeof(MainPage), null, new DrillInNavigationTransitionInfo());
                     });
+
+
+                    break;
+                case "NewDesktopWindow":
+                    var window = AppWindow.Create();
+                    window.Show();
+                    window.Closing += Window_Closing;
                     break;
                 case "SearchFlyout" when SettingsPaneRegister.IsSearchPaneSupported:
                     SearchPane.GetForCurrentView().Show();
@@ -99,6 +107,11 @@ namespace CoreAppUWP.Pages.SettingsPages
                 default:
                     break;
             }
+        }
+
+        private void Window_Closing(AppWindow sender, AppWindowClosingEventArgs args)
+        {
+            sender.Destroy();
         }
 
         private async void HyperlinkButton_Click(object sender, RoutedEventArgs e)

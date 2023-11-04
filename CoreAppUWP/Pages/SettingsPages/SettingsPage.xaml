@@ -79,11 +79,19 @@
                     <controls:Setting
                         ActionIcon="&#xE8A7;"
                         Click="Button_Click"
-                        Description="Create a new window."
+                        Description="Create a new UWP window."
                         Header="Multiple Window"
                         Icon="&#xE78B;"
                         IsClickEnabled="True"
                         Tag="NewWindow" />
+                    <controls:Setting
+                        ActionIcon="&#xE8A7;"
+                        Click="Button_Click"
+                        Description="Create a new desktop window."
+                        Header="Desktop Window"
+                        Icon="&#xE78B;"
+                        IsClickEnabled="True"
+                        Tag="NewDesktopWindow" />
                     <controls:Setting
                         x:Name="SettingsFlyoutSettings"
                         x:Load="{x:Bind common:SettingsPaneRegister.IsSettingsPaneSupported}"
