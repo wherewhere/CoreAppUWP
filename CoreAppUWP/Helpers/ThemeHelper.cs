@@ -223,7 +223,6 @@ namespace CoreAppUWP.Helpers
                 {
                     await window.Dispatcher.ResumeForegroundAsync();
                 }
-
                 CoreApplication.GetCurrentView().TitleBar.ExtendViewIntoTitleBar = IsExtendsTitleBar;
             });
         }

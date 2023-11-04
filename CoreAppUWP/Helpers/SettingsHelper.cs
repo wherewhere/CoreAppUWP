@@ -2,7 +2,6 @@
 using MetroLog;
 using MetroLog.Targets;
 using Microsoft.UI.Xaml;
-using System;
 using System.IO;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -15,6 +14,7 @@ namespace CoreAppUWP.Helpers
     public static partial class SettingsHelper
     {
         public const string SelectedAppTheme = nameof(SelectedAppTheme);
+        public const string SelectedBackdrop = nameof(SelectedBackdrop);
         public const string IsExtendsTitleBar = nameof(IsExtendsTitleBar);
 
         public static Type Get<Type>(string key) => LocalObject.Read<Type>(key);
@@ -27,6 +27,10 @@ namespace CoreAppUWP.Helpers
             if (!LocalObject.KeyExists(SelectedAppTheme))
             {
                 LocalObject.Save(SelectedAppTheme, ElementTheme.Default);
+            }
+            if (!LocalObject.KeyExists(SelectedBackdrop))
+            {
+                LocalObject.Save(SelectedBackdrop, BackdropType.Mica);
             }
             if (!LocalObject.KeyExists(IsExtendsTitleBar))
             {
