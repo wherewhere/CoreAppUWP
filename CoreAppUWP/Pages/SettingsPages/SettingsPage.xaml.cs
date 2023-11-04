@@ -2,16 +2,20 @@ using CommunityToolkit.WinUI.UI.Controls;
 using CoreAppUWP.Common;
 using CoreAppUWP.Helpers;
 using CoreAppUWP.ViewModels.SettingsPages;
+using Microsoft.UI;
+using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Navigation;
 using System;
 using System.Threading.Tasks;
+using Windows.ApplicationModel;
 using Windows.ApplicationModel.Core;
 using Windows.ApplicationModel.Search;
 using Windows.Storage;
 using Windows.System;
+using Windows.UI;
 using Windows.UI.ApplicationSettings;
 using Windows.UI.ViewManagement;
 
@@ -90,6 +94,25 @@ namespace CoreAppUWP.Pages.SettingsPages
                         _ = _frame.Navigate(typeof(MainPage), null, new DrillInNavigationTransitionInfo());
                         BackdropHelper.SetBackdrop(window, SettingsHelper.Get<BackdropType>(SettingsHelper.SelectedBackdrop));
                     });
+                    break;
+                case "NewAppWindow":
+                    AppWindow window = AppWindow.Create();
+                    window.Closing += (sender, args) => sender.Destroy();
+                    if (AppWindowTitleBar.IsCustomizationSupported())
+                    {
+                        AppWindowTitleBar TitleBar = window.TitleBar;
+
+                        Color ForegroundColor = Colors.Black;
+                        Color BackgroundColor = Colors.White;
+
+                        TitleBar.ExtendsContentIntoTitleBar = true;
+                        TitleBar.ForegroundColor = TitleBar.ButtonForegroundColor = ForegroundColor;
+                        TitleBar.BackgroundColor = TitleBar.InactiveBackgroundColor = BackgroundColor;
+                        TitleBar.ButtonBackgroundColor = TitleBar.ButtonInactiveBackgroundColor = Colors.Transparent;
+                    }
+                    window.Title = Package.Current.DisplayName;
+                    window.SetIcon("favicon.ico");
+                    window.Show();
                     break;
                 case "SearchFlyout" when SettingsPaneRegister.IsSearchPaneSupported:
                     SearchPane.GetForCurrentView().Show();

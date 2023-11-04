@@ -72,4 +72,8 @@
   <ItemGroup>
     <ProjectReference Include="..\CoreAppUWP.WinRT\CoreAppUWP.WinRT.vcxproj" />
   </ItemGroup>
+	
+  <ItemGroup>
+    <Content Include="favicon.ico" />
+  </ItemGroup>
 </Project>
