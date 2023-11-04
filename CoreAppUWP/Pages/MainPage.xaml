@@ -17,9 +17,7 @@
             IsHitTestVisible="True">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition x:Name="LeftPaddingColumn" Width="0" />
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition x:Name="DragColumn" Width="*"/>
                 <ColumnDefinition x:Name="RightPaddingColumn" Width="0" />
             </Grid.ColumnDefinitions>
             <Grid.ChildrenTransitions>
@@ -57,7 +55,7 @@
             <Grid
                 x:Name="DragRegion"
                 Grid.Column="1"
-                Grid.ColumnSpan="3"
+                Loaded="DragRegion_Loaded"
                 Background="{ThemeResource SystemControlTransparentBrush}" />
         </Grid>
         <NavigationView
