@@ -3,12 +3,19 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Windows.Foundation.Metadata;
+using Windows.Graphics.Display;
 
 namespace CoreAppUWP.Helpers
 {
     public static class UIHelper
     {
         public static bool HasStatusBar => ApiInformation.IsTypePresent("Windows.UI.ViewManagement.StatusBar");
+
+        public static int GetActualPixel(this double pixel)
+        {
+            double currentDpi = DisplayInformation.GetForCurrentView().RawPixelsPerViewPixel;
+            return Convert.ToInt32(pixel * currentDpi);
+        }
 
         public static string ExceptionToMessage(this Exception ex)
         {

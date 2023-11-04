@@ -16,7 +16,8 @@
             Height="48"
             VerticalAlignment="Top"
             Canvas.ZIndex="1"
-            IsHitTestVisible="True">
+            IsHitTestVisible="True"
+            SizeChanged="CustomTitleBar_SizeChanged">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition x:Name="LeftPaddingColumn" Width="0" />
                 <ColumnDefinition Width="Auto" />
@@ -56,10 +57,12 @@
                     TextTrimming="CharacterEllipsis"
                     TextWrapping="NoWrap" />
             </Grid>
-            <Grid
+            <Border
                 x:Name="DragRegion"
                 Grid.Column="1"
-                Grid.ColumnSpan="3"
+                Grid.ColumnSpan="4"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Stretch"
                 Background="{ThemeResource SystemControlTransparentBrush}" />
         </Grid>
         <NavigationView

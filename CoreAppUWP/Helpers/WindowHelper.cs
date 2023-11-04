@@ -1,4 +1,6 @@
 ﻿using CoreAppUWP.Common;
+using Microsoft.UI;
+using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using System;
 using System.Collections.Generic;
@@ -6,6 +8,9 @@ using System.Threading.Tasks;
 using Windows.ApplicationModel.Core;
 using Windows.UI.Core;
 using Windows.UI.ViewManagement;
+using Windows.Win32.Foundation;
+using Windows.Win32.System.WinRT;
+using WinRT;
 
 namespace CoreAppUWP.Helpers
 {
@@ -48,6 +53,24 @@ namespace CoreAppUWP.Helpers
             }
         }
 
+        public static AppWindow GetAppWindow(this CoreWindow window)
+        {
+            if (!ActiveAppWindows.TryGetValue(window, out AppWindow appWindow))
+            {
+                HWND handle = window.As<ICoreWindowInterop>().WindowHandle;
+                WindowId id = Win32Interop.GetWindowIdFromWindow(handle);
+                appWindow = AppWindow.GetFromWindowId(id);
+                window.Closed += (sender, args) =>
+                {
+                    ActiveAppWindows.Remove(window);
+                    window = null;
+                };
+                ActiveAppWindows[window] = appWindow;
+            }
+            return appWindow;
+        }
+
         public static Dictionary<CoreDispatcher, Window> ActiveWindows { get; } = [];
+        public static Dictionary<CoreWindow, AppWindow> ActiveAppWindows { get; } = [];
     }
 }

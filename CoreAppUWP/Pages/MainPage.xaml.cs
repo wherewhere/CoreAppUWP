@@ -8,7 +8,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Windows.ApplicationModel.Core;
+using Windows.Graphics;
 using Windows.UI.Core;
+
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -179,6 +181,12 @@ namespace CoreAppUWP.Pages
             {
                 e.Handled = TryGoBack();
             }
+        }
+
+        private void CustomTitleBar_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            RectInt32 Rect = new((ActualWidth - DragRegion.ActualWidth).GetActualPixel(), 0, DragRegion.ActualWidth.GetActualPixel(), DragRegion.ActualHeight.GetActualPixel());
+            Window.Current.CoreWindow.GetAppWindow().TitleBar.SetDragRectangles([Rect]);
         }
     }
 }
