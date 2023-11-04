@@ -37,6 +37,7 @@ namespace CoreAppUWP.Pages
         {
             base.OnNavigatedTo(e);
             NavigationView_Navigate("Home", new EntranceNavigationTransitionInfo());
+            BackdropHelper.AddBackdropTypeChanged(Window.Current, OnBackdropTypeChanged);
             SystemNavigationManager.GetForCurrentView().BackRequested += System_BackRequested;
             CoreApplication.GetCurrentView().TitleBar.LayoutMetricsChanged += TitleBar_LayoutMetricsChanged;
         }
@@ -44,9 +45,12 @@ namespace CoreAppUWP.Pages
         protected override void OnNavigatedFrom(NavigationEventArgs e)
         {
             base.OnNavigatedFrom(e);
+            BackdropHelper.RemoveBackdropTypeChanged(Window.Current, OnBackdropTypeChanged);
             SystemNavigationManager.GetForCurrentView().BackRequested -= System_BackRequested;
             CoreApplication.GetCurrentView().TitleBar.LayoutMetricsChanged -= TitleBar_LayoutMetricsChanged;
         }
+
+        private void OnBackdropTypeChanged(BackdropType? args) => RootBackground.Opacity = args is null or BackdropType.DefaultColor ? 1 : 0;
 
         private void TitleBar_LayoutMetricsChanged(CoreApplicationViewTitleBar sender, object args)
         {

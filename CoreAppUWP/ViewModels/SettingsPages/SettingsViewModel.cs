@@ -49,6 +49,20 @@ namespace CoreAppUWP.ViewModels.SettingsPages
             }
         }
 
+        public static int SelectedBackdrop
+        {
+            get => (int)SettingsHelper.Get<BackdropType>(SettingsHelper.SelectedBackdrop);
+            set
+            {
+                if (SelectedBackdrop != value)
+                {
+                    BackdropType type = (BackdropType)value;
+                    SettingsHelper.Set(SettingsHelper.SelectedBackdrop, type);
+                    BackdropHelper.SetAllBackdrop(type);
+                }
+            }
+        }
+
         public bool IsExtendsTitleBar
         {
             get => CoreApplication.GetCurrentView().TitleBar.ExtendViewIntoTitleBar;
