@@ -24,8 +24,8 @@ namespace CoreAppUWP.Helpers
             int newViewId = await newView.Dispatcher.AwaitableRunAsync(() =>
             {
                 Window newWindow = Window.Current;
-                launched(newWindow);
                 newWindow.TrackWindow();
+                launched(newWindow);
                 Window.Current.Activate();
                 return ApplicationView.GetForCurrentView().Id;
             });
@@ -44,6 +44,7 @@ namespace CoreAppUWP.Helpers
                     window = null;
                 };
                 ActiveWindows[window.Dispatcher] = window;
+                BackdropHelper.RegisterWindow(window);
             }
         }
 

@@ -20,7 +20,7 @@ using WinRT;
 
 namespace CoreAppUWP
 {
-    public static class Program
+    public static partial class Program
     {
         private static unsafe bool IsPackagedApp
         {
@@ -99,7 +99,7 @@ namespace CoreAppUWP
             }
         }
 
-        [DllImport("Microsoft.UI.Xaml.dll")]
-        private static extern void XamlCheckProcessRequirements();
+        [LibraryImport("Microsoft.UI.Xaml.dll")]
+        private static partial void XamlCheckProcessRequirements();
     }
 }

@@ -88,6 +88,7 @@ namespace CoreAppUWP.Pages.SettingsPages
                         window.Content = _frame;
                         ThemeHelper.Initialize(window);
                         _ = _frame.Navigate(typeof(MainPage), null, new DrillInNavigationTransitionInfo());
+                        BackdropHelper.SetBackdrop(window, SettingsHelper.Get<BackdropType>(SettingsHelper.SelectedBackdrop));
                     });
                     break;
                 case "SearchFlyout" when SettingsPaneRegister.IsSearchPaneSupported:

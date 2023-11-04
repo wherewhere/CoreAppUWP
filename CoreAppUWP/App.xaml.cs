@@ -49,9 +49,10 @@ namespace CoreAppUWP
             }
 
             Window window = Window.Current;
+            WindowHelper.TrackWindow(window);
 
-            // ²»ÒªÔÚ´°¿ÚÒÑ°üº¬ÄÚÈİÊ±ÖØ¸´Ó¦ÓÃ³ÌĞò³õÊ¼»¯£¬
-            // Ö»ĞèÈ·±£´°¿Ú´¦ÓÚ»î¶¯×´Ì¬
+            // ä¸è¦åœ¨çª—å£å·²åŒ…å«å†…å®¹æ—¶é‡å¤åº”ç”¨ç¨‹åºåˆå§‹åŒ–ï¼Œ
+            // åªéœ€ç¡®ä¿çª—å£å¤„äºæ´»åŠ¨çŠ¶æ€
             if (window.Content is not Frame rootFrame)
             {
                 if (SettingsHelper.Get<bool>(SettingsHelper.IsExtendsTitleBar))
@@ -59,20 +60,19 @@ namespace CoreAppUWP
                     CoreApplication.GetCurrentView().TitleBar.ExtendViewIntoTitleBar = true;
                 }
 
-                // ´´½¨Òª³äµ±µ¼º½ÉÏÏÂÎÄµÄ¿ò¼Ü£¬²¢µ¼º½µ½µÚÒ»Ò³
+                // åˆ›å»ºè¦å……å½“å¯¼èˆªä¸Šä¸‹æ–‡çš„æ¡†æ¶ï¼Œå¹¶å¯¼èˆªåˆ°ç¬¬ä¸€é¡µ
                 rootFrame = new Frame();
 
                 rootFrame.NavigationFailed += OnNavigationFailed;
 
                 if (e.UWPLaunchActivatedEventArgs.PreviousExecutionState == Windows.ApplicationModel.Activation.ApplicationExecutionState.Terminated)
                 {
-                    //TODO: ´ÓÖ®Ç°¹ÒÆğµÄÓ¦ÓÃ³ÌĞò¼ÓÔØ×´Ì¬
+                    //TODO: ä»ä¹‹å‰æŒ‚èµ·çš„åº”ç”¨ç¨‹åºåŠ è½½çŠ¶æ€
                 }
 
-                // ½«¿ò¼Ü·ÅÔÚµ±Ç°´°¿ÚÖĞ
+                // å°†æ¡†æ¶æ”¾åœ¨å½“å‰çª—å£ä¸­
                 window.Content = rootFrame;
 
-                WindowHelper.TrackWindow(window);
                 ThemeHelper.Initialize();
             }
 
@@ -87,21 +87,22 @@ namespace CoreAppUWP
 
             if (rootFrame.Content == null)
             {
-                // µ±µ¼º½¶ÑÕ»ÉĞÎ´»¹Ô­Ê±£¬µ¼º½µ½µÚÒ»Ò³£¬
-                // ²¢Í¨¹ı½«ËùĞèĞÅÏ¢×÷Îªµ¼º½²ÎÊı´«ÈëÀ´ÅäÖÃ
-                // ²ÎÊı
+                // å½“å¯¼èˆªå †æ ˆå°šæœªè¿˜åŸæ—¶ï¼Œå¯¼èˆªåˆ°ç¬¬ä¸€é¡µï¼Œ
+                // å¹¶é€šè¿‡å°†æ‰€éœ€ä¿¡æ¯ä½œä¸ºå¯¼èˆªå‚æ•°ä¼ å…¥æ¥é…ç½®
+                // å‚æ•°
                 rootFrame.Navigate(typeof(MainPage), e);
+                BackdropHelper.SetBackdrop(window, SettingsHelper.Get<BackdropType>(SettingsHelper.SelectedBackdrop));
             }
 
-            // È·±£µ±Ç°´°¿Ú´¦ÓÚ»î¶¯×´Ì¬
+            // ç¡®ä¿å½“å‰çª—å£å¤„äºæ´»åŠ¨çŠ¶æ€
             window.Activate();
         }
 
         /// <summary>
-        /// µ¼º½µ½ÌØ¶¨Ò³Ê§°ÜÊ±µ÷ÓÃ
+        /// å¯¼èˆªåˆ°ç‰¹å®šé¡µå¤±è´¥æ—¶è°ƒç”¨
         /// </summary>
-        ///<param name="sender">µ¼º½Ê§°ÜµÄ¿ò¼Ü</param>
-        ///<param name="e">ÓĞ¹Øµ¼º½Ê§°ÜµÄÏêÏ¸ĞÅÏ¢</param>
+        ///<param name="sender">å¯¼èˆªå¤±è´¥çš„æ¡†æ¶</param>
+        ///<param name="e">æœ‰å…³å¯¼èˆªå¤±è´¥çš„è¯¦ç»†ä¿¡æ¯</param>
         private void OnNavigationFailed(object sender, NavigationFailedEventArgs e)
         {
             throw new Exception("Failed to load Page " + e.SourcePageType.FullName);

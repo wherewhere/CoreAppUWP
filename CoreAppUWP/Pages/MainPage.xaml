@@ -5,9 +5,11 @@
     xmlns:controls="using:CoreAppUWP.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
     NavigationCacheMode="Enabled"
     mc:Ignorable="d">
+    <Page.Background>
+        <SolidColorBrush x:Name="RootBackground" Color="{ThemeResource SolidBackgroundFillColorBase}" />
+    </Page.Background>
     <Grid>
         <Grid
             x:Name="AppTitleBar"
