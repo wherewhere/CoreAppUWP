@@ -24,7 +24,7 @@ namespace CoreAppUWP.Pages
         [
             ("Home", typeof(HomePage))
         ];
-        private AppWindow m_AppWindow;
+
         public MainPage()
         {
             InitializeComponent();
@@ -39,8 +39,7 @@ namespace CoreAppUWP.Pages
             NavigationView_Navigate("Home", new EntranceNavigationTransitionInfo());
             SystemNavigationManager.GetForCurrentView().BackRequested += System_BackRequested;
             CoreApplication.GetCurrentView().TitleBar.LayoutMetricsChanged += TitleBar_LayoutMetricsChanged;
-            m_AppWindow = GetAppWindowForCurrentWindow();
-            m_AppWindow.Closing += M_AppWindow_Closing;
+
         }
 
         private void Current_Closed(object sender, WindowEventArgs args)
