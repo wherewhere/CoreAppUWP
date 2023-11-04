@@ -16,10 +16,13 @@
             Height="48"
             VerticalAlignment="Top"
             Canvas.ZIndex="1"
-            IsHitTestVisible="True">
+            IsHitTestVisible="True"
+            SizeChanged="CustomTitleBar_SizeChanged">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition x:Name="LeftPaddingColumn" Width="0" />
-                <ColumnDefinition x:Name="DragColumn" Width="*"/>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
                 <ColumnDefinition x:Name="RightPaddingColumn" Width="0" />
             </Grid.ColumnDefinitions>
             <Grid.ChildrenTransitions>
@@ -54,10 +57,12 @@
                     TextTrimming="CharacterEllipsis"
                     TextWrapping="NoWrap" />
             </Grid>
-            <Grid
+            <Border
                 x:Name="DragRegion"
                 Grid.Column="1"
-                Loaded="DragRegion_Loaded"
+                Grid.ColumnSpan="4"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Stretch"
                 Background="{ThemeResource SystemControlTransparentBrush}" />
         </Grid>
         <NavigationView

@@ -1,7 +1,5 @@
 ﻿using CoreAppUWP.Helpers;
 using CoreAppUWP.Pages.SettingsPages;
-using Microsoft.UI;
-using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media.Animation;
@@ -10,11 +8,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Windows.ApplicationModel.Core;
+using Windows.Graphics;
 using Windows.UI.Core;
-using Windows.Win32.System.WinRT;
-using WinRT.Interop;
-using WinRT;
-using System.Runtime.InteropServices;
 
 
 // To learn more about WinUI, the WinUI project structure,
@@ -187,65 +182,11 @@ namespace CoreAppUWP.Pages
                 e.Handled = TryGoBack();
             }
         }
-        [DllImport("Shcore.dll", SetLastError = true)]
-        internal static extern int GetDpiForMonitor(IntPtr hmonitor, Monitor_DPI_Type dpiType, out uint dpiX, out uint dpiY);
 
-        internal enum Monitor_DPI_Type : int
+        private void CustomTitleBar_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            MDT_Effective_DPI = 0,
-            MDT_Angular_DPI = 1,
-            MDT_Raw_DPI = 2,
-            MDT_Default = MDT_Effective_DPI
-        }
-
-        private double GetScaleAdjustment(IntPtr hWnd)
-        {
-            WindowId wndId = Win32Interop.GetWindowIdFromWindow(hWnd);
-            DisplayArea displayArea = DisplayArea.GetFromWindowId(wndId, DisplayAreaFallback.Primary);
-            IntPtr hMonitor = Win32Interop.GetMonitorFromDisplayId(displayArea.DisplayId);
-
-            // Get DPI.
-            int result = GetDpiForMonitor(hMonitor, Monitor_DPI_Type.MDT_Default, out uint dpiX, out uint _);
-            if (result != 0)
-            {
-                throw new Exception("Could not get DPI for monitor.");
-            }
-
-            uint scaleFactorPercent = (uint)(((long)dpiX * 100 + (96 >> 1)) / 96);
-            return scaleFactorPercent / 100.0;
-        }
-
-        private void DragRegion_Loaded(object sender, RoutedEventArgs e)
-        {
-
-            var m_AppWindow = GetAppWindowForCurrentWindow();
-            double scaleAdjustment = GetScaleAdjustment(GetWindowhWnd());
-
-            List<Windows.Graphics.RectInt32> dragRectsList = new();
-
-            Windows.Graphics.RectInt32 dragRect;
-            dragRect.X = (int)(LeftPaddingColumn.ActualWidth * scaleAdjustment);
-            dragRect.Y = 0;
-            dragRect.Height = (int)(AppTitleBar.ActualHeight * scaleAdjustment);
-            dragRect.Width = (int)(DragColumn.ActualWidth * scaleAdjustment); ;
-            dragRectsList.Add(dragRect);
-
-
-
-            Windows.Graphics.RectInt32[] dragRects = dragRectsList.ToArray();
-
-            m_AppWindow.TitleBar.SetDragRectangles(dragRects);
-        }
-        private Microsoft.UI.Windowing.AppWindow GetAppWindowForCurrentWindow()
-        {
-            WindowId wndId = Microsoft.UI.Win32Interop.GetWindowIdFromWindow(GetWindowhWnd());
-            return Microsoft.UI.Windowing.AppWindow.GetFromWindowId(wndId);
-        }
-        private IntPtr GetWindowhWnd()
-        {
-            var appcoreWindow = CoreWindow.GetForCurrentThread();
-            var interop = appcoreWindow.As<ICoreWindowInterop>();
-            return interop.WindowHandle;
+            RectInt32 Rect = new((ActualWidth - DragRegion.ActualWidth).GetActualPixel(), 0, DragRegion.ActualWidth.GetActualPixel(), DragRegion.ActualHeight.GetActualPixel());
+            Window.Current.CoreWindow.GetAppWindow().TitleBar.SetDragRectangles([Rect]);
         }
     }
 }
