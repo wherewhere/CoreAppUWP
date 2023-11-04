@@ -76,22 +76,27 @@
                                 Content="Exit" />
                         </StackPanel>
                     </controls:Setting>
-                    <controls:Setting
-                        ActionIcon="&#xE8A7;"
-                        Click="Button_Click"
-                        Description="Create a new UWP window."
+                    <controls:SettingExpander
+                        Description="Create a new window."
                         Header="Multiple Window"
-                        Icon="&#xE78B;"
-                        IsClickEnabled="True"
-                        Tag="NewWindow" />
-                    <controls:Setting
-                        ActionIcon="&#xE8A7;"
-                        Click="Button_Click"
-                        Description="Create a new desktop window."
-                        Header="Desktop Window"
-                        Icon="&#xE78B;"
-                        IsClickEnabled="True"
-                        Tag="NewDesktopWindow" />
+                        Icon="&#xE78B;">
+                        <controls:Setting
+                            ActionIcon="&#xE8A7;"
+                            Click="Button_Click"
+                            Description="Create a new CoreWindow."
+                            Header="CoreWindow"
+                            IsClickEnabled="True"
+                            Style="{StaticResource ClickableSettingExpanderItemStyle}"
+                            Tag="NewWindow" />
+                        <controls:Setting
+                            ActionIcon="&#xE8A7;"
+                            Click="Button_Click"
+                            Description="Create a new AppWindow."
+                            Header="Desktop Window"
+                            IsClickEnabled="True"
+                            Style="{StaticResource ClickableSettingExpanderItemStyle}"
+                            Tag="NewAppWindow" />
+                    </controls:SettingExpander>
                     <controls:Setting
                         x:Name="SettingsFlyoutSettings"
                         x:Load="{x:Bind common:SettingsPaneRegister.IsSettingsPaneSupported}"

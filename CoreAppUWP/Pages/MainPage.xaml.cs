@@ -39,12 +39,6 @@ namespace CoreAppUWP.Pages
             NavigationView_Navigate("Home", new EntranceNavigationTransitionInfo());
             SystemNavigationManager.GetForCurrentView().BackRequested += System_BackRequested;
             CoreApplication.GetCurrentView().TitleBar.LayoutMetricsChanged += TitleBar_LayoutMetricsChanged;
-
-        }
-
-        private void Current_Closed(object sender, WindowEventArgs args)
-        {
-
         }
 
         protected override void OnNavigatedFrom(NavigationEventArgs e)
