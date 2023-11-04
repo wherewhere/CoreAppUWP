@@ -1,5 +1,6 @@
 ﻿using CoreAppUWP.Helpers;
 using CoreAppUWP.Pages.SettingsPages;
+using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media.Animation;
@@ -38,6 +39,8 @@ namespace CoreAppUWP.Pages
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
+            if (AppWindowTitleBar.IsCustomizationSupported())
+            { DragRegion.SizeChanged += CustomTitleBar_SizeChanged; }
             NavigationView_Navigate("Home", new EntranceNavigationTransitionInfo());
             BackdropHelper.AddBackdropTypeChanged(Window.Current, OnBackdropTypeChanged);
             SystemNavigationManager.GetForCurrentView().BackRequested += System_BackRequested;
@@ -47,6 +50,7 @@ namespace CoreAppUWP.Pages
         protected override void OnNavigatedFrom(NavigationEventArgs e)
         {
             base.OnNavigatedFrom(e);
+            DragRegion.SizeChanged -= CustomTitleBar_SizeChanged;
             BackdropHelper.RemoveBackdropTypeChanged(Window.Current, OnBackdropTypeChanged);
             SystemNavigationManager.GetForCurrentView().BackRequested -= System_BackRequested;
             CoreApplication.GetCurrentView().TitleBar.LayoutMetricsChanged -= TitleBar_LayoutMetricsChanged;
@@ -141,10 +145,15 @@ namespace CoreAppUWP.Pages
 
         private void NavigationViewControl_PaneClosing(NavigationView sender, NavigationViewPaneClosingEventArgs args)
         {
-            UpdateLeftPaddingColumn();
+            UpdateTitlePaddingColumn();
         }
 
         private void NavigationViewControl_PaneOpening(NavigationView sender, object args)
+        {
+            UpdateTitlePaddingColumn();
+        }
+
+        private void NavigationViewControl_DisplayModeChanged(NavigationView sender, NavigationViewDisplayModeChangedEventArgs args)
         {
             UpdateLeftPaddingColumn();
         }
@@ -161,12 +170,18 @@ namespace CoreAppUWP.Pages
                     ? NavigationView.IsPaneToggleButtonVisible
                         ? new GridLength(88)
                         : new GridLength(44)
-                    : NavigationView.IsPaneOpen ? new GridLength(44) : new GridLength(60);
+                    : new GridLength(44);
+            UpdateTitlePaddingColumn();
         }
 
-        private void NavigationViewControl_DisplayModeChanged(NavigationView sender, NavigationViewDisplayModeChangedEventArgs args)
+        private void UpdateTitlePaddingColumn()
         {
-            UpdateLeftPaddingColumn();
+            TitlePaddingColumn.Width =
+                NavigationView.IsBackButtonVisible != NavigationViewBackButtonVisible.Collapsed
+                && NavigationView.DisplayMode != NavigationViewDisplayMode.Minimal
+                && !NavigationView.IsPaneOpen
+                    ? new GridLength(16)
+                    : new GridLength(0);
         }
 
         private void UpdateAppTitle(CoreApplicationViewTitleBar coreTitleBar)
@@ -186,7 +201,7 @@ namespace CoreAppUWP.Pages
         private void CustomTitleBar_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             RectInt32 Rect = new((ActualWidth - DragRegion.ActualWidth).GetActualPixel(), 0, DragRegion.ActualWidth.GetActualPixel(), DragRegion.ActualHeight.GetActualPixel());
-            Window.Current.CoreWindow.GetAppWindow().TitleBar.SetDragRectangles([Rect]);
+            CoreWindow.GetForCurrentThread()?.GetAppWindow()?.TitleBar.SetDragRectangles([Rect]);
         }
     }
 }

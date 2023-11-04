@@ -8,12 +8,12 @@ UWP running on .NET Core App
 ## Dictionary
 - [CoreAppUWP](#coreappuwp)
   - [Dictionary](#dictionary)
-  - [How to unlock Windows App SDK](#how-to-unlock-windows-app-sdk)
+  - [Unlock WAS](#unlock-was)
   - [Contributors](#contributors)
   - [Credits](#credits)
 
-## How to unlock Windows App SDK
-Import the registry file [EnableUWPWindow.reg](./EnableUWPWindow.reg) to unlock the Windows App SDK for UWP.
+## Unlock WAS
+Import the registry file [EnableUWPWindow.reg](./EnableUWPWindow.reg) to unlock the Windows App SDK for CoreWindow.
 
 ## Contributors
 [![Contributors](https://contrib.rocks/image?repo=wherewhere/CoreAppUWP)](https://github.com/wherewhere/CoreAppUWP/graphs/contributors "Contributors")

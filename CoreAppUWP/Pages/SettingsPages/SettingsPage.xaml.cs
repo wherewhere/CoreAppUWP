@@ -110,6 +110,7 @@ namespace CoreAppUWP.Pages.SettingsPages
                         TitleBar.BackgroundColor = TitleBar.InactiveBackgroundColor = BackgroundColor;
                         TitleBar.ButtonBackgroundColor = TitleBar.ButtonInactiveBackgroundColor = Colors.Transparent;
                     }
+                    window.AssociateWithDispatcherQueue(DispatcherQueue);
                     window.Title = Package.Current.DisplayName;
                     window.SetIcon("favicon.ico");
                     window.Show();
