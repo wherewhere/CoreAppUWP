@@ -1,0 +1,23 @@
+namespace CoreAppUWP.WinRT
+{
+    enum WindowingModel
+    {
+        None = 0,
+        Universal = 1,
+        ClassicDesktop = 2,
+        ClassicPhone = 3
+    };
+
+    [default_interface]
+    runtimeclass HookWindowingModel
+    {
+        HookWindowingModel();
+
+        Boolean IsHooked { get; set; };
+
+        static CoreAppUWP.WinRT.WindowingModel WindowingModel { get; set; };
+
+        void StartHook();
+        void EndHook();
+    }
+}

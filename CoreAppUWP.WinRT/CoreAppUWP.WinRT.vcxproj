@@ -118,22 +118,29 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="pch.h" />
     <ClInclude Include="HookRegistry.h">
       <DependentUpon>HookRegistry.idl</DependentUpon>
     </ClInclude>
+    <ClInclude Include="HookWindowingModel.h">
+      <DependentUpon>HookWindowingModel.idl</DependentUpon>
+    </ClInclude>
+    <ClInclude Include="pch.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="pch.cpp">
-      <PrecompiledHeader>Create</PrecompiledHeader>
-    </ClCompile>
     <ClCompile Include="HookRegistry.cpp">
       <DependentUpon>HookRegistry.idl</DependentUpon>
+    </ClCompile>
+    <ClCompile Include="HookWindowingModel.cpp">
+      <DependentUpon>HookWindowingModel.idl</DependentUpon>
+    </ClCompile>
+    <ClCompile Include="pch.cpp">
+      <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="$(GeneratedFilesDir)module.g.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Midl Include="HookRegistry.idl" />
+    <Midl Include="HookWindowingModel.idl" />
   </ItemGroup>
   <ItemGroup>
     <None Include="CoreAppUWP.WinRT.def" />
