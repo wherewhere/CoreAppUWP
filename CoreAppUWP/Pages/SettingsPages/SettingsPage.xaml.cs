@@ -3,12 +3,15 @@ using CoreAppUWP.Common;
 using CoreAppUWP.Helpers;
 using CoreAppUWP.ViewModels.SettingsPages;
 using Microsoft.UI;
+using Microsoft.UI.Composition;
+using Microsoft.UI.Content;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Navigation;
 using System;
+using System.Numerics;
 using System.Threading.Tasks;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Core;
@@ -96,8 +99,16 @@ namespace CoreAppUWP.Pages.SettingsPages
                     });
                     break;
                 case "NewAppWindow":
-                    AppWindow window = AppWindow.Create();
-                    window.Closing += (sender, args) => sender.Destroy();
+                    AppWindow window = await WindowHelper.CreateAppWindowAsync((bridge, compositor) =>
+                    {
+                        ContainerVisual root = compositor.CreateContainerVisual();
+                        ContentIsland contentIsland = ContentIsland.Create(root);
+                        SpriteVisual child = compositor.CreateSpriteVisual();
+                        child.Size = new Vector2(100f, 100f);
+                        child.Brush = compositor.CreateColorBrush(Color.FromArgb(0xFF, 0x00, 0x80, 0xFF));
+                        root.Children.InsertAtTop(child);
+                        bridge.Connect(contentIsland);
+                    }).ConfigureAwait(false);
                     if (AppWindowTitleBar.IsCustomizationSupported())
                     {
                         AppWindowTitleBar TitleBar = window.TitleBar;
@@ -110,7 +121,6 @@ namespace CoreAppUWP.Pages.SettingsPages
                         TitleBar.BackgroundColor = TitleBar.InactiveBackgroundColor = BackgroundColor;
                         TitleBar.ButtonBackgroundColor = TitleBar.ButtonInactiveBackgroundColor = Colors.Transparent;
                     }
-                    window.AssociateWithDispatcherQueue(DispatcherQueue);
                     window.Title = Package.Current.DisplayName;
                     window.SetIcon("favicon.ico");
                     window.Show();

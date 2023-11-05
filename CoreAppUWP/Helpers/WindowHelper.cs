@@ -1,9 +1,13 @@
 ﻿using CoreAppUWP.Common;
 using Microsoft.UI;
+using Microsoft.UI.Composition;
+using Microsoft.UI.Content;
+using Microsoft.UI.Dispatching;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.Core;
 using Windows.UI.Core;
@@ -35,6 +39,40 @@ namespace CoreAppUWP.Helpers
                 return ApplicationView.GetForCurrentView().Id;
             });
             return await ApplicationViewSwitcher.TryShowAsStandaloneAsync(newViewId);
+        }
+
+
+
+        public static Task<AppWindow> CreateAppWindowAsync(Action<DesktopChildSiteBridge, Compositor> launched)
+        {
+            TaskCompletionSource<AppWindow> taskCompletionSource = new();
+
+            Thread thread = new(async () =>
+            {
+                try
+                {
+                    DispatcherQueueController controller = DispatcherQueueController.CreateOnCurrentThread();
+                    DispatcherQueue dispatcherQueue = controller.DispatcherQueue;
+                    AppWindow window = AppWindow.Create();
+                    window.AssociateWithDispatcherQueue(dispatcherQueue);
+                    taskCompletionSource.SetResult(window);
+                    window.Destroying += (sender, args) => dispatcherQueue.EnqueueEventLoopExit();
+                    Compositor compositor = new();
+                    DesktopChildSiteBridge bridge = DesktopChildSiteBridge.Create(compositor, window.Id);
+                    bridge.Show();
+                    bridge.ResizePolicy = ContentSizePolicy.ResizeContentToParentWindow;
+                    launched(bridge, compositor);
+                    dispatcherQueue.RunEventLoop();
+                    await controller.ShutdownQueueAsync();
+                }
+                catch (Exception e)
+                {
+                    taskCompletionSource.SetException(e);
+                }
+            });
+            thread.Start();
+
+            return taskCompletionSource.Task;
         }
 
         public static void TrackWindow(this Window window)
