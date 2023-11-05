@@ -3,6 +3,11 @@ namespace CoreAppUWP.WinRT
     [default_interface]
     runtimeclass HookRegistry
     {
-        static Boolean IsHooked { get; };
+        HookRegistry();
+
+        Boolean IsHooked { get; set; };
+
+        void StartHook();
+        void EndHook();
     }
 }

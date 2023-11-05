@@ -22,6 +22,8 @@ namespace CoreAppUWP
 {
     public static partial class Program
     {
+        private static HookRegistry hookRegistry;
+
         private static unsafe bool IsPackagedApp
         {
             get
@@ -62,16 +64,19 @@ namespace CoreAppUWP
             ComWrappersSupport.InitializeComWrappers();
             if (IsPackagedApp)
             {
-                if (IsSupportCoreWindow || HookRegistry.IsHooked)
+                if (!IsSupportCoreWindow)
                 {
-                    XamlCheckProcessRequirements();
-                    Application.Start(p =>
-                    {
-                        DispatcherQueueSynchronizationContext context = new(DispatcherQueue.GetForCurrentThread());
-                        SynchronizationContext.SetSynchronizationContext(context);
-                        _ = new App();
-                    });
+                    hookRegistry = new HookRegistry();
+                    hookRegistry.StartHook();
                 }
+                XamlCheckProcessRequirements();
+                Application.Start(p =>
+                {
+                    DispatcherQueueSynchronizationContext context = new(DispatcherQueue.GetForCurrentThread());
+                    SynchronizationContext.SetSynchronizationContext(context);
+                    _ = new App();
+                });
+                hookRegistry?.EndHook();
             }
             else
             {
