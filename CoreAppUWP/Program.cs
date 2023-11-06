@@ -90,10 +90,10 @@ namespace CoreAppUWP
             string basePath = AppDomain.CurrentDomain.BaseDirectory;
             XmlDocument manifest = await XmlDocument.LoadFromFileAsync(await StorageFile.GetFileFromPathAsync(Path.Combine(basePath, "AppxManifest.xml")));
             IXmlNode identity = manifest.GetElementsByTagName("Identity")?[0];
-            string name = identity.Attributes.FirstOrDefault((x) => x.NodeName == "Name")?.InnerText;
+            string name = identity.Attributes.FirstOrDefault(x => x.NodeName == "Name")?.InnerText;
             IXmlNode application = manifest.GetElementsByTagName("Application")?[0];
-            string id = application.Attributes.FirstOrDefault((x) => x.NodeName == "Id")?.InnerText;
-            IEnumerable<Package> packages = manager.FindPackagesForUser("").Where((x) => x.Id.FamilyName.StartsWith(name));
+            string id = application.Attributes.FirstOrDefault(x => x.NodeName == "Id")?.InnerText;
+            IEnumerable<Package> packages = manager.FindPackagesForUser("").Where(x => x.Id.FamilyName.StartsWith(name));
             if (packages.FirstOrDefault() is Package package)
             {
                 IReadOnlyList<AppListEntry> entries = await package.GetAppListEntriesAsync();

@@ -1,24 +1,20 @@
 using CommunityToolkit.WinUI.UI.Controls;
 using CoreAppUWP.Common;
+using CoreAppUWP.Controls;
 using CoreAppUWP.Helpers;
 using CoreAppUWP.ViewModels.SettingsPages;
-using Microsoft.UI;
-using Microsoft.UI.Composition;
-using Microsoft.UI.Content;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Navigation;
 using System;
-using System.Numerics;
 using System.Threading.Tasks;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Core;
 using Windows.ApplicationModel.Search;
 using Windows.Storage;
 using Windows.System;
-using Windows.UI;
 using Windows.UI.ApplicationSettings;
 using Windows.UI.ViewManagement;
 
@@ -32,6 +28,8 @@ namespace CoreAppUWP.Pages.SettingsPages
     /// </summary>
     public sealed partial class SettingsPage : Page
     {
+        public bool IsCoreWindow => Dispatcher != null;
+
         #region Provider
 
         /// <summary>
@@ -77,17 +75,32 @@ namespace CoreAppUWP.Pages.SettingsPages
                     }
                     _ = Refresh(true);
                     break;
-                case "OutPIP" when ApplicationView.GetForCurrentView().IsViewModeSupported(ApplicationViewMode.Default):
-                    _ = ApplicationView.GetForCurrentView().TryEnterViewModeAsync(ApplicationViewMode.Default);
+                case "ExitPIP":
+                    if (IsCoreWindow)
+                    {
+                        ApplicationView.GetForCurrentView().IsViewModeSupported(ApplicationViewMode.Default);
+                        _ = ApplicationView.GetForCurrentView().TryEnterViewModeAsync(ApplicationViewMode.Default);
+                    }
+                    else if (this.GetWindowForElement() is DesktopWindow desktopWindow)
+                    {
+                        desktopWindow.AppWindow.SetPresenter(AppWindowPresenterKind.Default);
+                    }
                     break;
-                case "EnterPIP" when ApplicationView.GetForCurrentView().IsViewModeSupported(ApplicationViewMode.CompactOverlay):
-                    _ = ApplicationView.GetForCurrentView().TryEnterViewModeAsync(ApplicationViewMode.CompactOverlay);
+                case "EnterPIP":
+                    if (IsCoreWindow)
+                    {
+                        ApplicationView.GetForCurrentView().IsViewModeSupported(ApplicationViewMode.CompactOverlay);
+                        _ = ApplicationView.GetForCurrentView().TryEnterViewModeAsync(ApplicationViewMode.CompactOverlay);
+                    }
+                    else if (this.GetWindowForElement() is DesktopWindow desktopWindow)
+                    {
+                        desktopWindow.AppWindow.SetPresenter(AppWindowPresenterKind.CompactOverlay);
+                    }
                     break;
                 case "NewWindow":
-                    bool IsExtendsTitleBar = Provider.IsExtendsTitleBar;
                     _ = await WindowHelper.CreateWindowAsync(window =>
                     {
-                        if (IsExtendsTitleBar)
+                        if (SettingsHelper.Get<bool>(SettingsHelper.IsExtendsTitleBar))
                         {
                             CoreApplication.GetCurrentView().TitleBar.ExtendViewIntoTitleBar = true;
                         }
@@ -99,37 +112,41 @@ namespace CoreAppUWP.Pages.SettingsPages
                     });
                     break;
                 case "NewAppWindow":
-                    AppWindow window = await WindowHelper.CreateAppWindowAsync((bridge, compositor) =>
+                    DesktopWindow window = await WindowHelper.CreateDesktopWindowAsync(window =>
                     {
-                        ContainerVisual root = compositor.CreateContainerVisual();
-                        ContentIsland contentIsland = ContentIsland.Create(root);
-                        SpriteVisual child = compositor.CreateSpriteVisual();
-                        child.Size = new Vector2(100f, 100f);
-                        child.Brush = compositor.CreateColorBrush(Color.FromArgb(0xFF, 0x00, 0x80, 0xFF));
-                        root.Children.InsertAtTop(child);
-                        bridge.Connect(contentIsland);
+                        Frame _frame = new();
+                        window.Content = _frame;
+                        _ = _frame.Navigate(typeof(MainPage), null, new DrillInNavigationTransitionInfo());
                     }).ConfigureAwait(false);
-                    if (AppWindowTitleBar.IsCustomizationSupported())
+                    if (AppWindowTitleBar.IsCustomizationSupported()
+                        && SettingsHelper.Get<bool>(SettingsHelper.IsExtendsTitleBar))
                     {
-                        AppWindowTitleBar TitleBar = window.TitleBar;
-
-                        Color ForegroundColor = Colors.Black;
-                        Color BackgroundColor = Colors.White;
-
-                        TitleBar.ExtendsContentIntoTitleBar = true;
-                        TitleBar.ForegroundColor = TitleBar.ButtonForegroundColor = ForegroundColor;
-                        TitleBar.BackgroundColor = TitleBar.InactiveBackgroundColor = BackgroundColor;
-                        TitleBar.ButtonBackgroundColor = TitleBar.ButtonInactiveBackgroundColor = Colors.Transparent;
+                        window.ExtendsContentIntoTitleBar = true;
                     }
-                    window.Title = Package.Current.DisplayName;
-                    window.SetIcon("favicon.ico");
-                    window.Show();
+                    ThemeHelper.Initialize(window);
+                    BackdropHelper.SetBackdrop(window, SettingsHelper.Get<BackdropType>(SettingsHelper.SelectedBackdrop));
+                    AppWindow appWindow = window.AppWindow;
+                    appWindow.Title = Package.Current.DisplayName;
+                    appWindow.SetIcon("favicon.ico");
+                    appWindow.Show();
                     break;
                 case "SearchFlyout" when SettingsPaneRegister.IsSearchPaneSupported:
                     SearchPane.GetForCurrentView().Show();
                     break;
+                case "ExitFullWindow":
+                    if (IsCoreWindow)
+                    { ApplicationView.GetForCurrentView().ExitFullScreenMode(); }
+                    else if (this.GetWindowForElement() is DesktopWindow desktopWindow)
+                    { desktopWindow.AppWindow.SetPresenter(AppWindowPresenterKind.Default); }
+                    break;
                 case "SettingsFlyout" when SettingsPaneRegister.IsSettingsPaneSupported:
                     SettingsPane.Show();
+                    break;
+                case "EnterFullWindow":
+                    if (IsCoreWindow)
+                    { ApplicationView.GetForCurrentView().TryEnterFullScreenMode(); }
+                    else if (this.GetWindowForElement() is DesktopWindow desktopWindow)
+                    { desktopWindow.AppWindow.SetPresenter(AppWindowPresenterKind.FullScreen); }
                     break;
                 default:
                     break;

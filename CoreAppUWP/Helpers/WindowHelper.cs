@@ -1,13 +1,12 @@
 ﻿using CoreAppUWP.Common;
+using CoreAppUWP.Controls;
 using Microsoft.UI;
-using Microsoft.UI.Composition;
-using Microsoft.UI.Content;
-using Microsoft.UI.Dispatching;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Hosting;
 using System;
 using System.Collections.Generic;
-using System.Threading;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.Core;
 using Windows.UI.Core;
@@ -41,38 +40,11 @@ namespace CoreAppUWP.Helpers
             return await ApplicationViewSwitcher.TryShowAsStandaloneAsync(newViewId);
         }
 
-
-
-        public static Task<AppWindow> CreateAppWindowAsync(Action<DesktopChildSiteBridge, Compositor> launched)
+        public static async Task<DesktopWindow> CreateDesktopWindowAsync(Action<DesktopWindowXamlSource> launched)
         {
-            TaskCompletionSource<AppWindow> taskCompletionSource = new();
-
-            Thread thread = new(async () =>
-            {
-                try
-                {
-                    DispatcherQueueController controller = DispatcherQueueController.CreateOnCurrentThread();
-                    DispatcherQueue dispatcherQueue = controller.DispatcherQueue;
-                    AppWindow window = AppWindow.Create();
-                    window.AssociateWithDispatcherQueue(dispatcherQueue);
-                    taskCompletionSource.SetResult(window);
-                    window.Destroying += (sender, args) => dispatcherQueue.EnqueueEventLoopExit();
-                    Compositor compositor = new();
-                    DesktopChildSiteBridge bridge = DesktopChildSiteBridge.Create(compositor, window.Id);
-                    bridge.Show();
-                    bridge.ResizePolicy = ContentSizePolicy.ResizeContentToParentWindow;
-                    launched(bridge, compositor);
-                    dispatcherQueue.RunEventLoop();
-                    await controller.ShutdownQueueAsync();
-                }
-                catch (Exception e)
-                {
-                    taskCompletionSource.SetException(e);
-                }
-            });
-            thread.Start();
-
-            return taskCompletionSource.Task;
+            DesktopWindow newWindow = await DesktopWindow.CreateAsync(launched).ConfigureAwait(false);
+            TrackWindow(newWindow);
+            return newWindow;
         }
 
         public static void TrackWindow(this Window window)
@@ -90,6 +62,23 @@ namespace CoreAppUWP.Helpers
                 BackdropHelper.RegisterWindow(window);
             }
         }
+
+        public static void TrackWindow(this DesktopWindow window)
+        {
+            if (!ActiveDesktopWindow.ContainsKey(window.XamlRoot))
+            {
+                window.AppWindow.Closing += (sender, args) =>
+                {
+                    ActiveDesktopWindow.Remove(window.XamlRoot);
+                    window = null;
+                };
+                ActiveDesktopWindow[window.XamlRoot] = window;
+                BackdropHelper.RegisterWindow(window);
+            }
+        }
+
+        public static DesktopWindow GetWindowForElement(this UIElement element) =>
+            ActiveDesktopWindow.TryGetValue(element.XamlRoot, out DesktopWindow window) ? window : null;
 
         public static AppWindow GetAppWindow(this CoreWindow window)
         {
@@ -110,5 +99,6 @@ namespace CoreAppUWP.Helpers
 
         public static Dictionary<CoreDispatcher, Window> ActiveWindows { get; } = [];
         public static Dictionary<CoreWindow, AppWindow> ActiveAppWindows { get; } = [];
+        public static Dictionary<XamlRoot, DesktopWindow> ActiveDesktopWindow { get; } = [];
     }
 }

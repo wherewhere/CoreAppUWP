@@ -9,8 +9,8 @@ namespace winrt::CoreAppUWP::WinRT::implementation
     {
         if (value == isHooked)
         {
-			return;
-		}
+            return;
+        }
 
         if (value)
         {

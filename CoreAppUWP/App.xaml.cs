@@ -48,7 +48,7 @@ namespace CoreAppUWP
                 isLoaded = true;
             }
 
-            Window window = Window.Current;
+            if (Window.Current is not Window window) { return; }
             WindowHelper.TrackWindow(window);
 
             // 不要在窗口已包含内容时重复应用程序初始化，

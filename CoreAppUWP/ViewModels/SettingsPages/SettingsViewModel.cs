@@ -65,7 +65,7 @@ namespace CoreAppUWP.ViewModels.SettingsPages
 
         public bool IsExtendsTitleBar
         {
-            get => CoreApplication.GetCurrentView().TitleBar.ExtendViewIntoTitleBar;
+            get => SettingsHelper.Get<bool>(SettingsHelper.IsExtendsTitleBar);
             set
             {
                 if (IsExtendsTitleBar != value)

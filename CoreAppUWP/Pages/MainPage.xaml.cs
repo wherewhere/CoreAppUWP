@@ -1,4 +1,5 @@
-﻿using CoreAppUWP.Helpers;
+﻿using CoreAppUWP.Controls;
+using CoreAppUWP.Helpers;
 using CoreAppUWP.Pages.SettingsPages;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
@@ -28,6 +29,8 @@ namespace CoreAppUWP.Pages
             ("Home", typeof(HomePage))
         ];
 
+        private bool IsAppWindow => Dispatcher == null;
+
         public MainPage()
         {
             InitializeComponent();
@@ -42,18 +45,45 @@ namespace CoreAppUWP.Pages
             if (AppWindowTitleBar.IsCustomizationSupported())
             { DragRegion.SizeChanged += CustomTitleBar_SizeChanged; }
             NavigationView_Navigate("Home", new EntranceNavigationTransitionInfo());
-            BackdropHelper.AddBackdropTypeChanged(Window.Current, OnBackdropTypeChanged);
-            SystemNavigationManager.GetForCurrentView().BackRequested += System_BackRequested;
-            CoreApplication.GetCurrentView().TitleBar.LayoutMetricsChanged += TitleBar_LayoutMetricsChanged;
+            if (IsAppWindow)
+            {
+                Loaded += Page_Loaded;
+            }
+            else
+            {
+                BackdropHelper.AddBackdropTypeChanged(Window.Current, OnBackdropTypeChanged);
+                SystemNavigationManager.GetForCurrentView().BackRequested += System_BackRequested;
+                CoreApplication.GetCurrentView().TitleBar.LayoutMetricsChanged += TitleBar_LayoutMetricsChanged;
+            }
+        }
+
+        private void Page_Loaded(object sender, RoutedEventArgs e)
+        {
+            if (this.GetWindowForElement() is DesktopWindow window)
+            {
+                BackdropHelper.AddBackdropTypeChanged(window, OnBackdropTypeChanged);
+                OnBackdropTypeChanged(BackdropHelper.GetBackdrop(window));
+            }
         }
 
         protected override void OnNavigatedFrom(NavigationEventArgs e)
         {
             base.OnNavigatedFrom(e);
             DragRegion.SizeChanged -= CustomTitleBar_SizeChanged;
-            BackdropHelper.RemoveBackdropTypeChanged(Window.Current, OnBackdropTypeChanged);
-            SystemNavigationManager.GetForCurrentView().BackRequested -= System_BackRequested;
-            CoreApplication.GetCurrentView().TitleBar.LayoutMetricsChanged -= TitleBar_LayoutMetricsChanged;
+            if (IsAppWindow)
+            {
+                Loaded -= Page_Loaded;
+                if (this.GetWindowForElement() is DesktopWindow window)
+                {
+                    BackdropHelper.RemoveBackdropTypeChanged(window, OnBackdropTypeChanged);
+                }
+            }
+            else
+            {
+                BackdropHelper.RemoveBackdropTypeChanged(Window.Current, OnBackdropTypeChanged);
+                SystemNavigationManager.GetForCurrentView().BackRequested -= System_BackRequested;
+                CoreApplication.GetCurrentView().TitleBar.LayoutMetricsChanged -= TitleBar_LayoutMetricsChanged;
+            }
         }
 
         private void OnBackdropTypeChanged(BackdropType? args) => RootBackground.Opacity = args is null or BackdropType.DefaultColor ? 1 : 0;
@@ -200,8 +230,20 @@ namespace CoreAppUWP.Pages
 
         private void CustomTitleBar_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            RectInt32 Rect = new((ActualWidth - DragRegion.ActualWidth).GetActualPixel(), 0, DragRegion.ActualWidth.GetActualPixel(), DragRegion.ActualHeight.GetActualPixel());
-            CoreWindow.GetForCurrentThread()?.GetAppWindow()?.TitleBar.SetDragRectangles([Rect]);
+            if (IsAppWindow)
+            {
+                if (this.GetWindowForElement() is DesktopWindow window)
+                {
+                    IntPtr hwnd = (IntPtr)window.AppWindow.Id.Value;
+                    RectInt32 Rect = new((e.NewSize.Width - DragRegion.ActualWidth).GetActualPixel(hwnd), 0, DragRegion.ActualWidth.GetActualPixel(hwnd), DragRegion.ActualHeight.GetActualPixel(hwnd));
+                    window.AppWindow?.TitleBar.SetDragRectangles([Rect]);
+                }
+            }
+            else
+            {
+                RectInt32 Rect = new((e.NewSize.Width - DragRegion.ActualWidth).GetActualPixel(), 0, DragRegion.ActualWidth.GetActualPixel(), DragRegion.ActualHeight.GetActualPixel());
+                CoreWindow.GetForCurrentThread()?.GetAppWindow()?.TitleBar.SetDragRectangles([Rect]);
+            }
         }
     }
 }

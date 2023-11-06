@@ -1,4 +1,5 @@
 ﻿using CoreAppUWP.Common;
+using CoreAppUWP.Controls;
 using Microsoft.UI.Composition;
 using Microsoft.UI.Composition.SystemBackdrops;
 using Microsoft.UI.Xaml;
@@ -20,6 +21,7 @@ namespace CoreAppUWP.Helpers
     public partial class BackdropHelper
     {
         private readonly Window window;
+        private readonly DesktopWindow desktopWindow;
         private readonly WindowsSystemDispatcherQueueHelper m_wsdqHelper;
         private MicaController m_micaController;
         private DesktopAcrylicController m_acrylicController;
@@ -31,6 +33,13 @@ namespace CoreAppUWP.Helpers
         public BackdropHelper(Window window)
         {
             this.window = window;
+            m_wsdqHelper = new WindowsSystemDispatcherQueueHelper();
+            m_wsdqHelper.EnsureWindowsSystemDispatcherQueueController();
+        }
+
+        public BackdropHelper(DesktopWindow desktopWindow)
+        {
+            this.desktopWindow = desktopWindow;
             m_wsdqHelper = new WindowsSystemDispatcherQueueHelper();
             m_wsdqHelper.EnsureWindowsSystemDispatcherQueueController();
         }
@@ -58,9 +67,14 @@ namespace CoreAppUWP.Helpers
                 m_acrylicController.Dispose();
                 m_acrylicController = null;
             }
-            window.Closed -= Window_Closed;
-            window.Activated -= Window_Activated;
-            ((FrameworkElement)window.Content).ActualThemeChanged -= Window_ThemeChanged;
+
+            if (window != null)
+            {
+                window.Closed -= Window_Closed;
+                window.Activated -= Window_Activated;
+                ((FrameworkElement)window.Content).ActualThemeChanged -= Window_ThemeChanged;
+            }
+
             m_configurationSource = null;
 
             if (type is BackdropType.Mica or BackdropType.MicaAlt)
@@ -93,9 +107,12 @@ namespace CoreAppUWP.Helpers
                 // Hooking up the policy object
                 m_configurationSource = new SystemBackdropConfiguration();
 
-                window.Closed += Window_Closed;
-                window.Activated += Window_Activated;
-                ((FrameworkElement)window.Content).ActualThemeChanged += Window_ThemeChanged;
+                if (window != null)
+                {
+                    window.Closed += Window_Closed;
+                    window.Activated += Window_Activated;
+                    ((FrameworkElement)window.Content).ActualThemeChanged += Window_ThemeChanged;
+                }
 
                 // Initial configuration state.
                 m_configurationSource.IsInputActive = true;
@@ -104,8 +121,16 @@ namespace CoreAppUWP.Helpers
                 m_micaController = new MicaController { Kind = kind };
 
                 // Enable the system backdrop.
-                // Note: Be sure to have "using WinRT;" to support the Window.As<...>() call.
-                m_micaController.AddSystemBackdropTarget(window.As<ICompositionSupportsSystemBackdrop>());
+                if (window != null)
+                {
+                    // Note: Be sure to have "using WinRT;" to support the Window.As<...>() call.
+                    m_micaController.AddSystemBackdropTarget(window.As<ICompositionSupportsSystemBackdrop>());
+                }
+                else if (desktopWindow != null)
+                {
+                    m_micaController.AddSystemBackdropTarget(desktopWindow.WindowXamlSource.As<ICompositionSupportsSystemBackdrop>());
+                }
+
                 m_micaController.SetSystemBackdropConfiguration(m_configurationSource);
                 return true; // succeeded
             }
@@ -120,9 +145,12 @@ namespace CoreAppUWP.Helpers
                 // Hooking up the policy object
                 m_configurationSource = new SystemBackdropConfiguration();
 
-                window.Closed += Window_Closed;
-                window.Activated += Window_Activated;
-                ((FrameworkElement)window.Content).ActualThemeChanged += Window_ThemeChanged;
+                if (window != null)
+                {
+                    window.Closed += Window_Closed;
+                    window.Activated += Window_Activated;
+                    ((FrameworkElement)window.Content).ActualThemeChanged += Window_ThemeChanged;
+                }
 
                 // Initial configuration state.
                 m_configurationSource.IsInputActive = true;
@@ -132,8 +160,16 @@ namespace CoreAppUWP.Helpers
                 m_acrylicController = new DesktopAcrylicController { TintColor = BackgroundColor, FallbackColor = BackgroundColor };
 
                 // Enable the system backdrop.
-                // Note: Be sure to have "using WinRT;" to support the Window.As<...>() call.
-                m_acrylicController.AddSystemBackdropTarget(window.As<ICompositionSupportsSystemBackdrop>());
+                if (window != null)
+                {
+                    // Note: Be sure to have "using WinRT;" to support the Window.As<...>() call.
+                    m_acrylicController.AddSystemBackdropTarget(window.As<ICompositionSupportsSystemBackdrop>());
+                }
+                else if (desktopWindow != null)
+                {
+                    m_acrylicController.AddSystemBackdropTarget(desktopWindow.WindowXamlSource.As<ICompositionSupportsSystemBackdrop>());
+                }
+
                 m_acrylicController.SetSystemBackdropConfiguration(m_configurationSource);
                 return true; // succeeded
             }
@@ -180,12 +216,13 @@ namespace CoreAppUWP.Helpers
 
         private void SetConfigurationSourceTheme()
         {
-            switch (((FrameworkElement)window.Content).ActualTheme)
+            m_configurationSource.Theme = (((window == null ? desktopWindow?.Content : window.Content) as FrameworkElement)?.ActualTheme) switch
             {
-                case ElementTheme.Dark: m_configurationSource.Theme = SystemBackdropTheme.Dark; break;
-                case ElementTheme.Light: m_configurationSource.Theme = SystemBackdropTheme.Light; break;
-                case ElementTheme.Default: m_configurationSource.Theme = SystemBackdropTheme.Default; break;
-            }
+                ElementTheme.Dark => SystemBackdropTheme.Dark,
+                ElementTheme.Light => SystemBackdropTheme.Light,
+                ElementTheme.Default => SystemBackdropTheme.Default,
+                _ => SystemBackdropTheme.Default,
+            };
         }
     }
 
@@ -204,9 +241,30 @@ namespace CoreAppUWP.Helpers
             }
         }
 
+        public static void RegisterWindow(DesktopWindow window)
+        {
+            if (!ActiveDesktopWindows.ContainsKey(window))
+            {
+                window.AppWindow.Closing += (sender, args) =>
+                {
+                    ActiveDesktopWindows.Remove(window);
+                    window = null;
+                };
+                ActiveDesktopWindows[window] = new BackdropHelper(window);
+            }
+        }
+
         public static void SetBackdrop(Window window, BackdropType type)
         {
             if (ActiveWindows.TryGetValue(window, out BackdropHelper backdrop))
+            {
+                backdrop.SetBackdrop(type);
+            }
+        }
+
+        public static void SetBackdrop(DesktopWindow window, BackdropType type)
+        {
+            if (ActiveDesktopWindows.TryGetValue(window, out BackdropHelper backdrop))
             {
                 backdrop.SetBackdrop(type);
             }
@@ -222,6 +280,15 @@ namespace CoreAppUWP.Helpers
                 }
                 x.SetBackdrop(type);
             });
+
+            ActiveDesktopWindows.Values.ForEach(async x =>
+            {
+                if (x.desktopWindow.DispatcherQueue?.HasThreadAccess == false)
+                {
+                    await x.desktopWindow.DispatcherQueue.ResumeForegroundAsync();
+                }
+                x.SetBackdrop(type);
+            });
         }
 
         public static BackdropType? GetBackdrop(Window window)
@@ -229,9 +296,22 @@ namespace CoreAppUWP.Helpers
             return ActiveWindows.TryGetValue(window, out BackdropHelper backdrop) ? backdrop.Backdrop : null;
         }
 
+        public static BackdropType? GetBackdrop(DesktopWindow window)
+        {
+            return ActiveDesktopWindows.TryGetValue(window, out BackdropHelper backdrop) ? backdrop.Backdrop : null;
+        }
+
         public static void AddBackdropTypeChanged(Window window, Action<BackdropType?> typedEventHandler)
         {
             if (ActiveWindows.TryGetValue(window, out BackdropHelper backdrop))
+            {
+                backdrop.BackdropTypeChanged.Add(typedEventHandler);
+            }
+        }
+
+        public static void AddBackdropTypeChanged(DesktopWindow window, Action<BackdropType?> typedEventHandler)
+        {
+            if (ActiveDesktopWindows.TryGetValue(window, out BackdropHelper backdrop))
             {
                 backdrop.BackdropTypeChanged.Add(typedEventHandler);
             }
@@ -245,6 +325,15 @@ namespace CoreAppUWP.Helpers
             }
         }
 
+        public static void RemoveBackdropTypeChanged(DesktopWindow window, Action<BackdropType?> typedEventHandler)
+        {
+            if (ActiveDesktopWindows.TryGetValue(window, out BackdropHelper backdrop))
+            {
+                backdrop.BackdropTypeChanged.Remove(typedEventHandler);
+            }
+        }
+
         public static Dictionary<Window, BackdropHelper> ActiveWindows { get; } = [];
+        public static Dictionary<DesktopWindow, BackdropHelper> ActiveDesktopWindows { get; } = [];
     }
 }

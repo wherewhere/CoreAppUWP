@@ -82,9 +82,27 @@
                                 Content="Enter Compact Overlay"
                                 Tag="EnterPIP" />
                             <Button
-                                x:Uid="/TestPage/OutPIP"
                                 Click="Button_Click"
-                                Content="Exit" />
+                                Content="Exit"
+                                Tag="ExitPIP" />
+                        </StackPanel>
+                    </controls:Setting>
+                    <controls:Setting
+                        Description="Enter or exit full screen."
+                        Header="Full Screen"
+                        Icon="&#xE9A6;">
+                        <StackPanel
+                            Margin="0,2"
+                            Orientation="Horizontal"
+                            Spacing="4">
+                            <Button
+                                Click="Button_Click"
+                                Content="Enter Full Screen"
+                                Tag="EnterFullWindow" />
+                            <Button
+                                Click="Button_Click"
+                                Content="Exit"
+                                Tag="ExitFullWindow" />
                         </StackPanel>
                     </controls:Setting>
                     <controls:SettingExpander
@@ -97,11 +115,13 @@
                             Description="Create a new CoreWindow."
                             Header="CoreWindow"
                             IsClickEnabled="True"
+                            IsEnabled="{x:Bind IsCoreWindow}"
                             Style="{StaticResource ClickableSettingExpanderItemStyle}"
                             Tag="NewWindow" />
                         <controls:Setting
                             ActionIcon="&#xE8A7;"
                             Click="Button_Click"
+                            CornerRadius="{Binding Source={StaticResource ControlCornerRadius}, Converter={StaticResource BottomCornerRadiusFilterConverter}}"
                             Description="Create a new AppWindow."
                             Header="Desktop Window"
                             IsClickEnabled="True"

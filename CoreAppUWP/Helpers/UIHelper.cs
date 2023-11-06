@@ -4,6 +4,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using Windows.Foundation.Metadata;
 using Windows.Graphics.Display;
+using Windows.Win32;
+using Windows.Win32.Foundation;
+using WinRT.Interop;
 
 namespace CoreAppUWP.Helpers
 {
@@ -15,6 +18,18 @@ namespace CoreAppUWP.Helpers
         {
             double currentDpi = DisplayInformation.GetForCurrentView().RawPixelsPerViewPixel;
             return Convert.ToInt32(pixel * currentDpi);
+        }
+
+        public static int GetActualPixel(this double pixel, IntPtr window)
+        {
+            uint currentDpi = PInvoke.GetDpiForWindow(new HWND(window));
+            return Convert.ToInt32(pixel * (currentDpi / 96.0));
+        }
+
+        public static int GetDisplayPixel(this int pixel, IntPtr window)
+        {
+            uint currentDpi = PInvoke.GetDpiForWindow(new HWND(window));
+            return Convert.ToInt32(pixel / (currentDpi / 96.0));
         }
 
         public static string ExceptionToMessage(this Exception ex)
