@@ -232,7 +232,7 @@ namespace CoreAppUWP.Pages
         private void UpdateAppTitle(AppWindow appWindow)
         {
             IntPtr hwnd = (IntPtr)appWindow.Id.Value;
-            RightPaddingColumn.Width = new GridLength(appWindow.TitleBar.RightInset.GetDisplayPixel(hwnd));
+            RightPaddingColumn.Width = new GridLength(Math.Max(0, appWindow.TitleBar.RightInset.GetDisplayPixel(hwnd)));
         }
 
         private void System_BackRequested(object sender, BackRequestedEventArgs e)

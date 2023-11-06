@@ -70,9 +70,7 @@ namespace CoreAppUWP.Pages.SettingsPages
                     SettingsHelper.LocalObject.Clear();
                     SettingsHelper.SetDefaultSettings();
                     if (Reset.Flyout is Flyout flyout_reset)
-                    {
-                        flyout_reset.Hide();
-                    }
+                    { flyout_reset.Hide(); }
                     _ = Refresh(true);
                     break;
                 case "ExitPIP":
@@ -82,9 +80,7 @@ namespace CoreAppUWP.Pages.SettingsPages
                         _ = ApplicationView.GetForCurrentView().TryEnterViewModeAsync(ApplicationViewMode.Default);
                     }
                     else if (this.GetWindowForElement() is DesktopWindow desktopWindow)
-                    {
-                        desktopWindow.AppWindow.SetPresenter(AppWindowPresenterKind.Default);
-                    }
+                    { desktopWindow.AppWindow.SetPresenter(AppWindowPresenterKind.Default); }
                     break;
                 case "EnterPIP":
                     if (IsCoreWindow)
@@ -93,17 +89,13 @@ namespace CoreAppUWP.Pages.SettingsPages
                         _ = ApplicationView.GetForCurrentView().TryEnterViewModeAsync(ApplicationViewMode.CompactOverlay);
                     }
                     else if (this.GetWindowForElement() is DesktopWindow desktopWindow)
-                    {
-                        desktopWindow.AppWindow.SetPresenter(AppWindowPresenterKind.CompactOverlay);
-                    }
+                    { desktopWindow.AppWindow.SetPresenter(AppWindowPresenterKind.CompactOverlay); }
                     break;
-                case "NewWindow":
+                case "NewWindow" when IsCoreWindow:
                     _ = await WindowHelper.CreateWindowAsync(window =>
                     {
                         if (SettingsHelper.Get<bool>(SettingsHelper.IsExtendsTitleBar))
-                        {
-                            CoreApplication.GetCurrentView().TitleBar.ExtendViewIntoTitleBar = true;
-                        }
+                        { CoreApplication.GetCurrentView().TitleBar.ExtendViewIntoTitleBar = true; }
                         Frame _frame = new();
                         window.Content = _frame;
                         ThemeHelper.Initialize(window);
@@ -120,9 +112,7 @@ namespace CoreAppUWP.Pages.SettingsPages
                     }).ConfigureAwait(false);
                     if (AppWindowTitleBar.IsCustomizationSupported()
                         && SettingsHelper.Get<bool>(SettingsHelper.IsExtendsTitleBar))
-                    {
-                        window.ExtendsContentIntoTitleBar = true;
-                    }
+                    { window.ExtendsContentIntoTitleBar = true; }
                     ThemeHelper.Initialize(window);
                     BackdropHelper.SetBackdrop(window, SettingsHelper.Get<BackdropType>(SettingsHelper.SelectedBackdrop));
                     AppWindow appWindow = window.AppWindow;

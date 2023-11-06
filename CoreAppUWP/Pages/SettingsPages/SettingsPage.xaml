@@ -5,6 +5,7 @@
     xmlns:animatedvisuals="using:Microsoft.UI.Xaml.Controls.AnimatedVisuals"
     xmlns:common="using:CoreAppUWP.Common"
     xmlns:controls="using:CoreAppUWP.Controls"
+    xmlns:converters="using:CommunityToolkit.WinUI.UI.Converters"
     xmlns:cwuc="using:CommunityToolkit.WinUI.UI.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:interopservices="using:System.Runtime.InteropServices"
@@ -14,6 +15,9 @@
     DataContext="{x:Bind Provider, Mode=OneWay}"
     NavigationCacheMode="Enabled"
     mc:Ignorable="d">
+    <Page.Resources>
+        <converters:BoolNegationConverter x:Key="BoolNegationConverter" />
+    </Page.Resources>
     <Grid
         x:Name="RootGrid"
         Padding="20,20,0,0"
@@ -54,7 +58,7 @@
                         Description="Select Backdrop Type for Windows 11"
                         Header="Backdrop"
                         Icon="&#xE81E;">
-                        <ComboBox SelectedIndex="{Binding SelectedBackdrop, Mode=TwoWay}">
+                        <ComboBox SelectedIndex="{x:Bind Provider.SelectedBackdrop, Mode=TwoWay}">
                             <x:String>Mica</x:String>
                             <x:String>MicaAlt</x:String>
                             <x:String>Acrylic</x:String>
@@ -352,11 +356,19 @@
                         </controls:SettingExpander.Description>
                         <Grid Style="{StaticResource SettingExpanderContentGridStyle}">
                             <cwuc:MarkdownTextBlock
+                                x:Name="AboutMarkdown"
                                 HorizontalAlignment="Left"
+                                x:Load="{x:Bind IsCoreWindow}"
                                 Background="{ThemeResource SystemControlTransparentBrush}"
                                 LinkClicked="MarkdownText_LinkClicked"
                                 LinkForeground="{ThemeResource HyperlinkForeground}"
                                 Text="{x:Bind Provider.AboutTextBlockText, Mode=OneWay}" />
+                            <TextBlock
+                                x:Name="AboutTextBlock"
+                                HorizontalAlignment="Left"
+                                x:Load="{x:Bind IsCoreWindow, Converter={StaticResource BoolNegationConverter}}"
+                                Text="{x:Bind Provider.AboutTextBlockText, Mode=OneWay}"
+                                TextWrapping="Wrap" />
                         </Grid>
                     </controls:SettingExpander>
                 </controls:SettingsGroup>

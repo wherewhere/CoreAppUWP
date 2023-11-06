@@ -105,6 +105,7 @@ namespace CoreAppUWP.Controls
                     DesktopWindowXamlSource source = new();
                     source.Initialize(window.Id);
                     DesktopChildSiteBridge bridge = source.SiteBridge;
+                    bridge.ResizePolicy = ContentSizePolicy.ResizeContentToParentWindow;
                     window.Changed += (sender, args) =>
                     {
                         if (args.DidPresenterChange)
@@ -114,7 +115,6 @@ namespace CoreAppUWP.Controls
                         }
                     };
                     bridge.Show();
-                    bridge.ResizePolicy = ContentSizePolicy.ResizeContentToParentWindow;
                     launched(source);
                     hook.EndHook();
                     DesktopWindow desktopWindow = new()
@@ -153,11 +153,11 @@ namespace CoreAppUWP.Controls
                     HookWindowingModel hook = new();
                     hook.StartHook();
                     AppWindow window = AppWindow.Create();
-                    window.Destroying += (sender, args) => dispatcherQueue.EnqueueEventLoopExit();
                     window.AssociateWithDispatcherQueue(dispatcherQueue);
                     DesktopWindowXamlSource source = new();
                     source.Initialize(window.Id);
                     DesktopChildSiteBridge bridge = source.SiteBridge;
+                    bridge.ResizePolicy = ContentSizePolicy.ResizeContentToParentWindow;
                     window.Changed += (sender, args) =>
                     {
                         if (args.DidPresenterChange)
@@ -167,7 +167,6 @@ namespace CoreAppUWP.Controls
                         }
                     };
                     bridge.Show();
-                    bridge.ResizePolicy = ContentSizePolicy.ResizeContentToParentWindow;
                     launched(source);
                     hook.EndHook();
                     DesktopWindow desktopWindow = new()

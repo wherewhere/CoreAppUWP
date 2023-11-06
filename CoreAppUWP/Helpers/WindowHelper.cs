@@ -64,20 +64,20 @@ namespace CoreAppUWP.Helpers
 
         public static void TrackWindow(this DesktopWindow window)
         {
-            if (!ActiveDesktopWindow.ContainsKey(window.XamlRoot))
+            if (!ActiveDesktopWindows.ContainsKey(window.XamlRoot))
             {
                 window.AppWindow.Closing += (sender, args) =>
                 {
-                    ActiveDesktopWindow.Remove(window.XamlRoot);
+                    ActiveDesktopWindows.Remove(window.XamlRoot);
                     window = null;
                 };
-                ActiveDesktopWindow[window.XamlRoot] = window;
+                ActiveDesktopWindows[window.XamlRoot] = window;
                 BackdropHelper.RegisterWindow(window);
             }
         }
 
         public static DesktopWindow GetWindowForElement(this UIElement element) =>
-            ActiveDesktopWindow.TryGetValue(element.XamlRoot, out DesktopWindow window) ? window : null;
+            ActiveDesktopWindows.TryGetValue(element.XamlRoot, out DesktopWindow window) ? window : null;
 
         public static AppWindow GetAppWindow(this CoreWindow window)
         {
@@ -98,6 +98,6 @@ namespace CoreAppUWP.Helpers
 
         public static Dictionary<CoreDispatcher, Window> ActiveWindows { get; } = [];
         public static Dictionary<CoreWindow, AppWindow> ActiveAppWindows { get; } = [];
-        public static Dictionary<XamlRoot, DesktopWindow> ActiveDesktopWindow { get; } = [];
+        public static Dictionary<XamlRoot, DesktopWindow> ActiveDesktopWindows { get; } = [];
     }
 }

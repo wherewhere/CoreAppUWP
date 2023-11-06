@@ -48,7 +48,7 @@ namespace CoreAppUWP.ViewModels.SettingsPages
             }
         }
 
-        public static int SelectedBackdrop
+        public int SelectedBackdrop
         {
             get => (int)SettingsHelper.Get<BackdropType>(SettingsHelper.SelectedBackdrop);
             set
@@ -58,6 +58,7 @@ namespace CoreAppUWP.ViewModels.SettingsPages
                     BackdropType type = (BackdropType)value;
                     SettingsHelper.Set(SettingsHelper.SelectedBackdrop, type);
                     BackdropHelper.SetAllBackdrop(type);
+                    RaisePropertyChangedEvent();
                 }
             }
         }
@@ -160,7 +161,10 @@ namespace CoreAppUWP.ViewModels.SettingsPages
         {
             if (reset)
             {
-                RaisePropertyChangedEvent(nameof(SelectedTheme));
+                RaisePropertyChangedEvent(
+                    nameof(SelectedTheme),
+                    nameof(SelectedBackdrop),
+                    nameof(IsExtendsTitleBar));
             }
             await GetAboutTextBlockTextAsync();
         }

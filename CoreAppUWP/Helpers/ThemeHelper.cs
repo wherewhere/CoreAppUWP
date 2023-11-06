@@ -129,7 +129,7 @@ namespace CoreAppUWP.Helpers
                 }
             });
 
-            WindowHelper.ActiveDesktopWindow.Values.ForEach(async window =>
+            WindowHelper.ActiveDesktopWindows.Values.ForEach(async window =>
             {
                 if (!window.DispatcherQueue.HasThreadAccess)
                 {
@@ -162,7 +162,7 @@ namespace CoreAppUWP.Helpers
                 }
             }));
 
-            await Task.WhenAll(WindowHelper.ActiveDesktopWindow.Values.Select(async window =>
+            await Task.WhenAll(WindowHelper.ActiveDesktopWindows.Values.Select(async window =>
             {
                 if (!window.DispatcherQueue.HasThreadAccess)
                 {
@@ -265,7 +265,7 @@ namespace CoreAppUWP.Helpers
 
             if (!AppWindowTitleBar.IsCustomizationSupported()) { return; }
 
-            WindowHelper.ActiveDesktopWindow.Values.ForEach(async window =>
+            WindowHelper.ActiveDesktopWindows.Values.ForEach(async window =>
             {
                 if (window.DispatcherQueue?.HasThreadAccess == false)
                 {
@@ -299,7 +299,7 @@ namespace CoreAppUWP.Helpers
 
             if (!AppWindowTitleBar.IsCustomizationSupported()) { return; }
 
-            WindowHelper.ActiveDesktopWindow.Values.ForEach(async window =>
+            WindowHelper.ActiveDesktopWindows.Values.ForEach(async window =>
             {
                 if (window.DispatcherQueue?.HasThreadAccess == false)
                 {
