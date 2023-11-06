@@ -50,11 +50,14 @@ namespace CoreAppUWP.Helpers
 
         public static void CreateLogManager()
         {
-            string path = Path.Combine(ApplicationData.Current.LocalFolder.Path, "MetroLogs");
-            if (!Directory.Exists(path)) { Directory.CreateDirectory(path); }
-            LoggingConfiguration loggingConfiguration = new();
-            loggingConfiguration.AddTarget(LogLevel.Info, LogLevel.Fatal, new StreamingFileTarget(path, 7));
-            LogManager = LogManagerFactory.CreateLogManager(loggingConfiguration);
+            if (LogManager == null)
+            {
+                string path = Path.Combine(ApplicationData.Current.LocalFolder.Path, "MetroLogs");
+                if (!Directory.Exists(path)) { Directory.CreateDirectory(path); }
+                LoggingConfiguration loggingConfiguration = new();
+                loggingConfiguration.AddTarget(LogLevel.Info, LogLevel.Fatal, new StreamingFileTarget(path, 7));
+                LogManager = LogManagerFactory.CreateLogManager(loggingConfiguration);
+            }
         }
     }
 

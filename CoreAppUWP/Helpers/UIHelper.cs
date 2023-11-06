@@ -6,7 +6,6 @@ using Windows.Foundation.Metadata;
 using Windows.Graphics.Display;
 using Windows.Win32;
 using Windows.Win32.Foundation;
-using WinRT.Interop;
 
 namespace CoreAppUWP.Helpers
 {
@@ -26,10 +25,10 @@ namespace CoreAppUWP.Helpers
             return Convert.ToInt32(pixel * (currentDpi / 96.0));
         }
 
-        public static int GetDisplayPixel(this int pixel, IntPtr window)
+        public static double GetDisplayPixel(this int pixel, IntPtr window)
         {
             uint currentDpi = PInvoke.GetDpiForWindow(new HWND(window));
-            return Convert.ToInt32(pixel / (currentDpi / 96.0));
+            return pixel / (currentDpi / 96.0);
         }
 
         public static string ExceptionToMessage(this Exception ex)

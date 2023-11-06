@@ -38,7 +38,11 @@ namespace CoreAppUWP.Controls
         public bool ExtendsContentIntoTitleBar
         {
             get => AppWindow.TitleBar.ExtendsContentIntoTitleBar;
-            set => AppWindow.TitleBar.ExtendsContentIntoTitleBar = value;
+            set
+            {
+                AppWindow.TitleBar.ExtendsContentIntoTitleBar = value;
+                Refresh();
+            }
         }
 
         /// <summary>
@@ -96,13 +100,21 @@ namespace CoreAppUWP.Controls
                     DispatcherQueueController controller = DispatcherQueueController.CreateOnCurrentThread();
                     DispatcherQueue dispatcherQueue = controller.DispatcherQueue;
                     AppWindow window = AppWindow.Create();
+                    window.Destroying += (sender, args) => dispatcherQueue.EnqueueEventLoopExit();
                     window.AssociateWithDispatcherQueue(dispatcherQueue);
                     DesktopWindowXamlSource source = new();
                     source.Initialize(window.Id);
                     DesktopChildSiteBridge bridge = source.SiteBridge;
+                    window.Changed += (sender, args) =>
+                    {
+                        if (args.DidPresenterChange)
+                        {
+                            bridge.ResizePolicy = ContentSizePolicy.None;
+                            bridge.ResizePolicy = ContentSizePolicy.ResizeContentToParentWindow;
+                        }
+                    };
                     bridge.Show();
                     bridge.ResizePolicy = ContentSizePolicy.ResizeContentToParentWindow;
-                    window.Destroying += (sender, args) => dispatcherQueue.EnqueueEventLoopExit();
                     launched(source);
                     hook.EndHook();
                     DesktopWindow desktopWindow = new()
@@ -141,13 +153,21 @@ namespace CoreAppUWP.Controls
                     HookWindowingModel hook = new();
                     hook.StartHook();
                     AppWindow window = AppWindow.Create();
+                    window.Destroying += (sender, args) => dispatcherQueue.EnqueueEventLoopExit();
                     window.AssociateWithDispatcherQueue(dispatcherQueue);
                     DesktopWindowXamlSource source = new();
                     source.Initialize(window.Id);
                     DesktopChildSiteBridge bridge = source.SiteBridge;
+                    window.Changed += (sender, args) =>
+                    {
+                        if (args.DidPresenterChange)
+                        {
+                            bridge.ResizePolicy = ContentSizePolicy.None;
+                            bridge.ResizePolicy = ContentSizePolicy.ResizeContentToParentWindow;
+                        }
+                    };
                     bridge.Show();
                     bridge.ResizePolicy = ContentSizePolicy.ResizeContentToParentWindow;
-                    window.Destroying += (sender, args) => dispatcherQueue.EnqueueEventLoopExit();
                     launched(source);
                     hook.EndHook();
                     DesktopWindow desktopWindow = new()
@@ -176,5 +196,15 @@ namespace CoreAppUWP.Controls
         /// Closes the application window.
         /// </summary>
         public void Close() => AppWindow.Destroy();
+
+        /// <summary>
+        /// Refresh the <see cref="WindowXamlSource"/>.
+        /// </summary>
+        public void Refresh()
+        {
+            DesktopChildSiteBridge bridge = WindowXamlSource.SiteBridge;
+            bridge.ResizePolicy = ContentSizePolicy.None;
+            bridge.ResizePolicy = ContentSizePolicy.ResizeContentToParentWindow;
+        }
     }
 }

@@ -2,6 +2,7 @@
 using CoreAppUWP.Controls;
 using Microsoft.UI.Composition;
 using Microsoft.UI.Composition.SystemBackdrops;
+using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using System;
 using System.Collections.Generic;
@@ -72,7 +73,12 @@ namespace CoreAppUWP.Helpers
             {
                 window.Closed -= Window_Closed;
                 window.Activated -= Window_Activated;
-                ((FrameworkElement)window.Content).ActualThemeChanged -= Window_ThemeChanged;
+                ((FrameworkElement)window.Content).ActualThemeChanged -= FrameworkElement_ThemeChanged;
+            }
+            else
+            {
+                desktopWindow.AppWindow.Closing -= AppWindow_Closing;
+                ((FrameworkElement)desktopWindow.Content).ActualThemeChanged -= FrameworkElement_ThemeChanged;
             }
 
             m_configurationSource = null;
@@ -111,7 +117,12 @@ namespace CoreAppUWP.Helpers
                 {
                     window.Closed += Window_Closed;
                     window.Activated += Window_Activated;
-                    ((FrameworkElement)window.Content).ActualThemeChanged += Window_ThemeChanged;
+                    ((FrameworkElement)window.Content).ActualThemeChanged += FrameworkElement_ThemeChanged;
+                }
+                else
+                {
+                    desktopWindow.AppWindow.Closing += AppWindow_Closing;
+                    ((FrameworkElement)desktopWindow.Content).ActualThemeChanged += FrameworkElement_ThemeChanged;
                 }
 
                 // Initial configuration state.
@@ -149,7 +160,12 @@ namespace CoreAppUWP.Helpers
                 {
                     window.Closed += Window_Closed;
                     window.Activated += Window_Activated;
-                    ((FrameworkElement)window.Content).ActualThemeChanged += Window_ThemeChanged;
+                    ((FrameworkElement)window.Content).ActualThemeChanged += FrameworkElement_ThemeChanged;
+                }
+                else
+                {
+                    desktopWindow.AppWindow.Closing += AppWindow_Closing;
+                    ((FrameworkElement)desktopWindow.Content).ActualThemeChanged += FrameworkElement_ThemeChanged;
                 }
 
                 // Initial configuration state.
@@ -196,12 +212,30 @@ namespace CoreAppUWP.Helpers
                 m_acrylicController.Dispose();
                 m_acrylicController = null;
             }
-            ((FrameworkElement)window.Content).ActualThemeChanged -= Window_ThemeChanged;
+            ((FrameworkElement)window.Content).ActualThemeChanged -= FrameworkElement_ThemeChanged;
             window.Activated -= Window_Activated;
             m_configurationSource = null;
         }
 
-        private void Window_ThemeChanged(FrameworkElement sender, object args)
+        private void AppWindow_Closing(AppWindow sender, AppWindowClosingEventArgs args)
+        {
+            // Make sure any Mica/Acrylic controller is disposed so it doesn't try to
+            // use this closed window.
+            if (m_micaController != null)
+            {
+                m_micaController.Dispose();
+                m_micaController = null;
+            }
+            if (m_acrylicController != null)
+            {
+                m_acrylicController.Dispose();
+                m_acrylicController = null;
+            }
+            ((FrameworkElement)desktopWindow.Content).ActualThemeChanged -= FrameworkElement_ThemeChanged;
+            m_configurationSource = null;
+        }
+
+        private void FrameworkElement_ThemeChanged(FrameworkElement sender, object args)
         {
             if (m_configurationSource != null)
             {
