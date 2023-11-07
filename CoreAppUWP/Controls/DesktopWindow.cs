@@ -189,7 +189,11 @@ namespace CoreAppUWP.Controls
         /// <summary>
         /// Attempts to activate the application window by bringing it to the foreground and setting the input focus to it.
         /// </summary>
-        public void Activate() => AppWindow.Show();
+        public void Activate()
+        {
+            AppWindow.Show();
+            AppWindow.MoveInZOrderAtTop();
+        }
 
         /// <summary>
         /// Closes the application window.

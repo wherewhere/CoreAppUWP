@@ -308,9 +308,9 @@ namespace CoreAppUWP.Helpers
         {
             ActiveWindows.Values.ForEach(async x =>
             {
-                if (x.window.Dispatcher?.HasThreadAccess == false)
+                if (x.window.DispatcherQueue?.HasThreadAccess == false)
                 {
-                    await x.window.Dispatcher.ResumeForegroundAsync();
+                    await x.window.DispatcherQueue.ResumeForegroundAsync();
                 }
                 x.SetBackdrop(type);
             });

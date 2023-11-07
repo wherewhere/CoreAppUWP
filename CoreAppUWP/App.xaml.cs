@@ -3,6 +3,7 @@ using CoreAppUWP.Helpers;
 using CoreAppUWP.Pages;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Navigation;
 using System;
 using Windows.ApplicationModel.Core;
@@ -90,7 +91,7 @@ namespace CoreAppUWP
                 // 当导航堆栈尚未还原时，导航到第一页，
                 // 并通过将所需信息作为导航参数传入来配置
                 // 参数
-                rootFrame.Navigate(typeof(MainPage), e);
+                rootFrame.Navigate(typeof(MainPage), e, new DrillInNavigationTransitionInfo());
                 BackdropHelper.SetBackdrop(window, SettingsHelper.Get<BackdropType>(SettingsHelper.SelectedBackdrop));
             }
 

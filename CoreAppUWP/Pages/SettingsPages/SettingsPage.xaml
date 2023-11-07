@@ -119,7 +119,6 @@
                             Description="Create a new CoreWindow."
                             Header="CoreWindow"
                             IsClickEnabled="True"
-                            IsEnabled="{x:Bind IsCoreWindow}"
                             Style="{StaticResource ClickableSettingExpanderItemStyle}"
                             Tag="NewWindow" />
                         <controls:Setting
@@ -139,6 +138,7 @@
                         Description="Show settings charm pane."
                         Header="Open Settings"
                         IsClickEnabled="True"
+                        IsEnabled="{x:Bind IsCoreWindow}"
                         Tag="SettingsFlyout">
                         <controls:Setting.Icon>
                             <AnimatedIcon>
@@ -158,6 +158,7 @@
                         Description="Show search charm pane."
                         Header="Open Search"
                         IsClickEnabled="True"
+                        IsEnabled="{x:Bind IsCoreWindow}"
                         Tag="SearchFlyout">
                         <controls:Setting.Icon>
                             <AnimatedIcon>
