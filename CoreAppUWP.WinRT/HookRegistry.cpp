@@ -7,39 +7,46 @@ namespace winrt::CoreAppUWP::WinRT::implementation
 {
     void HookRegistry::IsHooked(bool value)
     {
-        if (value == isHooked)
-        {
-            return;
-        }
-
-        if (value)
-        {
-            StartHook();
-        }
-        else
-        {
-            EndHook();
-        }
+        if (value == isHooked) { return; }
+        if (value) { StartHook(); }
+        else { EndHook(); }
     }
 
     void HookRegistry::StartHook()
     {
-        DetourTransactionBegin();
-        DetourUpdateThread(currentThread);
-        DetourAttach((PVOID*)&BaseRegOpenKeyExW, OverrideRegOpenKeyExW);
-        DetourAttach((PVOID*)&BaseRegCloseKey, OverrideRegCloseKey);
-        DetourAttach((PVOID*)&BaseRegQueryValueExW, OverrideRegQueryValueExW);
-        DetourTransactionCommit();
+        if (!isHooked)
+        {
+            DetourTransactionBegin();
+            DetourUpdateThread(currentThread);
+            DetourAttach((PVOID*)&BaseRegOpenKeyExW, OverrideRegOpenKeyExW);
+            DetourAttach((PVOID*)&BaseRegCloseKey, OverrideRegCloseKey);
+            DetourAttach((PVOID*)&BaseRegQueryValueExW, OverrideRegQueryValueExW);
+            DetourTransactionCommit();
+            isHooked = true;
+        }
     }
 
     void HookRegistry::EndHook()
     {
-        DetourTransactionBegin();
-        DetourUpdateThread(currentThread);
-        DetourDetach((PVOID*)&BaseRegOpenKeyExW, OverrideRegOpenKeyExW);
-        DetourDetach((PVOID*)&BaseRegCloseKey, OverrideRegCloseKey);
-        DetourDetach((PVOID*)&BaseRegQueryValueExW, OverrideRegQueryValueExW);
-        DetourTransactionCommit();
+        if (isHooked)
+        {
+            DetourTransactionBegin();
+            DetourUpdateThread(currentThread);
+            DetourDetach((PVOID*)&BaseRegOpenKeyExW, OverrideRegOpenKeyExW);
+            DetourDetach((PVOID*)&BaseRegCloseKey, OverrideRegCloseKey);
+            DetourDetach((PVOID*)&BaseRegQueryValueExW, OverrideRegQueryValueExW);
+            DetourTransactionCommit();
+            isHooked = false;
+        }
+    }
+
+    void HookRegistry::Close()
+    {
+        if (currentThread)
+        {
+            EndHook();
+            currentThread = nullptr;
+        }
     }
 
     LSTATUS APIENTRY HookRegistry::OverrideRegOpenKeyExW(HKEY hkey, LPCWSTR lpSubKey, DWORD ulOptions, REGSAM samDesired, PHKEY phkResult)
@@ -69,7 +76,7 @@ namespace winrt::CoreAppUWP::WinRT::implementation
         bool isRealKey = false;
 
         std::lock_guard<std::mutex> lock(xamlKeyMtx);
-        auto pos = xamlKeyMap.find(hKey);
+        std::map<HKEY, bool>::iterator pos = xamlKeyMap.find(hKey);
 
         bool isXamlKey = pos != xamlKeyMap.end();
         if (isXamlKey)
@@ -94,9 +101,9 @@ namespace winrt::CoreAppUWP::WinRT::implementation
         {
             bool isRealKey = false;
             std::lock_guard<std::mutex> lock(xamlKeyMtx);
-            auto pos = xamlKeyMap.find(hKey);
+            std::map<HKEY, bool>::iterator pos = xamlKeyMap.find(hKey);
 
-            bool   isXamlKey = pos != xamlKeyMap.end();
+            bool isXamlKey = pos != xamlKeyMap.end();
             if (isXamlKey)
             {
                 isRealKey = pos->second;

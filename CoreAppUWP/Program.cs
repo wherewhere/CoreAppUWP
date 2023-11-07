@@ -58,25 +58,30 @@ namespace CoreAppUWP
             }
         }
 
-        [MTAThread]
         private static void Main()
         {
             ComWrappersSupport.InitializeComWrappers();
             if (IsPackagedApp)
             {
-                if (!IsSupportCoreWindow)
+                try
                 {
-                    hookRegistry = new HookRegistry();
-                    hookRegistry.StartHook();
+                    if (!IsSupportCoreWindow)
+                    {
+                        hookRegistry = new HookRegistry();
+                        hookRegistry.StartHook();
+                    }
+                    XamlCheckProcessRequirements();
+                    Application.Start(p =>
+                    {
+                        DispatcherQueueSynchronizationContext context = new(DispatcherQueue.GetForCurrentThread());
+                        SynchronizationContext.SetSynchronizationContext(context);
+                        _ = new App();
+                    });
                 }
-                XamlCheckProcessRequirements();
-                Application.Start(p =>
+                finally
                 {
-                    DispatcherQueueSynchronizationContext context = new(DispatcherQueue.GetForCurrentThread());
-                    SynchronizationContext.SetSynchronizationContext(context);
-                    _ = new App();
-                });
-                hookRegistry?.EndHook();
+                    hookRegistry?.Dispose();
+                }
             }
             else
             {

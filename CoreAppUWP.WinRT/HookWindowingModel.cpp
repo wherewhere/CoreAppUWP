@@ -7,35 +7,42 @@ namespace winrt::CoreAppUWP::WinRT::implementation
 {
     void HookWindowingModel::IsHooked(bool value)
     {
-        if (value == isHooked)
-        {
-            return;
-        }
-
-        if (value)
-        {
-            StartHook();
-        }
-        else
-        {
-            EndHook();
-        }
+        if (value == isHooked) { return; }
+        if (value) { StartHook(); }
+        else { EndHook(); }
     }
 
     void HookWindowingModel::StartHook()
     {
-        DetourTransactionBegin();
-        DetourUpdateThread(currentThread);
-        DetourAttach((PVOID*)&BaseAppPolicyGetWindowingModel, OverrideAppPolicyGetWindowingModel);
-        DetourTransactionCommit();
+        if (!isHooked)
+        {
+            DetourTransactionBegin();
+            DetourUpdateThread(currentThread);
+            DetourAttach((PVOID*)&BaseAppPolicyGetWindowingModel, OverrideAppPolicyGetWindowingModel);
+            DetourTransactionCommit();
+            isHooked = true;
+        }
     }
 
     void HookWindowingModel::EndHook()
     {
-        DetourTransactionBegin();
-        DetourUpdateThread(currentThread);
-        DetourDetach((PVOID*)&BaseAppPolicyGetWindowingModel, OverrideAppPolicyGetWindowingModel);
-        DetourTransactionCommit();
+        if (isHooked)
+        {
+            DetourTransactionBegin();
+            DetourUpdateThread(currentThread);
+            DetourDetach((PVOID*)&BaseAppPolicyGetWindowingModel, OverrideAppPolicyGetWindowingModel);
+            DetourTransactionCommit();
+            isHooked = false;
+        }
+    }
+
+    void HookWindowingModel::Close()
+    {
+        if (currentThread)
+        {
+            EndHook();
+            currentThread = nullptr;
+        }
     }
 
     LONG APIENTRY HookWindowingModel::OverrideAppPolicyGetWindowingModel(HANDLE processToken, AppPolicyWindowingModel* policy)

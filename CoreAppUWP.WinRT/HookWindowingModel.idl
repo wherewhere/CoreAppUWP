@@ -9,7 +9,7 @@ namespace CoreAppUWP.WinRT
     };
 
     [default_interface]
-    runtimeclass HookWindowingModel
+    runtimeclass HookWindowingModel : Windows.Foundation.IClosable
     {
         HookWindowingModel();
 

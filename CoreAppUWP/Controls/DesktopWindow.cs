@@ -123,17 +123,22 @@ namespace CoreAppUWP.Controls
             {
                 try
                 {
-                    HookWindowingModel hook = new();
-                    hook.StartHook();
-                    DispatcherQueueController controller = DispatcherQueueController.CreateOnCurrentThread();
-                    DispatcherQueue dispatcherQueue = controller.DispatcherQueue;
+                    DispatcherQueueController controller;
+                    DesktopWindowXamlSource source;
                     AppWindow window = AppWindow.Create();
-                    window.AssociateWithDispatcherQueue(dispatcherQueue);
-                    TrackWindow(window);
-                    DesktopWindowXamlSource source = new();
+
+                    using (HookWindowingModel hook = new())
+                    {
+                        hook.StartHook();
+                        controller = DispatcherQueueController.CreateOnCurrentThread();
+                        source = new();
+                    }
+
                     source.Initialize(window.Id);
                     DesktopChildSiteBridge bridge = source.SiteBridge;
                     bridge.ResizePolicy = ContentSizePolicy.ResizeContentToParentWindow;
+                    bridge.Show();
+
                     window.Changed += (sender, args) =>
                     {
                         if (args.DidPresenterChange)
@@ -142,15 +147,19 @@ namespace CoreAppUWP.Controls
                             bridge.ResizePolicy = ContentSizePolicy.ResizeContentToParentWindow;
                         }
                     };
-                    bridge.Show();
+
+                    DispatcherQueue dispatcherQueue = controller.DispatcherQueue;
+                    window.AssociateWithDispatcherQueue(dispatcherQueue);
+                    TrackWindow(window);
+
                     launched(source);
-                    hook.EndHook();
                     DesktopWindow desktopWindow = new()
                     {
                         AppWindow = window,
                         WindowXamlSource = source
                     };
                     taskCompletionSource.SetResult(desktopWindow);
+
                     dispatcherQueue.RunEventLoop();
                     await controller.ShutdownQueueAsync();
                 }
@@ -180,15 +189,22 @@ namespace CoreAppUWP.Controls
             {
                 try
                 {
-                    HookWindowingModel hook = new();
-                    hook.StartHook();
+                    DesktopWindowXamlSource source;
                     AppWindow window = AppWindow.Create();
                     window.AssociateWithDispatcherQueue(dispatcherQueue);
                     TrackWindow(window);
-                    DesktopWindowXamlSource source = new();
+
+                    using (HookWindowingModel hook = new())
+                    {
+                        hook.StartHook();
+                        source = new();
+                    }
+
                     source.Initialize(window.Id);
                     DesktopChildSiteBridge bridge = source.SiteBridge;
                     bridge.ResizePolicy = ContentSizePolicy.ResizeContentToParentWindow;
+                    bridge.Show();
+
                     window.Changed += (sender, args) =>
                     {
                         if (args.DidPresenterChange)
@@ -197,9 +213,8 @@ namespace CoreAppUWP.Controls
                             bridge.ResizePolicy = ContentSizePolicy.ResizeContentToParentWindow;
                         }
                     };
-                    bridge.Show();
+
                     launched(source);
-                    hook.EndHook();
                     DesktopWindow desktopWindow = new()
                     {
                         AppWindow = window,

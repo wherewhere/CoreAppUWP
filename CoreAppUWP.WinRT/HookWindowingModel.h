@@ -23,6 +23,7 @@ namespace winrt::CoreAppUWP::WinRT::implementation
 
         void StartHook();
         void EndHook();
+        void Close();
 
     private:
         bool isHooked = false;
