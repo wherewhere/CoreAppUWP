@@ -23,15 +23,17 @@ namespace CoreAppUWP.ViewModels.SettingsPages
     {
         public static Dictionary<DispatcherQueue, SettingsViewModel> Caches { get; } = [];
 
-        public static string WASVersion => Assembly.GetAssembly(typeof(ExtendedActivationKind)).GetName().Version.ToString(3);
+        public static string WASVersion { get; } = Assembly.GetAssembly(typeof(ExtendedActivationKind)).GetName().Version.ToString(3);
 
-        public static string SDKVersion => Assembly.GetAssembly(typeof(PackageSignatureKind)).GetName().Version.ToString();
+        public static string SDKVersion { get; } = Assembly.GetAssembly(typeof(PackageSignatureKind)).GetName().Version.ToString();
 
-        public static string WinRTVersion => Assembly.GetAssembly(typeof(TrustLevel)).GetName().Version.ToString(3);
+        public static string WinRTVersion { get; } = Assembly.GetAssembly(typeof(TrustLevel)).GetName().Version.ToString(3);
 
-        public static string DeviceFamily => AnalyticsInfo.VersionInfo.DeviceFamily.Replace('.', ' ');
+        public static string DeviceFamily { get; } = AnalyticsInfo.VersionInfo.DeviceFamily.Replace('.', ' ');
 
-        public static string ToolkitVersion => Assembly.GetAssembly(typeof(HsvColor)).GetName().Version.ToString(3);
+        public static string ToolkitVersion { get; } = Assembly.GetAssembly(typeof(HsvColor)).GetName().Version.ToString(3);
+
+        public static string VersionTextBlockText { get; } = $"{Package.Current.DisplayName} v{Package.Current.Id.Version.ToFormattedString(3)}";
 
         public DispatcherQueue Dispatcher { get; }
 
@@ -134,33 +136,25 @@ namespace CoreAppUWP.ViewModels.SettingsPages
             }
         }
 
-        public string VersionTextBlockText
-        {
-            get
-            {
-                string ver = Package.Current.Id.Version.ToFormattedString(3);
-                string name = Package.Current.DisplayName;
-                _ = GetAboutTextBlockTextAsync();
-                return $"{name} v{ver}";
-            }
-        }
-
         public SettingsViewModel(DispatcherQueue dispatcher)
         {
             Dispatcher = dispatcher ?? DispatcherQueue.GetForCurrentThread();
             Caches[dispatcher] = this;
         }
 
-        private async Task GetAboutTextBlockTextAsync()
+        private async Task GetAboutTextBlockTextAsync(bool reset)
         {
-            await ThreadSwitcher.ResumeBackgroundAsync();
-            const string langCode = "en-US";
-            Uri dataUri = new($"ms-appx:///Assets/About/About.{langCode}.md");
-            StorageFile file = await StorageFile.GetFileFromApplicationUriAsync(dataUri);
-            if (file != null)
+            if (reset || string.IsNullOrWhiteSpace(_aboutTextBlockText))
             {
-                string markdown = await FileIO.ReadTextAsync(file);
-                AboutTextBlockText = markdown;
+                await ThreadSwitcher.ResumeBackgroundAsync();
+                const string langCode = "en-US";
+                Uri dataUri = new($"ms-appx:///Assets/About/About.{langCode}.md");
+                StorageFile file = await StorageFile.GetFileFromApplicationUriAsync(dataUri);
+                if (file != null)
+                {
+                    string markdown = await FileIO.ReadTextAsync(file);
+                    AboutTextBlockText = markdown;
+                }
             }
         }
 
@@ -168,8 +162,8 @@ namespace CoreAppUWP.ViewModels.SettingsPages
         {
             if (!_isProcessKept)
             {
-                _ = Dispatcher.TryEnqueue(() => Dispatcher.RunEventLoop(DispatcherRunOptions.ContinueOnQuit, new DispatcherExitDeferral()));
                 IsProcessKept = true;
+                Dispatcher.RunEventLoop(DispatcherRunOptions.ContinueOnQuit, new DispatcherExitDeferral());
             }
         }
 
@@ -182,7 +176,7 @@ namespace CoreAppUWP.ViewModels.SettingsPages
                     nameof(SelectedBackdrop),
                     nameof(IsExtendsTitleBar));
             }
-            await GetAboutTextBlockTextAsync();
+            await GetAboutTextBlockTextAsync(reset);
         }
     }
 }

@@ -119,7 +119,7 @@ namespace CoreAppUWP.Controls
         {
             TaskCompletionSource<DesktopWindow> taskCompletionSource = new();
 
-            Thread thread = new(async () =>
+            new Thread(async () =>
             {
                 try
                 {
@@ -158,8 +158,10 @@ namespace CoreAppUWP.Controls
                 {
                     taskCompletionSource.SetException(e);
                 }
-            });
-            thread.Start();
+            })
+            {
+                Name = nameof(DesktopWindowXamlSource)
+            }.Start();
 
             return taskCompletionSource.Task;
         }
@@ -204,7 +206,6 @@ namespace CoreAppUWP.Controls
                         WindowXamlSource = source
                     };
                     taskCompletionSource.SetResult(desktopWindow);
-                    dispatcherQueue.RunEventLoop();
                 }
                 catch (Exception e)
                 {

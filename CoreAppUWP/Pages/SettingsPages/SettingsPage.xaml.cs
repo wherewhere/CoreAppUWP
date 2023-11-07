@@ -6,6 +6,7 @@ using CoreAppUWP.ViewModels.SettingsPages;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Hosting;
 using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Navigation;
 using System;
@@ -92,6 +93,7 @@ namespace CoreAppUWP.Pages.SettingsPages
                     { desktopWindow.AppWindow.SetPresenter(AppWindowPresenterKind.CompactOverlay); }
                     break;
                 case "NewWindow":
+                    bool isProcessKept = Provider.IsProcessKept;
                     _ = await WindowHelper.CreateWindowAsync(window =>
                     {
                         if (SettingsHelper.Get<bool>(SettingsHelper.IsExtendsTitleBar))
@@ -99,25 +101,25 @@ namespace CoreAppUWP.Pages.SettingsPages
                         Frame _frame = new();
                         window.Content = _frame;
                         ThemeHelper.Initialize(window);
-                        try { _ = _frame.Navigate(typeof(MainPage), null, new DrillInNavigationTransitionInfo()); }
-                        catch { _ = _frame.Navigate(typeof(MainPage)); }
+                        NavigationTransitionInfo transitionInfo = null;
+                        if (!isProcessKept) { try { transitionInfo = new DrillInNavigationTransitionInfo(); } catch { } }
+                        _ = _frame.Navigate(typeof(MainPage), null, transitionInfo);
                         BackdropHelper.SetBackdrop(window, SettingsHelper.Get<BackdropType>(SettingsHelper.SelectedBackdrop));
                     });
                     break;
                 case "NewAppWindow":
+                    isProcessKept = Provider.IsProcessKept;
                     DesktopWindow window = await (IsCoreWindow
-                        ? WindowHelper.CreateDesktopWindowAsync(window =>
-                        {
-                            Frame _frame = new();
-                            window.Content = _frame;
-                            _ = _frame.Navigate(typeof(MainPage), null, new DrillInNavigationTransitionInfo());
-                        })
-                        : DispatcherQueue.CreateDesktopWindowAsync(window =>
-                        {
-                            Frame _frame = new();
-                            window.Content = _frame;
-                            _ = _frame.Navigate(typeof(MainPage), null, new DrillInNavigationTransitionInfo());
-                        })).ConfigureAwait(false);
+                        ? WindowHelper.CreateDesktopWindowAsync(OnLaunched)
+                        : DispatcherQueue.CreateDesktopWindowAsync(OnLaunched)).ConfigureAwait(false);
+                    void OnLaunched(DesktopWindowXamlSource source)
+                    {
+                        Frame _frame = new();
+                        source.Content = _frame;
+                        NavigationTransitionInfo transitionInfo = null;
+                        if (!isProcessKept) { try { transitionInfo = new DrillInNavigationTransitionInfo(); } catch { } }
+                        _ = _frame.Navigate(typeof(MainPage), null, transitionInfo);
+                    }
                     if (AppWindowTitleBar.IsCustomizationSupported()
                         && SettingsHelper.Get<bool>(SettingsHelper.IsExtendsTitleBar))
                     { window.ExtendsContentIntoTitleBar = true; }

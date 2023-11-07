@@ -225,7 +225,7 @@
                                 Grid.Column="1"
                                 Padding="32,0,0,8"
                                 Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                Text="{Binding DeviceFamily}"
+                                Text="{x:Bind settingspages:SettingsViewModel.DeviceFamily}"
                                 TextWrapping="WrapWholeWords" />
 
                             <TextBlock
@@ -253,7 +253,7 @@
                                 Grid.Column="1"
                                 Padding="32,0,0,8"
                                 Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                Text="{Binding WinRTVersion}"
+                                Text="{x:Bind settingspages:SettingsViewModel.WinRTVersion}"
                                 TextWrapping="WrapWholeWords" />
 
                             <TextBlock
@@ -267,7 +267,7 @@
                                 Grid.Column="1"
                                 Padding="32,0,0,8"
                                 Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                Text="{Binding SDKVersion}"
+                                Text="{x:Bind settingspages:SettingsViewModel.SDKVersion}"
                                 TextWrapping="WrapWholeWords" />
 
                             <TextBlock
@@ -281,7 +281,7 @@
                                 Grid.Column="1"
                                 Padding="32,0,0,8"
                                 Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                Text="{Binding WASVersion}"
+                                Text="{x:Bind settingspages:SettingsViewModel.WASVersion}"
                                 TextWrapping="WrapWholeWords" />
 
                             <TextBlock
@@ -295,7 +295,7 @@
                                 Grid.Column="1"
                                 Padding="32,0,0,8"
                                 Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                Text="{Binding ToolkitVersion}"
+                                Text="{x:Bind settingspages:SettingsViewModel.ToolkitVersion}"
                                 TextWrapping="WrapWholeWords" />
 
                             <TextBlock
@@ -341,7 +341,7 @@
                     </controls:Setting>
                 </controls:SettingsGroup>
                 <controls:SettingsGroup Header="About">
-                    <controls:SettingExpander Header="{x:Bind Provider.VersionTextBlockText, Mode=OneWay}">
+                    <controls:SettingExpander Header="{x:Bind settingspages:SettingsViewModel.VersionTextBlockText, Mode=OneWay}">
                         <controls:SettingExpander.Icon>
                             <controls:AppLogo FontFamily="{StaticResource ContentControlThemeFontFamily}" />
                         </controls:SettingExpander.Icon>
