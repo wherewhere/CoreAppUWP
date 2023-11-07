@@ -91,7 +91,7 @@ namespace CoreAppUWP.Pages.SettingsPages
                     else if (this.GetWindowForElement() is DesktopWindow desktopWindow)
                     { desktopWindow.AppWindow.SetPresenter(AppWindowPresenterKind.CompactOverlay); }
                     break;
-                case "NewWindow" when IsCoreWindow:
+                case "NewWindow":
                     _ = await WindowHelper.CreateWindowAsync(window =>
                     {
                         if (SettingsHelper.Get<bool>(SettingsHelper.IsExtendsTitleBar))
@@ -99,7 +99,7 @@ namespace CoreAppUWP.Pages.SettingsPages
                         Frame _frame = new();
                         window.Content = _frame;
                         ThemeHelper.Initialize(window);
-                        _ = _frame.Navigate(typeof(MainPage), null, new DrillInNavigationTransitionInfo());
+                        _ = _frame.Navigate(typeof(MainPage));
                         BackdropHelper.SetBackdrop(window, SettingsHelper.Get<BackdropType>(SettingsHelper.SelectedBackdrop));
                     });
                     break;

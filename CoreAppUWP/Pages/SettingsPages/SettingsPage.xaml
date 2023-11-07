@@ -119,7 +119,7 @@
                             Description="Create a new CoreWindow."
                             Header="CoreWindow"
                             IsClickEnabled="True"
-                            IsEnabled="{x:Bind IsCoreWindow}"
+
                             Style="{StaticResource ClickableSettingExpanderItemStyle}"
                             Tag="NewWindow" />
                         <controls:Setting
