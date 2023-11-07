@@ -99,7 +99,8 @@ namespace CoreAppUWP.Pages.SettingsPages
                         Frame _frame = new();
                         window.Content = _frame;
                         ThemeHelper.Initialize(window);
-                        _ = _frame.Navigate(typeof(MainPage));
+                        try { _ = _frame.Navigate(typeof(MainPage), null, new DrillInNavigationTransitionInfo()); }
+                        catch { _ = _frame.Navigate(typeof(MainPage)); }
                         BackdropHelper.SetBackdrop(window, SettingsHelper.Get<BackdropType>(SettingsHelper.SelectedBackdrop));
                     });
                     break;
@@ -118,8 +119,7 @@ namespace CoreAppUWP.Pages.SettingsPages
                     AppWindow appWindow = window.AppWindow;
                     appWindow.Title = Package.Current.DisplayName;
                     appWindow.SetIcon("favicon.ico");
-                    appWindow.Show();
-                    appWindow.MoveInZOrderAtTop();
+                    window.Activate();
                     break;
                 case "SearchFlyout" when SettingsPaneRegister.IsSearchPaneSupported:
                     SearchPane.GetForCurrentView().Show();
