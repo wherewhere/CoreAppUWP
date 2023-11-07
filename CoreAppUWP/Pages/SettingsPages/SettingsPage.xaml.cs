@@ -119,6 +119,7 @@ namespace CoreAppUWP.Pages.SettingsPages
                     appWindow.Title = Package.Current.DisplayName;
                     appWindow.SetIcon("favicon.ico");
                     appWindow.Show();
+                    appWindow.MoveInZOrderAtTop();
                     break;
                 case "SearchFlyout" when SettingsPaneRegister.IsSearchPaneSupported:
                     SearchPane.GetForCurrentView().Show();
