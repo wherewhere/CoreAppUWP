@@ -105,12 +105,19 @@ namespace CoreAppUWP.Pages.SettingsPages
                     });
                     break;
                 case "NewAppWindow":
-                    DesktopWindow window = await WindowHelper.CreateDesktopWindowAsync(window =>
-                    {
-                        Frame _frame = new();
-                        window.Content = _frame;
-                        _ = _frame.Navigate(typeof(MainPage), null, new DrillInNavigationTransitionInfo());
-                    }).ConfigureAwait(false);
+                    DesktopWindow window = await (IsCoreWindow
+                        ? WindowHelper.CreateDesktopWindowAsync(window =>
+                        {
+                            Frame _frame = new();
+                            window.Content = _frame;
+                            _ = _frame.Navigate(typeof(MainPage), null, new DrillInNavigationTransitionInfo());
+                        })
+                        : DispatcherQueue.CreateDesktopWindowAsync(window =>
+                        {
+                            Frame _frame = new();
+                            window.Content = _frame;
+                            _ = _frame.Navigate(typeof(MainPage), null, new DrillInNavigationTransitionInfo());
+                        })).ConfigureAwait(false);
                     if (AppWindowTitleBar.IsCustomizationSupported()
                         && SettingsHelper.Get<bool>(SettingsHelper.IsExtendsTitleBar))
                     { window.ExtendsContentIntoTitleBar = true; }

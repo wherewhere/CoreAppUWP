@@ -6,12 +6,13 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Hosting;
 using Microsoft.UI.Xaml.Media;
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace CoreAppUWP.Controls
 {
-    public class DesktopWindow
+    public partial class DesktopWindow
     {
         /// <summary>
         /// Gets the <see cref="AppWindow"/> associated with this XAML Window.
@@ -83,6 +84,33 @@ namespace CoreAppUWP.Controls
         public DesktopWindowXamlSource WindowXamlSource { get; private set; }
 
         /// <summary>
+        /// Attempts to activate the application window by bringing it to the foreground and setting the input focus to it.
+        /// </summary>
+        public void Activate()
+        {
+            AppWindow.Show();
+            AppWindow.MoveInZOrderAtTop();
+        }
+
+        /// <summary>
+        /// Closes the application window.
+        /// </summary>
+        public void Close() => AppWindow.Destroy();
+
+        /// <summary>
+        /// Refresh the <see cref="WindowXamlSource"/>.
+        /// </summary>
+        public void Refresh()
+        {
+            DesktopChildSiteBridge bridge = WindowXamlSource.SiteBridge;
+            bridge.ResizePolicy = ContentSizePolicy.None;
+            bridge.ResizePolicy = ContentSizePolicy.ResizeContentToParentWindow;
+        }
+    }
+
+    public partial class DesktopWindow
+    {
+        /// <summary>
         /// Create a new <see cref="DesktopWindow"/> instance.
         /// </summary>
         /// <param name="launched">Do something after <see cref="DesktopWindowXamlSource"/> created.</param>
@@ -100,8 +128,8 @@ namespace CoreAppUWP.Controls
                     DispatcherQueueController controller = DispatcherQueueController.CreateOnCurrentThread();
                     DispatcherQueue dispatcherQueue = controller.DispatcherQueue;
                     AppWindow window = AppWindow.Create();
-                    window.Destroying += (sender, args) => dispatcherQueue.EnqueueEventLoopExit();
                     window.AssociateWithDispatcherQueue(dispatcherQueue);
+                    TrackWindow(window);
                     DesktopWindowXamlSource source = new();
                     source.Initialize(window.Id);
                     DesktopChildSiteBridge bridge = source.SiteBridge;
@@ -154,6 +182,7 @@ namespace CoreAppUWP.Controls
                     hook.StartHook();
                     AppWindow window = AppWindow.Create();
                     window.AssociateWithDispatcherQueue(dispatcherQueue);
+                    TrackWindow(window);
                     DesktopWindowXamlSource source = new();
                     source.Initialize(window.Id);
                     DesktopChildSiteBridge bridge = source.SiteBridge;
@@ -186,28 +215,35 @@ namespace CoreAppUWP.Controls
             return taskCompletionSource.Task;
         }
 
-        /// <summary>
-        /// Attempts to activate the application window by bringing it to the foreground and setting the input focus to it.
-        /// </summary>
-        public void Activate()
+        private static void TrackWindow(AppWindow window)
         {
-            AppWindow.Show();
-            AppWindow.MoveInZOrderAtTop();
+            if (ActiveDesktopWindows.ContainsKey(window.DispatcherQueue))
+            {
+                ActiveDesktopWindows[window.DispatcherQueue] += 1;
+            }
+            else
+            {
+                ActiveDesktopWindows[window.DispatcherQueue] = 1;
+            }
+            window.Destroying -= AppWindow_Destroying;
+            window.Destroying += AppWindow_Destroying;
         }
 
-        /// <summary>
-        /// Closes the application window.
-        /// </summary>
-        public void Close() => AppWindow.Destroy();
-
-        /// <summary>
-        /// Refresh the <see cref="WindowXamlSource"/>.
-        /// </summary>
-        public void Refresh()
+        private static void AppWindow_Destroying(AppWindow sender, object args)
         {
-            DesktopChildSiteBridge bridge = WindowXamlSource.SiteBridge;
-            bridge.ResizePolicy = ContentSizePolicy.None;
-            bridge.ResizePolicy = ContentSizePolicy.ResizeContentToParentWindow;
+            if (ActiveDesktopWindows.TryGetValue(sender.DispatcherQueue, out ulong num))
+            {
+                num--;
+                if (num == 0)
+                {
+                    ActiveDesktopWindows.Remove(sender.DispatcherQueue);
+                    sender.DispatcherQueue.EnqueueEventLoopExit();
+                    return;
+                }
+                ActiveDesktopWindows[sender.DispatcherQueue] = num;
+            }
         }
+
+        private static Dictionary<DispatcherQueue, ulong> ActiveDesktopWindows { get; } = [];
     }
 }

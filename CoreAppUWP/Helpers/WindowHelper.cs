@@ -1,6 +1,7 @@
 ﻿using CoreAppUWP.Common;
 using CoreAppUWP.Controls;
 using Microsoft.UI;
+using Microsoft.UI.Dispatching;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Hosting;
@@ -42,6 +43,13 @@ namespace CoreAppUWP.Helpers
         public static async Task<DesktopWindow> CreateDesktopWindowAsync(Action<DesktopWindowXamlSource> launched)
         {
             DesktopWindow newWindow = await DesktopWindow.CreateAsync(launched).ConfigureAwait(false);
+            TrackWindow(newWindow);
+            return newWindow;
+        }
+
+        public static async Task<DesktopWindow> CreateDesktopWindowAsync(this DispatcherQueue dispatcherQueue, Action<DesktopWindowXamlSource> launched)
+        {
+            DesktopWindow newWindow = await DesktopWindow.CreateAsync(dispatcherQueue, launched).ConfigureAwait(false);
             TrackWindow(newWindow);
             return newWindow;
         }
