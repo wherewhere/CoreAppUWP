@@ -146,6 +146,9 @@ namespace CoreAppUWP.Pages.SettingsPages
                     else if (this.GetWindowForElement() is DesktopWindow desktopWindow)
                     { desktopWindow.AppWindow.SetPresenter(AppWindowPresenterKind.FullScreen); }
                     break;
+                case "KeepProcess" when IsCoreWindow:
+                    Provider.KeepProcess();
+                    break;
                 default:
                     break;
             }

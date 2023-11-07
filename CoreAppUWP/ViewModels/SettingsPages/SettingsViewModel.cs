@@ -78,6 +78,13 @@ namespace CoreAppUWP.ViewModels.SettingsPages
             }
         }
 
+        private static bool _isProcessKept;
+        public bool IsProcessKept
+        {
+            get => _isProcessKept;
+            set => SetProperty(ref _isProcessKept, value);
+        }
+
         private static string _aboutTextBlockText;
         public string AboutTextBlockText
         {
@@ -154,6 +161,15 @@ namespace CoreAppUWP.ViewModels.SettingsPages
             {
                 string markdown = await FileIO.ReadTextAsync(file);
                 AboutTextBlockText = markdown;
+            }
+        }
+
+        public void KeepProcess()
+        {
+            if (!_isProcessKept)
+            {
+                _ = Dispatcher.TryEnqueue(() => Dispatcher.RunEventLoop(DispatcherRunOptions.ContinueOnQuit, new DispatcherExitDeferral()));
+                IsProcessKept = true;
             }
         }
 

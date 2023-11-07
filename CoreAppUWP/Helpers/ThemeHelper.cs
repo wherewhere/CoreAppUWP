@@ -18,7 +18,7 @@ namespace CoreAppUWP.Helpers
     /// </summary>
     public static class ThemeHelper
     {
-        private static Window CurrentApplicationWindow;
+        public static Window CurrentApplicationWindow { get; private set; }
 
         // Keep reference so it does not get optimized/garbage collected
         public static UISettings UISettings { get; } = new UISettings();

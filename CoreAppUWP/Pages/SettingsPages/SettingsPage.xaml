@@ -55,7 +55,7 @@
                         </ComboBox>
                     </controls:Setting>
                     <controls:Setting
-                        Description="Select Backdrop Type for Windows 11"
+                        Description="Select backdrop type for Windows 11"
                         Header="Backdrop"
                         Icon="&#xE81E;">
                         <ComboBox SelectedIndex="{x:Bind Provider.SelectedBackdrop, Mode=TwoWay}">
@@ -175,7 +175,7 @@
                 <controls:SettingsGroup Header="Configs">
                     <controls:Setting
                         Description="Reset settings of this application."
-                        Header="Reset application"
+                        Header="Reset Application"
                         Icon="&#xE777;">
                         <Button Name="Reset" Content="Reset">
                             <Button.Flyout>
@@ -327,6 +327,18 @@
                                 TextWrapping="WrapWholeWords" />
                         </Grid>
                     </controls:SettingExpander>
+                    <controls:Setting
+                        Click="Button_Click"
+                        Description="Keep the process and the application will not exit after CoreWindow is closed."
+                        Header="Keep Process"
+                        Icon="&#xE9F5;"
+                        IsClickEnabled="True"
+                        Tag="KeepProcess">
+                        <Grid>
+                            <ToggleSwitch IsOn="{x:Bind Provider.IsProcessKept, Mode=OneWay}" Style="{StaticResource ToggleSwitchSettingStyle}" />
+                            <Border Background="{ThemeResource SystemControlTransparentBrush}" />
+                        </Grid>
+                    </controls:Setting>
                 </controls:SettingsGroup>
                 <controls:SettingsGroup Header="About">
                     <controls:SettingExpander Header="{x:Bind Provider.VersionTextBlockText, Mode=OneWay}">
