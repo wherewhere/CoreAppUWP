@@ -10,7 +10,7 @@
   <Identity
     Name="wherewhere.CoreAppUWP"
     Publisher="CN=where"
-    Version="1.0.0.0" />
+    Version="0.0.1.0" />
 
   <mp:PhoneIdentity PhoneProductId="5821cf42-963a-4994-8c75-73a3420f4726" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 
