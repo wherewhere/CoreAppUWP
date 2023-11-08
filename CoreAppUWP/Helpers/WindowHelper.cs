@@ -26,7 +26,7 @@ namespace CoreAppUWP.Helpers
     /// </summary>
     public static class WindowHelper
     {
-        public static async Task<bool> CreateWindowAsync(Action<Window> launched)
+        public static async ValueTask<bool> CreateWindowAsync(Action<Window> launched)
         {
             CoreApplicationView newView = CoreApplication.CreateNewView();
             int newViewId = await newView.Dispatcher.AwaitableRunAsync(() =>
@@ -40,14 +40,14 @@ namespace CoreAppUWP.Helpers
             return await ApplicationViewSwitcher.TryShowAsStandaloneAsync(newViewId);
         }
 
-        public static async Task<DesktopWindow> CreateDesktopWindowAsync(Action<DesktopWindowXamlSource> launched)
+        public static async ValueTask<DesktopWindow> CreateDesktopWindowAsync(Action<DesktopWindowXamlSource> launched)
         {
             DesktopWindow newWindow = await DesktopWindow.CreateAsync(launched).ConfigureAwait(false);
             TrackWindow(newWindow);
             return newWindow;
         }
 
-        public static async Task<DesktopWindow> CreateDesktopWindowAsync(this DispatcherQueue dispatcherQueue, Action<DesktopWindowXamlSource> launched)
+        public static async ValueTask<DesktopWindow> CreateDesktopWindowAsync(this DispatcherQueue dispatcherQueue, Action<DesktopWindowXamlSource> launched)
         {
             DesktopWindow newWindow = await DesktopWindow.CreateAsync(dispatcherQueue, launched).ConfigureAwait(false);
             TrackWindow(newWindow);

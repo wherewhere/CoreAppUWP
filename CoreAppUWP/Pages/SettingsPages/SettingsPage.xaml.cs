@@ -171,7 +171,7 @@ namespace CoreAppUWP.Pages.SettingsPages
             }
         }
 
-        public Task Refresh(bool reset = false) => Provider.Refresh(reset);
+        public ValueTask Refresh(bool reset = false) => Provider.Refresh(reset);
 
         private void MarkdownText_LinkClicked(object sender, LinkClickedEventArgs e) => _ = Launcher.LaunchUriAsync(new Uri(e.Link));
     }

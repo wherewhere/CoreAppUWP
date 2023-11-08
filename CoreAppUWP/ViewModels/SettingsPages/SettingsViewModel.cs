@@ -142,7 +142,7 @@ namespace CoreAppUWP.ViewModels.SettingsPages
             Caches[dispatcher] = this;
         }
 
-        private async Task GetAboutTextBlockTextAsync(bool reset)
+        private async ValueTask GetAboutTextBlockTextAsync(bool reset)
         {
             if (reset || string.IsNullOrWhiteSpace(_aboutTextBlockText))
             {
@@ -167,7 +167,7 @@ namespace CoreAppUWP.ViewModels.SettingsPages
             }
         }
 
-        public async Task Refresh(bool reset)
+        public async ValueTask Refresh(bool reset)
         {
             if (reset)
             {

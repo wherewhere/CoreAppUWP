@@ -53,10 +53,10 @@ namespace CoreAppUWP.Helpers
                             ? rootElement.RequestedTheme
                             : SettingsHelper.Get<ElementTheme>(SettingsHelper.SelectedAppTheme);
 
-        public static Task<ElementTheme> GetActualThemeAsync() =>
+        public static ValueTask<ElementTheme> GetActualThemeAsync() =>
             GetActualThemeAsync(Window.Current ?? CurrentApplicationWindow);
 
-        public static async Task<ElementTheme> GetActualThemeAsync(Window window) =>
+        public static async ValueTask<ElementTheme> GetActualThemeAsync(Window window) =>
             window == null
                 ? SettingsHelper.Get<ElementTheme>(SettingsHelper.SelectedAppTheme)
                 : window.DispatcherQueue?.HasThreadAccess == false
@@ -100,10 +100,10 @@ namespace CoreAppUWP.Helpers
                             : ElementTheme.Default,
                         DispatcherQueuePriority.High).AwaitByTaskCompleteSource();
 
-        public static Task<ElementTheme> GetRootThemeAsync() =>
+        public static ValueTask<ElementTheme> GetRootThemeAsync() =>
             GetRootThemeAsync(Window.Current ?? CurrentApplicationWindow);
 
-        public static async Task<ElementTheme> GetRootThemeAsync(Window window) =>
+        public static async ValueTask<ElementTheme> GetRootThemeAsync(Window window) =>
             window == null
                 ? ElementTheme.Default
                 : window.DispatcherQueue.HasThreadAccess
@@ -149,7 +149,7 @@ namespace CoreAppUWP.Helpers
             UISettingChanged.Invoke(await IsDarkThemeAsync());
         }
 
-        public static async Task SetRootThemeAsync(ElementTheme value)
+        public static async ValueTask SetRootThemeAsync(ElementTheme value)
         {
             await Task.WhenAll(WindowHelper.ActiveWindows.Values.Select(async window =>
             {
@@ -230,7 +230,7 @@ namespace CoreAppUWP.Helpers
                     : ActualTheme == ElementTheme.Dark;
         }
 
-        public static async Task<bool> IsDarkThemeAsync()
+        public static async ValueTask<bool> IsDarkThemeAsync()
         {
             ElementTheme ActualTheme = await GetActualThemeAsync();
             return Window.Current != null
