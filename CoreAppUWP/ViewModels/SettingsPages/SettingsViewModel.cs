@@ -167,7 +167,7 @@ namespace CoreAppUWP.ViewModels.SettingsPages
             }
         }
 
-        public async ValueTask Refresh(bool reset)
+        public async Task Refresh(bool reset)
         {
             if (reset)
             {

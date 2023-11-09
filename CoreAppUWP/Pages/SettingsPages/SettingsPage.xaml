@@ -46,7 +46,8 @@
                             <HyperlinkButton
                                 Click="HyperlinkButton_Click"
                                 Content="Windows Color Settings"
-                                Tag="WindowsColor" />
+                                Tag="ms-settings:colors"
+                                ToolTipService.ToolTip="{Binding Tag, RelativeSource={RelativeSource Mode=Self}}" />
                         </controls:Setting.Description>
                         <ComboBox SelectedIndex="{x:Bind Provider.SelectedTheme, Mode=TwoWay}">
                             <ComboBoxItem Content="Dark" />
@@ -353,17 +354,19 @@
                                 VerticalScrollMode="Disabled">
                                 <StackPanel Orientation="Horizontal" Spacing="4">
                                     <HyperlinkButton
+                                        Click="HyperlinkButton_Click"
                                         Content="Feedback"
-                                        NavigateUri="https://github.com/wherewhere/CoreAppUWP/issues"
-                                        ToolTipService.ToolTip="{Binding NavigateUri, RelativeSource={RelativeSource Mode=Self}}" />
+                                        Tag="https://github.com/wherewhere/CoreAppUWP/issues"
+                                        ToolTipService.ToolTip="{Binding Tag, RelativeSource={RelativeSource Mode=Self}}" />
                                     <HyperlinkButton
                                         Click="HyperlinkButton_Click"
                                         Content="Log Folder"
                                         Tag="LogFolder" />
                                     <HyperlinkButton
+                                        Click="HyperlinkButton_Click"
                                         Content="Release Notes"
-                                        NavigateUri="https://github.com/wherewhere/CoreAppUWP/releases/latest"
-                                        ToolTipService.ToolTip="{Binding NavigateUri, RelativeSource={RelativeSource Mode=Self}}" />
+                                        Tag="https://github.com/wherewhere/CoreAppUWP/releases/latest"
+                                        ToolTipService.ToolTip="{Binding Tag, RelativeSource={RelativeSource Mode=Self}}" />
                                 </StackPanel>
                             </ScrollViewer>
                         </controls:SettingExpander.Description>

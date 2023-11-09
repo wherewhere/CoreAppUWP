@@ -226,7 +226,7 @@ namespace CoreAppUWP.Helpers
                     ? Application.Current.RequestedTheme == ApplicationTheme.Dark
                     : ActualTheme == ElementTheme.Dark
                 : ActualTheme == ElementTheme.Default
-                    ? UISettings?.GetColorValue(UIColorType.Background) == Colors.Black
+                    ? UISettings?.GetColorValue(UIColorType.Foreground).IsColorLight() == true
                     : ActualTheme == ElementTheme.Dark;
         }
 
@@ -238,7 +238,7 @@ namespace CoreAppUWP.Helpers
                     ? Application.Current.RequestedTheme == ApplicationTheme.Dark
                     : ActualTheme == ElementTheme.Dark
                 : ActualTheme == ElementTheme.Default
-                    ? UISettings?.GetColorValue(UIColorType.Background) == Colors.Black
+                    ? UISettings?.GetColorValue(UIColorType.Foreground).IsColorLight() == true
                     : ActualTheme == ElementTheme.Dark;
         }
 
@@ -249,9 +249,11 @@ namespace CoreAppUWP.Helpers
                     ? Application.Current.RequestedTheme == ApplicationTheme.Dark
                     : ActualTheme == ElementTheme.Dark
                 : ActualTheme == ElementTheme.Default
-                    ? UISettings?.GetColorValue(UIColorType.Background) == Colors.Black
+                    ? UISettings?.GetColorValue(UIColorType.Foreground).IsColorLight() == true
                     : ActualTheme == ElementTheme.Dark;
         }
+
+        public static bool IsColorLight(this Color color) => ((5 * color.G) + (2 * color.R) + color.B) > (8 * 128);
 
         public static void UpdateExtendViewIntoTitleBar(bool IsExtendsTitleBar)
         {
@@ -334,7 +336,6 @@ namespace CoreAppUWP.Helpers
             TitleBar.BackgroundColor = TitleBar.InactiveBackgroundColor = BackgroundColor;
             TitleBar.ButtonBackgroundColor = TitleBar.ButtonInactiveBackgroundColor = ExtendViewIntoTitleBar ? Colors.Transparent : BackgroundColor;
         }
-
 
         public static async void UpdateSystemCaptionButtonColors(DesktopWindow window)
         {

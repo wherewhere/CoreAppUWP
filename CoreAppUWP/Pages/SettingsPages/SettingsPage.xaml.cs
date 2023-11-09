@@ -10,6 +10,7 @@ using Microsoft.UI.Xaml.Hosting;
 using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Navigation;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Core;
@@ -18,6 +19,7 @@ using Windows.Storage;
 using Windows.System;
 using Windows.UI.ApplicationSettings;
 using Windows.UI.ViewManagement;
+using DispatcherQueue = Microsoft.UI.Dispatching.DispatcherQueue;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -65,7 +67,7 @@ namespace CoreAppUWP.Pages.SettingsPages
 
         private async void Button_Click(object sender, RoutedEventArgs e)
         {
-            switch ((sender as FrameworkElement).Tag as string)
+            switch ((sender as FrameworkElement).Tag?.ToString())
             {
                 case "Reset":
                     SettingsHelper.LocalObject.Clear();
@@ -158,20 +160,21 @@ namespace CoreAppUWP.Pages.SettingsPages
 
         private async void HyperlinkButton_Click(object sender, RoutedEventArgs e)
         {
-            switch ((sender as FrameworkElement).Tag.ToString())
+            string tag = (sender as FrameworkElement).Tag?.ToString();
+            if (!IsCoreWindow
+                && WindowHelper.ActiveWindows.Values.FirstOrDefault()?.DispatcherQueue is DispatcherQueue dispatcherQueue
+                && dispatcherQueue?.HasThreadAccess == false)
             {
-                case "LogFolder":
-                    _ = Launcher.LaunchFolderAsync(await ApplicationData.Current.LocalFolder.CreateFolderAsync("MetroLogs", CreationCollisionOption.OpenIfExists));
-                    break;
-                case "WindowsColor":
-                    _ = Launcher.LaunchUriAsync(new Uri("ms-settings:colors"));
-                    break;
-                default:
-                    break;
+                await dispatcherQueue.ResumeForegroundAsync();
             }
+            _ = tag switch
+            {
+                "LogFolder" => Launcher.LaunchFolderAsync(await ApplicationData.Current.LocalFolder.CreateFolderAsync("MetroLogs", CreationCollisionOption.OpenIfExists)),
+                _ => Launcher.LaunchUriAsync(new Uri(tag)),
+            };
         }
 
-        public ValueTask Refresh(bool reset = false) => Provider.Refresh(reset);
+        public Task Refresh(bool reset = false) => Provider.Refresh(reset);
 
         private void MarkdownText_LinkClicked(object sender, LinkClickedEventArgs e) => _ = Launcher.LaunchUriAsync(new Uri(e.Link));
     }
