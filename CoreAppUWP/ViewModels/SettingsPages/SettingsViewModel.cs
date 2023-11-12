@@ -21,7 +21,7 @@ namespace CoreAppUWP.ViewModels.SettingsPages
 {
     public class SettingsViewModel : INotifyPropertyChanged
     {
-        public static Dictionary<DispatcherQueue, SettingsViewModel> Caches { get; } = [];
+        public static ConditionalWeakTable<DispatcherQueue, SettingsViewModel> Caches { get; } = [];
 
         public static string WASVersion { get; } = Assembly.GetAssembly(typeof(ExtendedActivationKind)).GetName().Version.ToString(3);
 
@@ -102,10 +102,7 @@ namespace CoreAppUWP.ViewModels.SettingsPages
             {
                 foreach (KeyValuePair<DispatcherQueue, SettingsViewModel> cache in Caches)
                 {
-                    if (cache.Key?.HasThreadAccess == false)
-                    {
-                        await cache.Key.ResumeForegroundAsync();
-                    }
+                    await cache.Key.ResumeForegroundAsync();
                     cache.Value.PropertyChanged?.Invoke(cache.Value, new PropertyChangedEventArgs(name));
                 }
             }
@@ -117,10 +114,7 @@ namespace CoreAppUWP.ViewModels.SettingsPages
             {
                 foreach (KeyValuePair<DispatcherQueue, SettingsViewModel> cache in Caches)
                 {
-                    if (cache.Key?.HasThreadAccess == false)
-                    {
-                        await cache.Key.ResumeForegroundAsync();
-                    }
+                    await cache.Key.ResumeForegroundAsync();
                     names.ForEach(name => cache.Value.PropertyChanged?.Invoke(cache.Value, new PropertyChangedEventArgs(name)));
                 }
             }
@@ -139,7 +133,7 @@ namespace CoreAppUWP.ViewModels.SettingsPages
         public SettingsViewModel(DispatcherQueue dispatcher)
         {
             Dispatcher = dispatcher ?? DispatcherQueue.GetForCurrentThread();
-            Caches[dispatcher] = this;
+            Caches.AddOrUpdate(dispatcher, this);
         }
 
         private async ValueTask GetAboutTextBlockTextAsync(bool reset)

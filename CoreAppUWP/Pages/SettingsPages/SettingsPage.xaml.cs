@@ -161,9 +161,7 @@ namespace CoreAppUWP.Pages.SettingsPages
         private async void HyperlinkButton_Click(object sender, RoutedEventArgs e)
         {
             string tag = (sender as FrameworkElement).Tag?.ToString();
-            if (!IsCoreWindow
-                && WindowHelper.ActiveWindows.Values.FirstOrDefault()?.DispatcherQueue is DispatcherQueue dispatcherQueue
-                && dispatcherQueue?.HasThreadAccess == false)
+            if (!IsCoreWindow && WindowHelper.ActiveWindows.Values.FirstOrDefault()?.DispatcherQueue is DispatcherQueue dispatcherQueue)
             {
                 await dispatcherQueue.ResumeForegroundAsync();
             }

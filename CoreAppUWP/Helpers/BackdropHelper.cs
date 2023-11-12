@@ -308,19 +308,13 @@ namespace CoreAppUWP.Helpers
         {
             ActiveWindows.Values.ForEach(async x =>
             {
-                if (x.window.DispatcherQueue?.HasThreadAccess == false)
-                {
-                    await x.window.DispatcherQueue.ResumeForegroundAsync();
-                }
+                await x.window.DispatcherQueue.ResumeForegroundAsync();
                 x.SetBackdrop(type);
             });
 
             ActiveDesktopWindows.Values.ForEach(async x =>
             {
-                if (x.desktopWindow.DispatcherQueue?.HasThreadAccess == false)
-                {
-                    await x.desktopWindow.DispatcherQueue.ResumeForegroundAsync();
-                }
+                await x.desktopWindow.DispatcherQueue.ResumeForegroundAsync();
                 x.SetBackdrop(type);
             });
         }

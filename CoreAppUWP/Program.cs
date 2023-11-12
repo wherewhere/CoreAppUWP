@@ -22,8 +22,6 @@ namespace CoreAppUWP
 {
     public static partial class Program
     {
-        private static HookRegistry hookRegistry;
-
         private static unsafe bool IsPackagedApp
         {
             get
@@ -63,6 +61,7 @@ namespace CoreAppUWP
             ComWrappersSupport.InitializeComWrappers();
             if (IsPackagedApp)
             {
+                HookRegistry hookRegistry = null;
                 try
                 {
                     if (!IsSupportCoreWindow)

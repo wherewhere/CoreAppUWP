@@ -10,31 +10,54 @@ using ThreadPool = Windows.System.Threading.ThreadPool;
 namespace CoreAppUWP.Common
 {
     /// <summary>
+    /// The interface of helper type for switch thread.
+    /// </summary>
+    public interface IThreadSwitcher : INotifyCompletion
+    {
+        /// <summary>
+        /// Gets a value that indicates whether the asynchronous operation has completed.
+        /// </summary>
+        bool IsCompleted => true;
+
+        /// <summary>
+        /// Ends the await on the completed task.
+        /// </summary>
+        void GetResult() { }
+
+        /// <summary>
+        /// Gets an awaiter used to await this <see cref="IThreadSwitcher"/>.
+        /// </summary>
+        /// <returns>An awaiter instance.</returns>
+        IThreadSwitcher GetAwaiter();
+    }
+
+    /// <summary>
     /// A helper type for switch thread by <see cref="CoreDispatcher"/>. This type is not intended to be used directly from your code.
     /// </summary>
     /// <param name="Dispatcher">A <see cref="CoreDispatcher"/> whose foreground thread to switch execution to.</param>
     /// <param name="Priority">Specifies the priority for event dispatch.</param>
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public readonly record struct DispatcherThreadSwitcher(CoreDispatcher Dispatcher, CoreDispatcherPriority Priority = CoreDispatcherPriority.Normal) : INotifyCompletion
+    public readonly record struct CoreDispatcherThreadSwitcher(CoreDispatcher Dispatcher, CoreDispatcherPriority Priority = CoreDispatcherPriority.Normal) : IThreadSwitcher
     {
         /// <summary>
         /// Gets a value that indicates whether the asynchronous operation has completed.
         /// </summary>
-        public bool IsCompleted => Dispatcher.HasThreadAccess;
+        public bool IsCompleted => Dispatcher?.HasThreadAccess != false;
 
-        /// <summary>
-        /// Ends the await on the completed task.
-        /// </summary>
+        /// <inheritdoc/>
         public void GetResult() { }
 
         /// <summary>
-        /// Gets an awaiter used to await this <see cref="DispatcherThreadSwitcher"/>.
+        /// Gets an awaiter used to await this <see cref="CoreDispatcherThreadSwitcher"/>.
         /// </summary>
         /// <returns>An awaiter instance.</returns>
-        public DispatcherThreadSwitcher GetAwaiter() => this;
+        public CoreDispatcherThreadSwitcher GetAwaiter() => this;
 
         /// <inheritdoc/>
-        public void OnCompleted(Action continuation) => _ = Dispatcher.RunAsync(Priority, () => continuation());
+        IThreadSwitcher IThreadSwitcher.GetAwaiter() => this;
+
+        /// <inheritdoc/>
+        public void OnCompleted(Action continuation) => _ = Dispatcher?.RunAsync(Priority, () => continuation());
     }
 
     /// <summary>
@@ -43,26 +66,27 @@ namespace CoreAppUWP.Common
     /// <param name="Dispatcher">A <see cref="DispatcherQueue"/> whose foreground thread to switch execution to.</param>
     /// <param name="Priority">Specifies the priority for event dispatch.</param>
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public readonly record struct DispatcherQueueThreadSwitcher(DispatcherQueue Dispatcher, DispatcherQueuePriority Priority = DispatcherQueuePriority.Normal) : INotifyCompletion
+    public readonly record struct DispatcherQueueThreadSwitcher(DispatcherQueue Dispatcher, DispatcherQueuePriority Priority = DispatcherQueuePriority.Normal) : IThreadSwitcher
     {
         /// <summary>
         /// Gets a value that indicates whether the asynchronous operation has completed.
         /// </summary>
-        public bool IsCompleted => Dispatcher.HasThreadAccess;
+        public bool IsCompleted => Dispatcher?.HasThreadAccess != false;
 
-        /// <summary>
-        /// Ends the await on the completed task.
-        /// </summary>
+        /// <inheritdoc/>
         public void GetResult() { }
 
         /// <summary>
-        /// Gets an awaiter used to await this <see cref="DispatcherThreadSwitcher"/>.
+        /// Gets an awaiter used to await this <see cref="DispatcherQueueThreadSwitcher"/>.
         /// </summary>
         /// <returns>An awaiter instance.</returns>
         public DispatcherQueueThreadSwitcher GetAwaiter() => this;
 
         /// <inheritdoc/>
-        public void OnCompleted(Action continuation) => _ = Dispatcher.TryEnqueue(Priority, () => continuation());
+        IThreadSwitcher IThreadSwitcher.GetAwaiter() => this;
+
+        /// <inheritdoc/>
+        public void OnCompleted(Action continuation) => _ = Dispatcher?.TryEnqueue(Priority, () => continuation());
     }
 
     /// <summary>
@@ -70,23 +94,24 @@ namespace CoreAppUWP.Common
     /// </summary>
     /// <param name="Priority">Specifies the priority for event dispatch.</param>
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public readonly record struct ThreadPoolThreadSwitcher(WorkItemPriority Priority = WorkItemPriority.Normal) : INotifyCompletion
+    public readonly record struct ThreadPoolThreadSwitcher(WorkItemPriority Priority = WorkItemPriority.Normal) : IThreadSwitcher
     {
         /// <summary>
         /// Gets a value that indicates whether the asynchronous operation has completed.
         /// </summary>
         public bool IsCompleted => SynchronizationContext.Current == null;
 
-        /// <summary>
-        /// Ends the await on the completed task.
-        /// </summary>
+        /// <inheritdoc/>
         public void GetResult() { }
 
         /// <summary>
-        /// Gets an awaiter used to await this <see cref="DispatcherThreadSwitcher"/>.
+        /// Gets an awaiter used to await this <see cref="ThreadPoolThreadSwitcher"/>.
         /// </summary>
         /// <returns>An awaiter instance.</returns>
         public ThreadPoolThreadSwitcher GetAwaiter() => this;
+
+        /// <inheritdoc/>
+        IThreadSwitcher IThreadSwitcher.GetAwaiter() => this;
 
         /// <inheritdoc/>
         public void OnCompleted(Action continuation) => _ = ThreadPool.RunAsync(_ => continuation(), Priority);
@@ -111,7 +136,7 @@ namespace CoreAppUWP.Common
         /// <param name="dispatcher">A <see cref="CoreDispatcher"/> whose foreground thread to switch execution to.</param>
         /// <param name="priority">Specifies the priority for event dispatch.</param>
         /// <returns>An object that you can <see langword="await"/>.</returns>
-        public static DispatcherThreadSwitcher ResumeForegroundAsync(this CoreDispatcher dispatcher, CoreDispatcherPriority priority = CoreDispatcherPriority.Normal) => new(dispatcher, priority);
+        public static CoreDispatcherThreadSwitcher ResumeForegroundAsync(this CoreDispatcher dispatcher, CoreDispatcherPriority priority = CoreDispatcherPriority.Normal) => new(dispatcher, priority);
 
         /// <summary>
         /// A helper function—for use within a coroutine—that returns control to the caller, and then immediately resumes execution on a thread pool thread.

@@ -41,7 +41,7 @@ namespace CoreAppUWP.Helpers
             window == null
                 ? SettingsHelper.Get<ElementTheme>(SettingsHelper.SelectedAppTheme)
                 : window.DispatcherQueue?.HasThreadAccess == false
-                    ? window.DispatcherQueue?.EnqueueAsync(() =>
+                    ? window.DispatcherQueue.EnqueueAsync(() =>
                         window.Content is FrameworkElement _rootElement
                             && _rootElement.RequestedTheme != ElementTheme.Default
                                 ? _rootElement.RequestedTheme
@@ -60,7 +60,7 @@ namespace CoreAppUWP.Helpers
             window == null
                 ? SettingsHelper.Get<ElementTheme>(SettingsHelper.SelectedAppTheme)
                 : window.DispatcherQueue?.HasThreadAccess == false
-                    ? await window.DispatcherQueue?.EnqueueAsync(() =>
+                    ? await window.DispatcherQueue.EnqueueAsync(() =>
                         window.Content is FrameworkElement _rootElement
                             && _rootElement.RequestedTheme != ElementTheme.Default
                                 ? _rootElement.RequestedTheme
@@ -90,15 +90,15 @@ namespace CoreAppUWP.Helpers
         public static ElementTheme GetRootTheme(Window window) =>
             window == null
                 ? ElementTheme.Default
-                : window.DispatcherQueue.HasThreadAccess
-                    ? window.Content is FrameworkElement rootElement
-                        ? rootElement.RequestedTheme
-                        : ElementTheme.Default
-                    : window.DispatcherQueue.EnqueueAsync(() =>
+                : window.DispatcherQueue?.HasThreadAccess == false
+                    ? window.DispatcherQueue.EnqueueAsync(() =>
                         window.Content is FrameworkElement _rootElement
                             ? _rootElement.RequestedTheme
                             : ElementTheme.Default,
-                        DispatcherQueuePriority.High).AwaitByTaskCompleteSource();
+                        DispatcherQueuePriority.High).AwaitByTaskCompleteSource()
+                    : window.Content is FrameworkElement rootElement
+                        ? rootElement.RequestedTheme
+                        : ElementTheme.Default;
 
         public static ValueTask<ElementTheme> GetRootThemeAsync() =>
             GetRootThemeAsync(Window.Current ?? CurrentApplicationWindow);
@@ -106,25 +106,21 @@ namespace CoreAppUWP.Helpers
         public static async ValueTask<ElementTheme> GetRootThemeAsync(Window window) =>
             window == null
                 ? ElementTheme.Default
-                : window.DispatcherQueue.HasThreadAccess
-                    ? window.Content is FrameworkElement rootElement
-                        ? rootElement.RequestedTheme
-                        : ElementTheme.Default
-                    : await window.DispatcherQueue.EnqueueAsync(() =>
+                : window.DispatcherQueue?.HasThreadAccess == false
+                    ? await window.DispatcherQueue.EnqueueAsync(() =>
                         window.Content is FrameworkElement _rootElement
                             ? _rootElement.RequestedTheme
                             : ElementTheme.Default,
-                        DispatcherQueuePriority.High);
+                        DispatcherQueuePriority.High)
+                    : window.Content is FrameworkElement rootElement
+                        ? rootElement.RequestedTheme
+                        : ElementTheme.Default;
 
         public static async void SetRootTheme(ElementTheme value)
         {
             WindowHelper.ActiveWindows.Values.ForEach(async window =>
             {
-                if (window.DispatcherQueue?.HasThreadAccess == false)
-                {
-                    await window.DispatcherQueue.ResumeForegroundAsync();
-                }
-
+                await window.DispatcherQueue.ResumeForegroundAsync();
                 if (window.Content is FrameworkElement rootElement)
                 {
                     rootElement.RequestedTheme = value;
@@ -133,11 +129,7 @@ namespace CoreAppUWP.Helpers
 
             WindowHelper.ActiveDesktopWindows.Values.ForEach(async window =>
             {
-                if (!window.DispatcherQueue.HasThreadAccess)
-                {
-                    await window.DispatcherQueue.ResumeForegroundAsync();
-                }
-
+                await window.DispatcherQueue.ResumeForegroundAsync();
                 if (window.Content is FrameworkElement rootElement)
                 {
                     rootElement.RequestedTheme = value;
@@ -153,11 +145,7 @@ namespace CoreAppUWP.Helpers
         {
             await Task.WhenAll(WindowHelper.ActiveWindows.Values.Select(async window =>
             {
-                if (window.DispatcherQueue?.HasThreadAccess == false)
-                {
-                    await window.DispatcherQueue.ResumeForegroundAsync();
-                }
-
+                await window.DispatcherQueue.ResumeForegroundAsync();
                 if (window.Content is FrameworkElement rootElement)
                 {
                     rootElement.RequestedTheme = value;
@@ -166,11 +154,7 @@ namespace CoreAppUWP.Helpers
 
             await Task.WhenAll(WindowHelper.ActiveDesktopWindows.Values.Select(async window =>
             {
-                if (!window.DispatcherQueue.HasThreadAccess)
-                {
-                    await window.DispatcherQueue.ResumeForegroundAsync();
-                }
-
+                await window.DispatcherQueue.ResumeForegroundAsync();
                 if (window.Content is FrameworkElement rootElement)
                 {
                     rootElement.RequestedTheme = value;
@@ -191,6 +175,7 @@ namespace CoreAppUWP.Helpers
             RootTheme = SettingsHelper.Get<ElementTheme>(SettingsHelper.SelectedAppTheme);
 
             // Registering to color changes, thus we notice when user changes theme system wide
+            UISettings.ColorValuesChanged -= UISettings_ColorValuesChanged;
             UISettings.ColorValuesChanged += UISettings_ColorValuesChanged;
         }
 
@@ -259,10 +244,7 @@ namespace CoreAppUWP.Helpers
         {
             WindowHelper.ActiveWindows.Values.ForEach(async window =>
             {
-                if (window.DispatcherQueue?.HasThreadAccess == false)
-                {
-                    await window.DispatcherQueue.ResumeForegroundAsync();
-                }
+                await window.DispatcherQueue.ResumeForegroundAsync();
                 CoreApplication.GetCurrentView().TitleBar.ExtendViewIntoTitleBar = IsExtendsTitleBar;
             });
 
@@ -270,10 +252,7 @@ namespace CoreAppUWP.Helpers
 
             WindowHelper.ActiveDesktopWindows.Values.ForEach(async window =>
             {
-                if (window.DispatcherQueue?.HasThreadAccess == false)
-                {
-                    await window.DispatcherQueue.ResumeForegroundAsync();
-                }
+                await window.DispatcherQueue.ResumeForegroundAsync();
                 window.ExtendsContentIntoTitleBar = IsExtendsTitleBar;
             });
         }
@@ -288,11 +267,7 @@ namespace CoreAppUWP.Helpers
 
             WindowHelper.ActiveWindows.Values.ForEach(async window =>
             {
-                if (window.DispatcherQueue?.HasThreadAccess == false)
-                {
-                    await window.DispatcherQueue.ResumeForegroundAsync();
-                }
-
+                await window.DispatcherQueue.ResumeForegroundAsync();
                 bool ExtendViewIntoTitleBar = CoreApplication.GetCurrentView().TitleBar.ExtendViewIntoTitleBar;
                 ApplicationViewTitleBar TitleBar = ApplicationView.GetForCurrentView().TitleBar;
                 TitleBar.ForegroundColor = TitleBar.ButtonForegroundColor = ForegroundColor;
@@ -304,11 +279,7 @@ namespace CoreAppUWP.Helpers
 
             WindowHelper.ActiveDesktopWindows.Values.ForEach(async window =>
             {
-                if (window.DispatcherQueue?.HasThreadAccess == false)
-                {
-                    await window.DispatcherQueue.ResumeForegroundAsync();
-                }
-
+                await window.DispatcherQueue.ResumeForegroundAsync();
                 bool ExtendViewIntoTitleBar = window.ExtendsContentIntoTitleBar;
                 AppWindowTitleBar TitleBar = window.AppWindow.TitleBar;
                 TitleBar.ForegroundColor = TitleBar.ButtonForegroundColor = ForegroundColor;
@@ -319,10 +290,7 @@ namespace CoreAppUWP.Helpers
 
         public static async void UpdateSystemCaptionButtonColors(Window window)
         {
-            if (window.DispatcherQueue?.HasThreadAccess == false)
-            {
-                await window.DispatcherQueue.ResumeForegroundAsync();
-            }
+            await window.DispatcherQueue.ResumeForegroundAsync();
 
             bool IsDark = window?.Content is FrameworkElement rootElement ? rootElement.RequestedTheme.IsDarkTheme() : await IsDarkThemeAsync();
             bool IsHighContrast = AccessibilitySettings.HighContrast;
@@ -341,10 +309,7 @@ namespace CoreAppUWP.Helpers
         {
             if (!AppWindowTitleBar.IsCustomizationSupported()) { return; }
 
-            if (window.DispatcherQueue?.HasThreadAccess == false)
-            {
-                await window.DispatcherQueue.ResumeForegroundAsync();
-            }
+            await window.DispatcherQueue.ResumeForegroundAsync();
 
             bool IsDark = window?.Content is FrameworkElement rootElement ? rootElement.RequestedTheme.IsDarkTheme() : await IsDarkThemeAsync();
             bool IsHighContrast = AccessibilitySettings.HighContrast;
