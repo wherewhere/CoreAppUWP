@@ -15,11 +15,11 @@ namespace winrt::CoreAppUWP::WinRT::implementation
     {
         HookWindowingModel() = default;
 
-        bool IsHooked() const { return isHooked; }
-        void IsHooked(bool value);
-
         static WindowingModel WindowingModel() { return windowingModel; }
         static void WindowingModel(CoreAppUWP::WinRT::WindowingModel value) { windowingModel = value; }
+
+        bool IsHooked() const { return isHooked; }
+        void IsHooked(bool value);
 
         void StartHook();
         void EndHook();

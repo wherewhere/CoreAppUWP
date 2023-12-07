@@ -55,7 +55,7 @@ namespace winrt::CoreAppUWP::WinRT::implementation
 
         if (hkey == HKEY_LOCAL_MACHINE && !_wcsicmp(lpSubKey, L"Software\\Microsoft\\WinUI\\Xaml"))
         {
-            std::lock_guard<std::mutex> lock(xamlKeyMtx);
+            const std::lock_guard<std::mutex> lock(xamlKeyMtx);
             if (result == ERROR_FILE_NOT_FOUND)
             {
                 xamlKeyMap.emplace((HKEY)INVALID_HANDLE_VALUE, false);
@@ -75,10 +75,10 @@ namespace winrt::CoreAppUWP::WinRT::implementation
     {
         bool isRealKey = false;
 
-        std::lock_guard<std::mutex> lock(xamlKeyMtx);
-        std::map<HKEY, bool>::iterator pos = xamlKeyMap.find(hKey);
+        const std::lock_guard<std::mutex> lock(xamlKeyMtx);
+        const std::map<HKEY, bool>::iterator pos = xamlKeyMap.find(hKey);
 
-        bool isXamlKey = pos != xamlKeyMap.end();
+        const bool isXamlKey = pos != xamlKeyMap.end();
         if (isXamlKey)
         {
             isRealKey = pos->second;
@@ -100,10 +100,10 @@ namespace winrt::CoreAppUWP::WinRT::implementation
         if (lpValueName != NULL && !_wcsicmp(lpValueName, L"EnableUWPWindow"))
         {
             bool isRealKey = false;
-            std::lock_guard<std::mutex> lock(xamlKeyMtx);
-            std::map<HKEY, bool>::iterator pos = xamlKeyMap.find(hKey);
+            const std::lock_guard<std::mutex> lock(xamlKeyMtx);
+            const std::map<HKEY, bool>::iterator pos = xamlKeyMap.find(hKey);
 
-            bool isXamlKey = pos != xamlKeyMap.end();
+            const bool isXamlKey = pos != xamlKeyMap.end();
             if (isXamlKey)
             {
                 isRealKey = pos->second;

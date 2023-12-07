@@ -61,11 +61,7 @@ namespace CoreAppUWP.Common
 
         public WeakEvent(ReadOnlySpan<Action<TEventArgs>> callbacks)
         {
-            _list = new List<Method>(callbacks.Length);
-            foreach (Action<TEventArgs> callback in callbacks)
-            {
-                _list.Add(callback);
-            }
+            _list = [.. callbacks];
         }
 
         public int Count => _list.Count;

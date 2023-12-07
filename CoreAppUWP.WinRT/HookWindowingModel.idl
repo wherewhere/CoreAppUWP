@@ -13,9 +13,9 @@ namespace CoreAppUWP.WinRT
     {
         HookWindowingModel();
 
-        Boolean IsHooked { get; set; };
+        static WindowingModel WindowingModel { get; set; };
 
-        static CoreAppUWP.WinRT.WindowingModel WindowingModel { get; set; };
+        Boolean IsHooked { get; set; };
 
         void StartHook();
         void EndHook();

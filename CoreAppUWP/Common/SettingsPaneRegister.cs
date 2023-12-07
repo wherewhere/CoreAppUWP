@@ -13,39 +13,33 @@ using Windows.UI.Core;
 
 namespace CoreAppUWP.Common
 {
-    public class SettingsPaneRegister
+    public static class SettingsPaneRegister
     {
-        private CoreDispatcher dispatcher;
-
         public static bool IsSearchPaneSupported { get; } = ApiInformation.IsTypePresent("Windows.UI.ApplicationSettings.SettingsPane") && CheckSearchExtension();
         public static bool IsSettingsPaneSupported { get; } = ApiInformation.IsTypePresent("Windows.UI.ApplicationSettings.SettingsPane");
 
-        public SettingsPaneRegister(Window window)
+        public static void Register(Window window)
         {
-            dispatcher = window.Dispatcher;
             if (IsSettingsPaneSupported)
             {
                 SettingsPane settingsPane = SettingsPane.GetForCurrentView();
                 settingsPane.CommandsRequested -= OnCommandsRequested;
                 settingsPane.CommandsRequested += OnCommandsRequested;
-                dispatcher.AcceleratorKeyActivated -= Dispatcher_AcceleratorKeyActivated;
-                dispatcher.AcceleratorKeyActivated += Dispatcher_AcceleratorKeyActivated;
+                window.Dispatcher.AcceleratorKeyActivated -= Dispatcher_AcceleratorKeyActivated;
+                window.Dispatcher.AcceleratorKeyActivated += Dispatcher_AcceleratorKeyActivated;
             }
         }
 
-        public static SettingsPaneRegister Register(Window window) => new(window);
-
-        public void Unregister()
+        public static void Unregister(Window window)
         {
             if (IsSettingsPaneSupported)
             {
                 SettingsPane.GetForCurrentView().CommandsRequested -= OnCommandsRequested;
-                dispatcher.AcceleratorKeyActivated -= Dispatcher_AcceleratorKeyActivated;
+                window.Dispatcher.AcceleratorKeyActivated -= Dispatcher_AcceleratorKeyActivated;
             }
-            dispatcher = null;
         }
 
-        private void OnCommandsRequested(SettingsPane sender, SettingsPaneCommandsRequestedEventArgs args)
+        private static void OnCommandsRequested(SettingsPane sender, SettingsPaneCommandsRequestedEventArgs args)
         {
             args.Request.ApplicationCommands.Add(
                 new SettingsCommand(
@@ -64,7 +58,7 @@ namespace CoreAppUWP.Common
                     handler => _ = Launcher.LaunchUriAsync(new Uri("https://github.com/wherewhere/CoreAppUWP"))));
         }
 
-        private void Dispatcher_AcceleratorKeyActivated(CoreDispatcher sender, AcceleratorKeyEventArgs args)
+        private static void Dispatcher_AcceleratorKeyActivated(CoreDispatcher sender, AcceleratorKeyEventArgs args)
         {
             if (args.EventType is CoreAcceleratorKeyEventType.KeyDown or CoreAcceleratorKeyEventType.SystemKeyDown)
             {
