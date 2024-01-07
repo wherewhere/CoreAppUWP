@@ -2,8 +2,10 @@
 using MetroLog;
 using MetroLog.Targets;
 using Microsoft.UI.Xaml;
+using System;
 using System.IO;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Windows.Storage;
 using Windows.UI.ViewManagement;
@@ -63,16 +65,38 @@ namespace CoreAppUWP.Helpers
 
     public class SystemTextJsonObjectSerializer : IObjectSerializer
     {
-        public string Serialize<T>(T value)
+        public string Serialize<T>(T value) => value switch
         {
-            try { return JsonSerializer.Serialize(value); }
-            catch { return string.Empty; }
-        }
+            bool => JsonSerializer.Serialize(value, SourceGenerationContext.Default.Boolean),
+            ElementTheme => JsonSerializer.Serialize(value, SourceGenerationContext.Default.ElementTheme),
+            BackdropType => JsonSerializer.Serialize(value, SourceGenerationContext.Default.BackdropType),
+#if DEBUG
+            _ => JsonSerializer.Serialize(value)
+#else
+            _ => value?.ToString(),
+#endif
+        };
 
         public T Deserialize<T>(string value)
         {
-            try { return JsonSerializer.Deserialize<T>(value); }
-            catch { return default; }
+            if (string.IsNullOrEmpty(value)) { return default; }
+            Type type = typeof(T);
+            return type == typeof(bool) && JsonSerializer.Deserialize(value, SourceGenerationContext.Default.Boolean) is T @bool
+                ? @bool
+                : type == typeof(ElementTheme) && JsonSerializer.Deserialize(value, SourceGenerationContext.Default.ElementTheme) is T ElementTheme
+                    ? ElementTheme
+                    : type == typeof(BackdropType) && JsonSerializer.Deserialize(value, SourceGenerationContext.Default.BackdropType) is T BackdropType
+                        ? BackdropType
+#if DEBUG
+                        : JsonSerializer.Deserialize<T>(value);
+#else
+                        : default;
+#endif
         }
     }
+
+    [JsonSerializable(typeof(bool))]
+    [JsonSerializable(typeof(ElementTheme))]
+    [JsonSerializable(typeof(BackdropType))]
+    public partial class SourceGenerationContext : JsonSerializerContext;
 }
