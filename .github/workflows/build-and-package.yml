@@ -2,9 +2,9 @@ name: build and package
 
 on:
   push:
-    branches: [main]
+    branches: [muxc]
   pull_request:
-    branches: [main]
+    branches: [muxc]
     paths:
       - '.github/workflows/build-and-package.yml'
       - 'CoreAppUWP**'

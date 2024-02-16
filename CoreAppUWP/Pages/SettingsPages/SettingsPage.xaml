@@ -199,7 +199,11 @@
                         Description="Information about the frameworks of this app."
                         Header="Framework Information"
                         Icon="&#xE950;">
-                        <Grid Style="{StaticResource SettingExpanderContentGridStyle}">
+                        <Grid
+                            Margin="0,0,0,8"
+                            ColumnSpacing="32"
+                            RowSpacing="8"
+                            Style="{StaticResource SettingExpanderContentGridStyle}">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto" />
                                 <ColumnDefinition Width="*" />
@@ -214,116 +218,108 @@
                                 <RowDefinition Height="Auto" />
                                 <RowDefinition Height="Auto" />
                             </Grid.RowDefinitions>
-
                             <TextBlock
                                 Grid.Row="0"
                                 Grid.Column="0"
-                                Padding="0,0,0,8"
                                 Foreground="{ThemeResource SettingCardForeground}"
                                 Text="Device Family" />
                             <TextBlock
                                 Grid.Row="0"
                                 Grid.Column="1"
-                                Padding="32,0,0,8"
+                                HorizontalAlignment="Left"
                                 Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                IsTextSelectionEnabled="True"
                                 Text="{x:Bind settingspages:SettingsViewModel.DeviceFamily}"
                                 TextWrapping="WrapWholeWords" />
-
                             <TextBlock
                                 Grid.Row="1"
                                 Grid.Column="0"
-                                Padding="0,0,0,8"
                                 Foreground="{ThemeResource SettingCardForeground}"
                                 Text="Framework" />
                             <TextBlock
                                 Grid.Row="1"
                                 Grid.Column="1"
-                                Padding="32,0,0,8"
+                                HorizontalAlignment="Left"
                                 Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                IsTextSelectionEnabled="True"
                                 Text="{x:Bind interopservices:RuntimeInformation.FrameworkDescription}"
                                 TextWrapping="WrapWholeWords" />
-
                             <TextBlock
                                 Grid.Row="2"
                                 Grid.Column="0"
-                                Padding="0,0,0,8"
                                 Foreground="{ThemeResource SettingCardForeground}"
                                 Text="CS/WinRT" />
                             <TextBlock
                                 Grid.Row="2"
                                 Grid.Column="1"
-                                Padding="32,0,0,8"
+                                HorizontalAlignment="Left"
                                 Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                IsTextSelectionEnabled="True"
                                 Text="{x:Bind settingspages:SettingsViewModel.WinRTVersion}"
                                 TextWrapping="WrapWholeWords" />
-
                             <TextBlock
                                 Grid.Row="3"
                                 Grid.Column="0"
-                                Padding="0,0,0,8"
                                 Foreground="{ThemeResource SettingCardForeground}"
                                 Text="Windows SDK" />
                             <TextBlock
                                 Grid.Row="3"
                                 Grid.Column="1"
-                                Padding="32,0,0,8"
+                                HorizontalAlignment="Left"
                                 Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                IsTextSelectionEnabled="True"
                                 Text="{x:Bind settingspages:SettingsViewModel.SDKVersion}"
-                                TextWrapping="WrapWholeWords" />
-
+                                TextWrapping="Wrap" />
                             <TextBlock
                                 Grid.Row="4"
                                 Grid.Column="0"
-                                Padding="0,0,0,8"
                                 Foreground="{ThemeResource SettingCardForeground}"
                                 Text="Windows App SDK" />
                             <TextBlock
                                 Grid.Row="4"
                                 Grid.Column="1"
-                                Padding="32,0,0,8"
+                                HorizontalAlignment="Left"
                                 Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                IsTextSelectionEnabled="True"
                                 Text="{x:Bind settingspages:SettingsViewModel.WASVersion}"
-                                TextWrapping="WrapWholeWords" />
-
+                                TextWrapping="Wrap" />
                             <TextBlock
                                 Grid.Row="5"
                                 Grid.Column="0"
-                                Padding="0,0,0,8"
                                 Foreground="{ThemeResource SettingCardForeground}"
                                 Text="Community Toolkit" />
                             <TextBlock
                                 Grid.Row="5"
                                 Grid.Column="1"
-                                Padding="32,0,0,8"
+                                HorizontalAlignment="Left"
                                 Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                IsTextSelectionEnabled="True"
                                 Text="{x:Bind settingspages:SettingsViewModel.ToolkitVersion}"
                                 TextWrapping="WrapWholeWords" />
-
                             <TextBlock
                                 Grid.Row="6"
                                 Grid.Column="0"
-                                Padding="0,0,0,8"
                                 Foreground="{ThemeResource SettingCardForeground}"
                                 Text="OS Platform" />
                             <TextBlock
                                 Grid.Row="6"
                                 Grid.Column="1"
-                                Padding="32,0,0,8"
+                                HorizontalAlignment="Left"
                                 Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                IsTextSelectionEnabled="True"
                                 Text="{x:Bind interopservices:RuntimeInformation.OSDescription}"
-                                TextWrapping="WrapWholeWords" />
-
+                                TextWrapping="Wrap" />
                             <TextBlock
                                 Grid.Row="7"
                                 Grid.Column="0"
-                                Padding="0,0,0,8"
                                 Foreground="{ThemeResource SettingCardForeground}"
                                 Text="OS Architecture" />
                             <TextBlock
                                 Grid.Row="7"
                                 Grid.Column="1"
-                                Padding="32,0,0,8"
+                                HorizontalAlignment="Left"
                                 Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                IsTextSelectionEnabled="True"
                                 Text="{x:Bind interopservices:RuntimeInformation.OSArchitecture}"
                                 TextWrapping="WrapWholeWords" />
                         </Grid>
@@ -383,6 +379,7 @@
                                 x:Name="AboutTextBlock"
                                 HorizontalAlignment="Left"
                                 x:Load="{x:Bind IsCoreWindow, Converter={StaticResource BoolNegationConverter}}"
+                                IsTextSelectionEnabled="True"
                                 Text="{x:Bind Provider.AboutTextBlockText, Mode=OneWay}"
                                 TextWrapping="Wrap" />
                         </Grid>

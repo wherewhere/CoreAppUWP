@@ -79,8 +79,8 @@ namespace CoreAppUWP.Pages.SettingsPages
                 case "ExitPIP":
                     if (IsCoreWindow)
                     {
-                        ApplicationView.GetForCurrentView().IsViewModeSupported(ApplicationViewMode.Default);
-                        _ = ApplicationView.GetForCurrentView().TryEnterViewModeAsync(ApplicationViewMode.Default);
+                        if (ApplicationView.GetForCurrentView().IsViewModeSupported(ApplicationViewMode.Default))
+                        { _ = ApplicationView.GetForCurrentView().TryEnterViewModeAsync(ApplicationViewMode.Default); }
                     }
                     else if (this.GetWindowForElement() is DesktopWindow desktopWindow)
                     { desktopWindow.AppWindow.SetPresenter(AppWindowPresenterKind.Default); }
@@ -88,8 +88,8 @@ namespace CoreAppUWP.Pages.SettingsPages
                 case "EnterPIP":
                     if (IsCoreWindow)
                     {
-                        ApplicationView.GetForCurrentView().IsViewModeSupported(ApplicationViewMode.CompactOverlay);
-                        _ = ApplicationView.GetForCurrentView().TryEnterViewModeAsync(ApplicationViewMode.CompactOverlay);
+                        if (ApplicationView.GetForCurrentView().IsViewModeSupported(ApplicationViewMode.CompactOverlay))
+                        { _ = ApplicationView.GetForCurrentView().TryEnterViewModeAsync(ApplicationViewMode.CompactOverlay); }
                     }
                     else if (this.GetWindowForElement() is DesktopWindow desktopWindow)
                     { desktopWindow.AppWindow.SetPresenter(AppWindowPresenterKind.CompactOverlay); }
