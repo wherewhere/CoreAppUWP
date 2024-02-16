@@ -3,9 +3,9 @@
     <ApplicationIcon>favicon.ico</ApplicationIcon>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <BuiltInComInteropSupport>True</BuiltInComInteropSupport>
-    <CsWinRTIncludes>CoreAppUWP.WinRT</CsWinRTIncludes>
     <DefaultXamlRuntime>UAP</DefaultXamlRuntime>
     <EnableMsixTooling>True</EnableMsixTooling>
+    <LangVersion>latest</LangVersion>
     <OutputType>WinExe</OutputType>
     <Platforms>x86;x64;ARM64</Platforms>
     <PublishProfile>win10-$(Platform).pubxml</PublishProfile>
