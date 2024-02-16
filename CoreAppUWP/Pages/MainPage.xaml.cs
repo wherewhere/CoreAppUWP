@@ -114,18 +114,18 @@ namespace CoreAppUWP.Pages
             if (NavigationViewFrame.SourcePageType == typeof(SettingsPage))
             {
                 // SettingsItem is not part of NavView.MenuItems, and doesn't have a Tag.
-                NavigationView.SelectedItem = (NavigationViewItem)NavigationView.SettingsItem;
+                NavigationView.SelectedItem = (muxc.NavigationViewItem)NavigationView.SettingsItem;
             }
             else if (NavigationViewFrame.SourcePageType != null)
             {
                 (string Tag, Type Page) item = _pages.FirstOrDefault(p => p.Page == e.SourcePageType);
                 if (item.Tag != null)
                 {
-                    NavigationViewItem SelectedItem = NavigationView.MenuItems
-                        .OfType<NavigationViewItem>()
+                    muxc.NavigationViewItem SelectedItem = NavigationView.MenuItems
+                        .OfType<muxc.NavigationViewItem>()
                         .FirstOrDefault(n => n.Tag.Equals(item.Tag))
                             ?? NavigationView.FooterMenuItems
-                                .OfType<NavigationViewItem>()
+                                .OfType<muxc.NavigationViewItem>()
                                 .FirstOrDefault(n => n.Tag.Equals(item.Tag));
                     NavigationView.SelectedItem = SelectedItem;
                 }

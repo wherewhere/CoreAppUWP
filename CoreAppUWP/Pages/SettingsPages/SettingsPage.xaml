@@ -2,11 +2,324 @@
     x:Class="CoreAppUWP.Pages.SettingsPages.SettingsPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:animatedvisuals="using:Microsoft.UI.Xaml.Controls.AnimatedVisuals"
+    xmlns:common="using:CoreAppUWP.Common"
+    xmlns:controls="using:CoreAppUWP.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:local="using:CoreAppUWP.Pages.SettingsPages"
+    xmlns:interopservices="using:System.Runtime.InteropServices"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
+    xmlns:settingspages="using:CoreAppUWP.ViewModels.SettingsPages"
+    xmlns:wuxa="using:Windows.UI.Xaml.Automation"
     xmlns:wuxc="using:Windows.UI.Xaml.Controls"
+    xmlns:wuxma="using:Windows.UI.Xaml.Media.Animation"
+    d:DataContext="{d:DesignInstance Type=settingspages:SettingsViewModel}"
+    DataContext="{x:Bind Provider, Mode=OneWay}"
     NavigationCacheMode="Enabled"
     mc:Ignorable="d">
-    <wuxc:Grid />
+    <wuxc:Grid
+        x:Name="RootGrid"
+        Padding="20,20,0,0"
+        RowSpacing="24">
+        <wuxc:Grid.RowDefinitions>
+            <wuxc:RowDefinition Height="Auto" />
+            <wuxc:RowDefinition Height="*" />
+        </wuxc:Grid.RowDefinitions>
+        <wuxc:TextBlock
+            x:Name="Header"
+            HorizontalAlignment="Stretch"
+            VerticalAlignment="Stretch"
+            wuxa:AutomationProperties.HeadingLevel="1"
+            Style="{StaticResource TitleTextBlockStyle}"
+            Text="Settings" />
+        <wuxc:ScrollViewer wuxc:Grid.Row="1">
+            <wuxc:StackPanel Padding="0,0,20,48">
+                <wuxc:StackPanel.ChildrenTransitions>
+                    <wuxma:TransitionCollection>
+                        <wuxma:ReorderThemeTransition />
+                    </wuxma:TransitionCollection>
+                </wuxc:StackPanel.ChildrenTransitions>
+                <controls:SettingsGroup Margin="0,-28,0,0" Header="Display">
+                    <controls:Setting Header="Theme" Icon="&#xE790;">
+                        <controls:Setting.Description>
+                            <wuxc:HyperlinkButton
+                                wuxc:ToolTipService.ToolTip="{Binding Tag, RelativeSource={RelativeSource Mode=Self}}"
+                                Click="HyperlinkButton_Click"
+                                Content="Windows Color Settings"
+                                Tag="ms-settings:colors" />
+                        </controls:Setting.Description>
+                        <wuxc:ComboBox SelectedIndex="{x:Bind Provider.SelectedTheme, Mode=TwoWay}">
+                            <wuxc:ComboBoxItem Content="Dark" />
+                            <wuxc:ComboBoxItem Content="Light" />
+                            <wuxc:ComboBoxItem Content="Windows Default" />
+                        </wuxc:ComboBox>
+                    </controls:Setting>
+                    <controls:Setting
+                        Description="Extends content into titlebar."
+                        Header="TitleBar"
+                        Icon="&#xE737;">
+                        <wuxc:ToggleSwitch IsOn="{x:Bind Provider.IsExtendsTitleBar, Mode=TwoWay}" Style="{StaticResource ToggleSwitchSettingStyle}" />
+                    </controls:Setting>
+                </controls:SettingsGroup>
+                <controls:SettingsGroup Header="Window">
+                    <controls:Setting
+                        Description="Enter or exit compact overlay."
+                        Header="Compact Overlay"
+                        Icon="&#xE944;">
+                        <wuxc:StackPanel
+                            Margin="0,2"
+                            Orientation="Horizontal"
+                            Spacing="4">
+                            <wuxc:Button
+                                Click="Button_Click"
+                                Content="Enter Compact Overlay"
+                                Tag="EnterPIP" />
+                            <wuxc:Button
+                                Click="Button_Click"
+                                Content="Exit"
+                                Tag="ExitPIP" />
+                        </wuxc:StackPanel>
+                    </controls:Setting>
+                    <controls:Setting
+                        Description="Enter or exit full screen."
+                        Header="Full Screen"
+                        Icon="&#xE9A6;">
+                        <wuxc:StackPanel
+                            Margin="0,2"
+                            Orientation="Horizontal"
+                            Spacing="4">
+                            <wuxc:Button
+                                Click="Button_Click"
+                                Content="Enter Full Screen"
+                                Tag="EnterFullWindow" />
+                            <wuxc:Button
+                                Click="Button_Click"
+                                Content="Exit"
+                                Tag="ExitFullWindow" />
+                        </wuxc:StackPanel>
+                    </controls:Setting>
+                    <controls:SettingExpander
+                        Description="Create a new window."
+                        Header="Multiple Window"
+                        Icon="&#xE78B;">
+                        <controls:Setting
+                            ActionIcon="&#xE8A7;"
+                            Click="Button_Click"
+                            Description="Create a new CoreWindow."
+                            Header="CoreWindow"
+                            IsClickEnabled="True"
+                            Style="{StaticResource ClickableSettingExpanderItemStyle}"
+                            Tag="NewWindow" />
+                        <controls:Setting
+                            ActionIcon="&#xE8A7;"
+                            Click="Button_Click"
+                            CornerRadius="{Binding Source={StaticResource ControlCornerRadius}, Converter={StaticResource BottomCornerRadiusFilterConverter}}"
+                            Description="Create a new AppWindow."
+                            Header="AppWindow"
+                            IsClickEnabled="True"
+                            Style="{StaticResource ClickableSettingExpanderItemStyle}"
+                            Tag="NewAppWindow" />
+                    </controls:SettingExpander>
+                    <controls:Setting
+                        x:Name="SettingsFlyoutSettings"
+                        x:Load="{x:Bind common:SettingsPaneRegister.IsSettingsPaneSupported}"
+                        Click="Button_Click"
+                        Description="Show settings charm pane."
+                        Header="Open Settings"
+                        IsClickEnabled="True"
+                        Tag="SettingsFlyout">
+                        <controls:Setting.Icon>
+                            <muxc:AnimatedIcon>
+                                <muxc:AnimatedIcon.Source>
+                                    <animatedvisuals:AnimatedSettingsVisualSource />
+                                </muxc:AnimatedIcon.Source>
+                                <muxc:AnimatedIcon.FallbackIconSource>
+                                    <muxc:FontIconSource FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE713;" />
+                                </muxc:AnimatedIcon.FallbackIconSource>
+                            </muxc:AnimatedIcon>
+                        </controls:Setting.Icon>
+                    </controls:Setting>
+                    <controls:Setting
+                        x:Name="SearchFlyoutSettings"
+                        x:Load="{x:Bind common:SettingsPaneRegister.IsSearchPaneSupported}"
+                        Click="Button_Click"
+                        Description="Show search charm pane."
+                        Header="Open Search"
+                        IsClickEnabled="True"
+                        Tag="SearchFlyout">
+                        <controls:Setting.Icon>
+                            <muxc:AnimatedIcon>
+                                <muxc:AnimatedIcon.Source>
+                                    <animatedvisuals:AnimatedFindVisualSource />
+                                </muxc:AnimatedIcon.Source>
+                                <muxc:AnimatedIcon.FallbackIconSource>
+                                    <muxc:FontIconSource FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE721;" />
+                                </muxc:AnimatedIcon.FallbackIconSource>
+                            </muxc:AnimatedIcon>
+                        </controls:Setting.Icon>
+                    </controls:Setting>
+                </controls:SettingsGroup>
+                <controls:SettingsGroup Header="Configs">
+                    <controls:Setting
+                        Description="Reset settings of this application."
+                        Header="Reset Application"
+                        Icon="&#xE777;">
+                        <wuxc:Button Name="Reset" Content="Reset">
+                            <wuxc:Button.Flyout>
+                                <wuxc:Flyout>
+                                    <wuxc:StackPanel>
+                                        <wuxc:TextBlock
+                                            Margin="0,0,0,12"
+                                            Style="{ThemeResource BaseTextBlockStyle}"
+                                            Text="Are you sure you want to reset the app?" />
+                                        <wuxc:Button
+                                            Click="Button_Click"
+                                            Content="Yes"
+                                            Tag="Reset" />
+                                    </wuxc:StackPanel>
+                                </wuxc:Flyout>
+                            </wuxc:Button.Flyout>
+                        </wuxc:Button>
+                    </controls:Setting>
+                    <controls:SettingExpander
+                        Description="Information about the frameworks of this app."
+                        Header="Framework Information"
+                        Icon="&#xE950;">
+                        <wuxc:Grid
+                            Margin="0,0,0,8"
+                            ColumnSpacing="32"
+                            RowSpacing="8"
+                            Style="{StaticResource SettingExpanderContentGridStyle}">
+                            <wuxc:Grid.ColumnDefinitions>
+                                <wuxc:ColumnDefinition Width="Auto" />
+                                <wuxc:ColumnDefinition Width="*" />
+                            </wuxc:Grid.ColumnDefinitions>
+                            <wuxc:Grid.RowDefinitions>
+                                <wuxc:RowDefinition Height="Auto" />
+                                <wuxc:RowDefinition Height="Auto" />
+                                <wuxc:RowDefinition Height="Auto" />
+                                <wuxc:RowDefinition Height="Auto" />
+                                <wuxc:RowDefinition Height="Auto" />
+                                <wuxc:RowDefinition Height="Auto" />
+                            </wuxc:Grid.RowDefinitions>
+                            <wuxc:TextBlock
+                                wuxc:Grid.Column="0"
+                                wuxc:Grid.Row="0"
+                                Foreground="{ThemeResource SettingCardForeground}"
+                                Text="Device Family" />
+                            <wuxc:TextBlock
+                                HorizontalAlignment="Left"
+                                wuxc:Grid.Column="1"
+                                wuxc:Grid.Row="0"
+                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                IsTextSelectionEnabled="True"
+                                Text="{x:Bind settingspages:SettingsViewModel.DeviceFamily}"
+                                TextWrapping="WrapWholeWords" />
+                            <wuxc:TextBlock
+                                wuxc:Grid.Column="0"
+                                wuxc:Grid.Row="1"
+                                Foreground="{ThemeResource SettingCardForeground}"
+                                Text="Framework" />
+                            <wuxc:TextBlock
+                                HorizontalAlignment="Left"
+                                wuxc:Grid.Column="1"
+                                wuxc:Grid.Row="1"
+                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                IsTextSelectionEnabled="True"
+                                Text="{x:Bind interopservices:RuntimeInformation.FrameworkDescription}"
+                                TextWrapping="WrapWholeWords" />
+                            <wuxc:TextBlock
+                                wuxc:Grid.Column="0"
+                                wuxc:Grid.Row="2"
+                                Foreground="{ThemeResource SettingCardForeground}"
+                                Text="CS/WinRT" />
+                            <wuxc:TextBlock
+                                HorizontalAlignment="Left"
+                                wuxc:Grid.Column="1"
+                                wuxc:Grid.Row="2"
+                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                IsTextSelectionEnabled="True"
+                                Text="{x:Bind settingspages:SettingsViewModel.WinRTVersion}"
+                                TextWrapping="WrapWholeWords" />
+                            <wuxc:TextBlock
+                                wuxc:Grid.Column="0"
+                                wuxc:Grid.Row="3"
+                                Foreground="{ThemeResource SettingCardForeground}"
+                                Text="Windows SDK" />
+                            <wuxc:TextBlock
+                                HorizontalAlignment="Left"
+                                wuxc:Grid.Column="1"
+                                wuxc:Grid.Row="3"
+                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                IsTextSelectionEnabled="True"
+                                Text="{x:Bind settingspages:SettingsViewModel.SDKVersion}"
+                                TextWrapping="Wrap" />
+                            <wuxc:TextBlock
+                                wuxc:Grid.Column="0"
+                                wuxc:Grid.Row="4"
+                                Foreground="{ThemeResource SettingCardForeground}"
+                                Text="OS Platform" />
+                            <wuxc:TextBlock
+                                HorizontalAlignment="Left"
+                                wuxc:Grid.Column="1"
+                                wuxc:Grid.Row="4"
+                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                IsTextSelectionEnabled="True"
+                                Text="{x:Bind interopservices:RuntimeInformation.OSDescription}"
+                                TextWrapping="Wrap" />
+                            <wuxc:TextBlock
+                                wuxc:Grid.Column="0"
+                                wuxc:Grid.Row="5"
+                                Foreground="{ThemeResource SettingCardForeground}"
+                                Text="OS Architecture" />
+                            <wuxc:TextBlock
+                                HorizontalAlignment="Left"
+                                wuxc:Grid.Column="1"
+                                wuxc:Grid.Row="5"
+                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                IsTextSelectionEnabled="True"
+                                Text="{x:Bind interopservices:RuntimeInformation.OSArchitecture}"
+                                TextWrapping="WrapWholeWords" />
+                        </wuxc:Grid>
+                    </controls:SettingExpander>
+                </controls:SettingsGroup>
+                <controls:SettingsGroup Header="About">
+                    <controls:SettingExpander Header="{x:Bind settingspages:SettingsViewModel.VersionTextBlockText, Mode=OneWay}">
+                        <controls:SettingExpander.Icon>
+                            <controls:AppLogo FontFamily="{StaticResource ContentControlThemeFontFamily}" />
+                        </controls:SettingExpander.Icon>
+                        <controls:SettingExpander.Description>
+                            <wuxc:ScrollViewer
+                                HorizontalScrollBarVisibility="Hidden"
+                                HorizontalScrollMode="Auto"
+                                VerticalScrollBarVisibility="Disabled"
+                                VerticalScrollMode="Disabled">
+                                <wuxc:StackPanel Orientation="Horizontal" Spacing="4">
+                                    <wuxc:HyperlinkButton
+                                        Click="HyperlinkButton_Click"
+                                        Content="Feedback"
+                                        NavigateUri="https://github.com/wherewhere/CoreAppUWP/issues" />
+                                    <wuxc:HyperlinkButton
+                                        Click="HyperlinkButton_Click"
+                                        Content="Log Folder"
+                                        Tag="LogFolder" />
+                                    <wuxc:HyperlinkButton
+                                        Click="HyperlinkButton_Click"
+                                        Content="Release Notes"
+                                        NavigateUri="https://github.com/wherewhere/CoreAppUWP/releases/latest" />
+                                </wuxc:StackPanel>
+                            </wuxc:ScrollViewer>
+                        </controls:SettingExpander.Description>
+                        <wuxc:Grid Style="{StaticResource SettingExpanderContentGridStyle}">
+                            <wuxc:TextBlock
+                                x:Name="AboutTextBlock"
+                                HorizontalAlignment="Left"
+                                Text="{x:Bind Provider.AboutTextBlockText, Mode=OneWay}"
+                                TextWrapping="Wrap" />
+                        </wuxc:Grid>
+                    </controls:SettingExpander>
+                </controls:SettingsGroup>
+            </wuxc:StackPanel>
+        </wuxc:ScrollViewer>
+    </wuxc:Grid>
 </wuxc:Page>

@@ -1,0 +1,7 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:controls="using:CoreAppUWP.Controls">
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="SettingExpander.ThemeResources.xaml" />
+    </ResourceDictionary.MergedDictionaries>
+    <!--  Implicitly applied default style  -->
+    <Style BasedOn="{StaticResource DefaultSettingExpanderStyle}" TargetType="controls:SettingExpander" />
+</ResourceDictionary>

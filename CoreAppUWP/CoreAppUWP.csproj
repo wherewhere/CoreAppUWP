@@ -45,6 +45,53 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="Styles\Button.xaml" />
+    <None Remove="Themes\CustomStyles.xaml" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Content Include="favicon.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Controls\SettingExpander\SettingExpander.ThemeResources.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </None>
+    <None Update="Controls\SettingExpander\SettingExpander.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </None>
+    <None Update="Controls\SettingsGroup\SettingsGroup.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </None>
+    <None Update="Controls\Setting\Setting.ThemeResources.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </None>
+    <None Update="Controls\Setting\Setting.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="Controls\SettingExpander\SettingExpander.ThemeResources.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="Controls\SettingExpander\SettingExpander.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="Controls\SettingsGroup\SettingsGroup.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="Controls\Setting\Setting.ThemeResources.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="Controls\Setting\Setting.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="Styles\Button.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="Themes\CustomStyles.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
 </Project>

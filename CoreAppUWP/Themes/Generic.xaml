@@ -1,5 +1,8 @@
 <ResourceDictionary xmlns="using:Windows.UI.Xaml">
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="ms-appx:///Controls/AppLogo/AppLogo.xaml" />
+        <ResourceDictionary Source="ms-appx:///Controls/Setting/Setting.xaml" />
+        <ResourceDictionary Source="ms-appx:///Controls/SettingsGroup/SettingsGroup.xaml" />
+        <ResourceDictionary Source="ms-appx:///Controls/SettingExpander/SettingExpander.xaml" />
     </ResourceDictionary.MergedDictionaries>
 </ResourceDictionary>

@@ -1,0 +1,9 @@
+﻿<wux:ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:controls="using:CoreAppUWP.Controls"
+    xmlns:wux="using:Windows.UI.Xaml">
+    <wux:ResourceDictionary.MergedDictionaries>
+        <wux:ResourceDictionary Source="Setting.ThemeResources.xaml" />
+    </wux:ResourceDictionary.MergedDictionaries>
+    <Style BasedOn="{StaticResource DefaultSettingCardStyle}" TargetType="controls:Setting" />
+</wux:ResourceDictionary>

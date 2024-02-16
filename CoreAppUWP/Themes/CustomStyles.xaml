@@ -1,0 +1,7 @@
+﻿<ResourceDictionary xmlns="using:Windows.UI.Xaml">
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="ms-appx:///Styles/Button.xaml" />
+        <ResourceDictionary Source="ms-appx:///Controls/Setting/Setting.ThemeResources.xaml" />
+        <ResourceDictionary Source="ms-appx:///Controls/SettingExpander/SettingExpander.ThemeResources.xaml" />
+    </ResourceDictionary.MergedDictionaries>
+</ResourceDictionary>

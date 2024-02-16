@@ -9,6 +9,7 @@
             <wux:ResourceDictionary.MergedDictionaries>
                 <XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls" />
                 <!--  Add resource dictionaries here  -->
+                <wux:ResourceDictionary Source="ms-appx:///Themes/CustomStyles.xaml" />
             </wux:ResourceDictionary.MergedDictionaries>
             <!--  Other app resources here  -->
 
