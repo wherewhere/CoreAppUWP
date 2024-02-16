@@ -1,0 +1,112 @@
+﻿<wuxc:Page
+    x:Class="CoreAppUWP.Pages.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:CoreAppUWP.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
+    xmlns:wuxc="using:Windows.UI.Xaml.Controls"
+    xmlns:wuxma="using:Windows.UI.Xaml.Media.Animation"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
+    NavigationCacheMode="Enabled"
+    mc:Ignorable="d">
+    <wuxc:Grid>
+        <wuxc:Grid
+            x:Name="AppTitleBar"
+            Height="48"
+            VerticalAlignment="Top"
+            wuxc:Canvas.ZIndex="1"
+            IsHitTestVisible="True">
+            <wuxc:Grid.ColumnDefinitions>
+                <wuxc:ColumnDefinition x:Name="LeftPaddingColumn" Width="0" />
+                <wuxc:ColumnDefinition x:Name="TitlePaddingColumn" Width="0" />
+                <wuxc:ColumnDefinition Width="Auto" />
+                <wuxc:ColumnDefinition Width="*" />
+                <wuxc:ColumnDefinition Width="Auto" />
+                <wuxc:ColumnDefinition x:Name="RightPaddingColumn" Width="0" />
+            </wuxc:Grid.ColumnDefinitions>
+            <wuxc:Grid.ChildrenTransitions>
+                <wuxma:TransitionCollection>
+                    <wuxma:ReorderThemeTransition />
+                </wuxma:TransitionCollection>
+            </wuxc:Grid.ChildrenTransitions>
+            <wuxc:Grid
+                x:Name="AppTitle"
+                Margin="8,0"
+                wuxc:Grid.Column="2"
+                ColumnSpacing="20">
+                <wuxc:Grid.ColumnDefinitions>
+                    <wuxc:ColumnDefinition Width="Auto" />
+                    <wuxc:ColumnDefinition Width="*" />
+                </wuxc:Grid.ColumnDefinitions>
+                <wuxc:Viewbox
+                    x:Name="AppTitleIcon"
+                    Width="16"
+                    Height="16"
+                    VerticalAlignment="Center">
+                    <controls:AppLogo />
+                </wuxc:Viewbox>
+                <wuxc:TextBlock
+                    x:Name="AppTitleText"
+                    Margin="0,0,0,2"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Center"
+                    wuxc:Grid.Column="1"
+                    Style="{StaticResource CaptionTextBlockStyle}"
+                    Text="CoreAppUWP"
+                    TextTrimming="CharacterEllipsis"
+                    TextWrapping="NoWrap" />
+            </wuxc:Grid>
+            <wuxc:Border
+                x:Name="DragRegion"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Stretch"
+                wuxc:Grid.Column="1"
+                wuxc:Grid.ColumnSpan="5"
+                Background="{ThemeResource SystemControlTransparentBrush}" />
+        </wuxc:Grid>
+        <muxc:NavigationView
+            x:Name="NavigationView"
+            AlwaysShowHeader="True"
+            BackRequested="NavigationView_BackRequested"
+            DisplayModeChanged="NavigationViewControl_DisplayModeChanged"
+            IsTabStop="False"
+            IsTitleBarAutoPaddingEnabled="False"
+            ItemInvoked="NavigationView_ItemInvoked"
+            Loaded="NavigationView_Loaded"
+            PaneClosing="NavigationViewControl_PaneClosing"
+            PaneOpening="NavigationViewControl_PaneOpening">
+            <muxc:NavigationView.MenuItems>
+                <muxc:NavigationViewItem Content="Home" Tag="Home">
+                    <muxc:NavigationViewItem.Icon>
+                        <wuxc:FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE80F;" />
+                    </muxc:NavigationViewItem.Icon>
+                </muxc:NavigationViewItem>
+                <muxc:NavigationViewItem Content="Empty" Tag="Empty">
+                    <muxc:NavigationViewItem.Icon>
+                        <wuxc:FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xEA3A;" />
+                    </muxc:NavigationViewItem.Icon>
+                </muxc:NavigationViewItem>
+                <muxc:NavigationViewItem Content="Empty" Tag="Empty">
+                    <muxc:NavigationViewItem.Icon>
+                        <wuxc:FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xEA3A;" />
+                    </muxc:NavigationViewItem.Icon>
+                </muxc:NavigationViewItem>
+                <muxc:NavigationViewItem Content="Empty" Tag="Empty">
+                    <muxc:NavigationViewItem.Icon>
+                        <wuxc:FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xEA3A;" />
+                    </muxc:NavigationViewItem.Icon>
+                </muxc:NavigationViewItem>
+            </muxc:NavigationView.MenuItems>
+            <muxc:NavigationView.FooterMenuItems>
+                <muxc:NavigationViewItem Content="Empty" Tag="Empty">
+                    <muxc:NavigationViewItem.Icon>
+                        <wuxc:FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xEA3A;" />
+                    </muxc:NavigationViewItem.Icon>
+                </muxc:NavigationViewItem>
+            </muxc:NavigationView.FooterMenuItems>
+            <wuxc:Frame x:Name="NavigationViewFrame" x:FieldModifier="public" />
+        </muxc:NavigationView>
+    </wuxc:Grid>
+</wuxc:Page>

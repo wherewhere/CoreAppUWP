@@ -1,0 +1,239 @@
+﻿<wuxc:Page
+    x:Class="CoreAppUWP.Pages.HomePage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:CoreAppUWP.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
+    xmlns:wux="using:Windows.UI.Xaml"
+    xmlns:wuxa="using:Windows.UI.Xaml.Automation"
+    xmlns:wuxc="using:Windows.UI.Xaml.Controls"
+    xmlns:wuxcp="using:Windows.UI.Xaml.Controls.Primitives"
+    NavigationCacheMode="Enabled"
+    mc:Ignorable="d">
+    <wuxc:Page.Resources>
+        <wuxc:Flyout x:Key="ExampleFlyout" Placement="Bottom">
+            <wuxc:Flyout.FlyoutPresenterStyle>
+                <wux:Style TargetType="FlyoutPresenter">
+                    <wux:Setter Property="Width" Value="296" />
+                    <wux:Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
+                    <wux:Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Disabled" />
+                </wux:Style>
+            </wuxc:Flyout.FlyoutPresenterStyle>
+            <wuxc:TextBlock Style="{StaticResource BodyTextBlockStyle}" Text="This is a flyout with placeholder text that wraps to a second line." />
+        </wuxc:Flyout>
+    </wuxc:Page.Resources>
+    <wuxc:Grid
+        x:Name="RootGrid"
+        Padding="20,20,0,0"
+        RowSpacing="24">
+        <wuxc:Grid.RowDefinitions>
+            <wuxc:RowDefinition Height="Auto" />
+            <wuxc:RowDefinition Height="*" />
+        </wuxc:Grid.RowDefinitions>
+        <wuxc:TextBlock
+            x:Name="Header"
+            HorizontalAlignment="Stretch"
+            VerticalAlignment="Stretch"
+            wuxa:AutomationProperties.HeadingLevel="1"
+            Style="{StaticResource TitleTextBlockStyle}"
+            Text="Overview" />
+        <wuxc:ScrollViewer
+            wuxc:Grid.Row="1"
+            HorizontalScrollBarVisibility="Disabled"
+            HorizontalScrollMode="Disabled"
+            VerticalScrollBarVisibility="Auto"
+            VerticalScrollMode="Auto">
+            <wuxc:Border Padding="0,0,20,48">
+                <controls:StaggeredPanel
+                    ColumnSpacing="40"
+                    DesiredColumnWidth="296"
+                    RowSpacing="25">
+                    <wuxc:StackPanel Spacing="20">
+                        <wuxc:TextBlock Style="{StaticResource BaseTextBlockStyle}" Text="Buttons" />
+                        <wuxc:StackPanel Spacing="15">
+                            <wuxc:Button Content="Enabled button" />
+                            <wuxc:Button Content="Disabled button" IsEnabled="False" />
+                            <wuxcp:ToggleButton Content="Toggle button" IsChecked="True" />
+                            <muxc:DropDownButton Content="Drop down button" Flyout="{StaticResource ExampleFlyout}" />
+                            <muxc:SplitButton Content="Split button" Flyout="{StaticResource ExampleFlyout}" />
+                        </wuxc:StackPanel>
+                    </wuxc:StackPanel>
+                    <wuxc:StackPanel Spacing="15">
+                        <wuxc:TextBlock Style="{StaticResource BaseTextBlockStyle}" Text="Checkbox" />
+                        <wuxc:StackPanel Spacing="8">
+                            <wuxc:CheckBox Content="Unchecked" />
+                            <wuxc:CheckBox Content="Checked" IsChecked="True" />
+                            <wuxc:CheckBox
+                                Content="Third state"
+                                IsChecked="{x:Null}"
+                                IsThreeState="True" />
+                            <wuxc:CheckBox
+                                Content="Disabled"
+                                IsChecked="True"
+                                IsEnabled="False" />
+                        </wuxc:StackPanel>
+                    </wuxc:StackPanel>
+                    <wuxc:StackPanel Spacing="14">
+                        <wuxc:TextBlock Style="{StaticResource BaseTextBlockStyle}" Text="Radio button" />
+                        <wuxc:StackPanel Spacing="8">
+                            <wuxc:RadioButton Content="Unchecked" />
+                            <wuxc:RadioButton Content="Checked" IsChecked="True" />
+                            <wuxc:RadioButton
+                                Content="Disabled"
+                                GroupName="Disabled"
+                                IsChecked="True"
+                                IsEnabled="False" />
+                        </wuxc:StackPanel>
+                    </wuxc:StackPanel>
+                    <wuxc:StackPanel Spacing="11">
+                        <wuxc:TextBlock Style="{StaticResource BaseTextBlockStyle}" Text="Date picker" />
+                        <wuxc:StackPanel Spacing="18">
+                            <wuxc:DatePicker HorizontalAlignment="Stretch" Header="Label title" />
+                            <wuxc:DatePicker
+                                HorizontalAlignment="Stretch"
+                                Header="Disabled"
+                                IsEnabled="False" />
+                        </wuxc:StackPanel>
+                    </wuxc:StackPanel>
+                    <wuxc:StackPanel Spacing="11">
+                        <wuxc:TextBlock Style="{StaticResource BaseTextBlockStyle}" Text="Time picker" />
+                        <wuxc:StackPanel Spacing="31">
+                            <wuxc:TimePicker HorizontalAlignment="Stretch" Header="Label title" />
+                            <wuxc:CalendarView />
+                        </wuxc:StackPanel>
+                    </wuxc:StackPanel>
+                    <wuxc:StackPanel>
+                        <wuxc:TextBlock
+                            Margin="0,0,0,11"
+                            Style="{StaticResource BaseTextBlockStyle}"
+                            Text="Combo box" />
+                        <wuxc:ComboBox
+                            HorizontalAlignment="Stretch"
+                            Header="Label title"
+                            PlaceholderText="Placeholder text">
+                            <wuxc:ComboBoxItem>List item</wuxc:ComboBoxItem>
+                            <wuxc:ComboBoxItem>List item</wuxc:ComboBoxItem>
+                            <wuxc:ComboBoxItem>List item</wuxc:ComboBoxItem>
+                            <wuxc:ComboBoxItem>List item</wuxc:ComboBoxItem>
+                        </wuxc:ComboBox>
+                        <wuxc:StackPanel Margin="0,17,0,0" Spacing="31">
+                            <wuxc:ComboBox
+                                HorizontalAlignment="Stretch"
+                                Header="Disabled"
+                                IsEnabled="False"
+                                PlaceholderText="Placeholder text" />
+                            <wuxc:Grid>
+                                <wuxc:ListBox Margin="0,6" SelectedIndex="0">
+                                    <wuxc:ListBoxItem Content="Microsoft" />
+                                    <wuxc:ListBoxItem Content="Windows" />
+                                    <wuxc:ListBoxItem Content="Office" />
+                                </wuxc:ListBox>
+                                <wuxc:Border
+                                    BorderBrush="{ThemeResource SystemControlForegroundChromeHighBrush}"
+                                    BorderThickness="1"
+                                    CornerRadius="{StaticResource ControlCornerRadius}"
+                                    IsHitTestVisible="False" />
+                            </wuxc:Grid>
+                            <wuxc:Grid Width="148" HorizontalAlignment="Left">
+                                <wuxc:ListBox Margin="0,6" SelectedIndex="0">
+                                    <wuxc:ListBox.ItemContainerStyle>
+                                        <wux:Style TargetType="ListBoxItem">
+                                            <wux:Setter Property="Padding" Value="12,5,12,8" />
+                                        </wux:Style>
+                                    </wuxc:ListBox.ItemContainerStyle>
+                                    <wuxc:ListBoxItem Content="Microsoft" />
+                                    <wuxc:ListBoxItem Content="Windows" />
+                                    <wuxc:ListBoxItem Content="Office" />
+                                </wuxc:ListBox>
+                                <wuxc:Border
+                                    BorderBrush="{ThemeResource SystemControlForegroundChromeHighBrush}"
+                                    BorderThickness="1"
+                                    CornerRadius="{StaticResource ControlCornerRadius}"
+                                    IsHitTestVisible="False" />
+                            </wuxc:Grid>
+                            <wuxc:Button Content="Button with flyout">
+                                <wuxc:Button.Flyout>
+                                    <wuxc:Flyout Placement="BottomEdgeAlignedLeft">
+                                        <wuxc:StackPanel>
+                                            <wuxc:TextBlock
+                                                Margin="0,0,0,12"
+                                                Style="{StaticResource BaseTextBlockStyle}"
+                                                Text="All items will be removed. Do you want to continue?" />
+                                            <wuxc:Button Content="Yes, empty my cart" />
+                                        </wuxc:StackPanel>
+                                    </wuxc:Flyout>
+                                </wuxc:Button.Flyout>
+                            </wuxc:Button>
+                        </wuxc:StackPanel>
+                    </wuxc:StackPanel>
+                    <wuxc:StackPanel Spacing="11">
+                        <wuxc:TextBlock Style="{StaticResource BaseTextBlockStyle}" Text="Textbox" />
+                        <wuxc:StackPanel Spacing="17">
+                            <wuxc:TextBox Header="Label title" PlaceholderText="Placeholder text" />
+                            <wuxc:TextBox
+                                Header="Disabled"
+                                IsEnabled="False"
+                                PlaceholderText="Placeholder text" />
+                            <wuxc:PasswordBox Header="Password" PlaceholderText="Placeholder text" />
+                        </wuxc:StackPanel>
+                    </wuxc:StackPanel>
+                    <wuxc:StackPanel Spacing="14">
+                        <wuxc:TextBlock Style="{StaticResource BaseTextBlockStyle}" Text="Toggle switch" />
+                        <wuxc:Grid RowSpacing="12">
+                            <wuxc:Grid.RowDefinitions>
+                                <wuxc:RowDefinition Height="Auto" />
+                                <wuxc:RowDefinition Height="Auto" />
+                            </wuxc:Grid.RowDefinitions>
+                            <wuxc:Grid.ColumnDefinitions>
+                                <wuxc:ColumnDefinition />
+                                <wuxc:ColumnDefinition Width="Auto" />
+                            </wuxc:Grid.ColumnDefinitions>
+                            <wuxc:ToggleSwitch wuxc:Grid.Column="0" wuxc:Grid.Row="0" />
+                            <wuxc:ToggleSwitch
+                                wuxc:Grid.Column="0"
+                                wuxc:Grid.Row="1"
+                                IsOn="True" />
+                            <wuxc:ToggleSwitch
+                                wuxc:Grid.Column="1"
+                                wuxc:Grid.Row="0"
+                                IsEnabled="False"
+                                OffContent="Disabled Off" />
+                            <wuxc:ToggleSwitch
+                                wuxc:Grid.Column="1"
+                                wuxc:Grid.Row="1"
+                                IsEnabled="False"
+                                IsOn="True"
+                                OnContent="Disabled On" />
+                        </wuxc:Grid>
+                    </wuxc:StackPanel>
+                    <wuxc:StackPanel Spacing="14">
+                        <wuxc:TextBlock Style="{StaticResource BaseTextBlockStyle}" Text="Slider" />
+                        <wuxc:Slider
+                            Header="Label title"
+                            Maximum="100"
+                            Value="50" />
+                    </wuxc:StackPanel>
+                </controls:StaggeredPanel>
+            </wuxc:Border>
+        </wuxc:ScrollViewer>
+        <wux:VisualStateManager.VisualStateGroups>
+            <wux:VisualStateGroup>
+                <wux:VisualState>
+                    <wux:VisualState.StateTriggers>
+                        <wux:AdaptiveTrigger MinWindowWidth="0" />
+                    </wux:VisualState.StateTriggers>
+                    <wux:VisualState.Setters>
+                        <wux:Setter Target="RootGrid.Padding" Value="20,52,0,0" />
+                    </wux:VisualState.Setters>
+                </wux:VisualState>
+                <wux:VisualState>
+                    <wux:VisualState.StateTriggers>
+                        <wux:AdaptiveTrigger MinWindowWidth="{StaticResource Breakpoint640Plus}" />
+                    </wux:VisualState.StateTriggers>
+                </wux:VisualState>
+            </wux:VisualStateGroup>
+        </wux:VisualStateManager.VisualStateGroups>
+    </wuxc:Grid>
+</wuxc:Page>
