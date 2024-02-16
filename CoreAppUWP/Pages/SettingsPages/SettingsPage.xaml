@@ -315,6 +315,7 @@
                             <wuxc:TextBlock
                                 x:Name="AboutTextBlock"
                                 HorizontalAlignment="Left"
+                                IsTextSelectionEnabled="True"
                                 Text="{x:Bind Provider.AboutTextBlockText, Mode=OneWay}"
                                 TextWrapping="Wrap" />
                         </wuxc:Grid>
