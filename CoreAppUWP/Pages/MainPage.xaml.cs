@@ -1,4 +1,5 @@
-﻿using CoreAppUWP.Pages.SettingsPages;
+﻿using CoreAppUWP.Helpers;
+using CoreAppUWP.Pages.SettingsPages;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -33,18 +34,28 @@ namespace CoreAppUWP.Pages
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
-            Window.Current.SetTitleBar(DragRegion);
             NavigationView_Navigate("Home", new EntranceNavigationTransitionInfo());
-            SystemNavigationManager.GetForCurrentView().BackRequested += System_BackRequested;
-            CoreApplication.GetCurrentView().TitleBar.LayoutMetricsChanged += TitleBar_LayoutMetricsChanged;
         }
 
         protected override void OnNavigatedFrom(NavigationEventArgs e)
         {
             base.OnNavigatedFrom(e);
-            Window.Current.SetTitleBar(null);
-            SystemNavigationManager.GetForCurrentView().BackRequested -= System_BackRequested;
-            CoreApplication.GetCurrentView().TitleBar.LayoutMetricsChanged -= TitleBar_LayoutMetricsChanged;
+            if (!this.IsAppWindow())
+            {
+                Window.Current.SetTitleBar(null);
+                SystemNavigationManager.GetForCurrentView().BackRequested -= System_BackRequested;
+                CoreApplication.GetCurrentView().TitleBar.LayoutMetricsChanged -= TitleBar_LayoutMetricsChanged;
+            }
+        }
+
+        private void Page_Loaded(object sender, RoutedEventArgs e)
+        {
+            if (!this.IsAppWindow())
+            {
+                Window.Current.SetTitleBar(DragRegion);
+                SystemNavigationManager.GetForCurrentView().BackRequested += System_BackRequested;
+                CoreApplication.GetCurrentView().TitleBar.LayoutMetricsChanged += TitleBar_LayoutMetricsChanged;
+            }
         }
 
         private void TitleBar_LayoutMetricsChanged(CoreApplicationViewTitleBar sender, object args)

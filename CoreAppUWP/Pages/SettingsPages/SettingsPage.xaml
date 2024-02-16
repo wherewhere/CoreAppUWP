@@ -10,6 +10,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
     xmlns:settingspages="using:CoreAppUWP.ViewModels.SettingsPages"
+    xmlns:wux="using:Windows.UI.Xaml"
     xmlns:wuxa="using:Windows.UI.Xaml.Automation"
     xmlns:wuxc="using:Windows.UI.Xaml.Controls"
     xmlns:wuxma="using:Windows.UI.Xaml.Media.Animation"
@@ -296,7 +297,7 @@
                                 VerticalScrollMode="Disabled">
                                 <wuxc:StackPanel Orientation="Horizontal" Spacing="4">
                                     <wuxc:HyperlinkButton
-                                        Click="HyperlinkButton_Click"
+                                        wuxc:ToolTipService.ToolTip="{Binding NavigateUri, RelativeSource={RelativeSource Mode=Self}}"
                                         Content="Feedback"
                                         NavigateUri="https://github.com/wherewhere/CoreAppUWP/issues" />
                                     <wuxc:HyperlinkButton
@@ -304,7 +305,7 @@
                                         Content="Log Folder"
                                         Tag="LogFolder" />
                                     <wuxc:HyperlinkButton
-                                        Click="HyperlinkButton_Click"
+                                        wuxc:ToolTipService.ToolTip="{Binding NavigateUri, RelativeSource={RelativeSource Mode=Self}}"
                                         Content="Release Notes"
                                         NavigateUri="https://github.com/wherewhere/CoreAppUWP/releases/latest" />
                                 </wuxc:StackPanel>
@@ -321,5 +322,22 @@
                 </controls:SettingsGroup>
             </wuxc:StackPanel>
         </wuxc:ScrollViewer>
+        <wux:VisualStateManager.VisualStateGroups>
+            <wux:VisualStateGroup>
+                <wux:VisualState>
+                    <wux:VisualState.StateTriggers>
+                        <wux:AdaptiveTrigger MinWindowWidth="0" />
+                    </wux:VisualState.StateTriggers>
+                    <wux:VisualState.Setters>
+                        <wux:Setter Target="RootGrid.Padding" Value="20,52,0,0" />
+                    </wux:VisualState.Setters>
+                </wux:VisualState>
+                <wux:VisualState>
+                    <wux:VisualState.StateTriggers>
+                        <wux:AdaptiveTrigger MinWindowWidth="{StaticResource Breakpoint640Plus}" />
+                    </wux:VisualState.StateTriggers>
+                </wux:VisualState>
+            </wux:VisualStateGroup>
+        </wux:VisualStateManager.VisualStateGroups>
     </wuxc:Grid>
 </wuxc:Page>

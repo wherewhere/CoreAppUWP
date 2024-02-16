@@ -91,6 +91,7 @@ namespace CoreAppUWP.Helpers
             }
         }
 
+        [SupportedOSPlatformGuard("Windows10.0.18362.0")]
         public static bool IsAppWindow(this UIElement element) =>
             IsAppWindowSupported
             && element?.XamlRoot?.Content != null

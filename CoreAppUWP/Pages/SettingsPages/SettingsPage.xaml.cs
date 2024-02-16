@@ -9,6 +9,7 @@ using Windows.Storage;
 using Windows.System;
 using Windows.UI.ApplicationSettings;
 using Windows.UI.ViewManagement;
+using Windows.UI.WindowManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media.Animation;
@@ -67,16 +68,16 @@ namespace CoreAppUWP.Pages.SettingsPages
                     _ = Refresh(true);
                     break;
                 case "ExitPIP":
-                    {
-                        ApplicationView.GetForCurrentView().IsViewModeSupported(ApplicationViewMode.Default);
-                        _ = ApplicationView.GetForCurrentView().TryEnterViewModeAsync(ApplicationViewMode.Default);
-                    }
+                    if (this.IsAppWindow())
+                    { _ = this.GetWindowForElement().Presenter.RequestPresentation(AppWindowPresentationKind.Default); }
+                    else if (ApplicationView.GetForCurrentView().IsViewModeSupported(ApplicationViewMode.Default))
+                    { _ = ApplicationView.GetForCurrentView().TryEnterViewModeAsync(ApplicationViewMode.Default); }
                     break;
                 case "EnterPIP":
-                    {
-                        ApplicationView.GetForCurrentView().IsViewModeSupported(ApplicationViewMode.CompactOverlay);
-                        _ = ApplicationView.GetForCurrentView().TryEnterViewModeAsync(ApplicationViewMode.CompactOverlay);
-                    }
+                    if (this.IsAppWindow())
+                    { _ = this.GetWindowForElement().Presenter.RequestPresentation(AppWindowPresentationKind.CompactOverlay); }
+                    else if (ApplicationView.GetForCurrentView().IsViewModeSupported(ApplicationViewMode.CompactOverlay))
+                    { _ = ApplicationView.GetForCurrentView().TryEnterViewModeAsync(ApplicationViewMode.CompactOverlay); }
                     break;
                 case "NewWindow":
                     _ = await WindowHelper.CreateWindowAsync(window =>
@@ -89,21 +90,32 @@ namespace CoreAppUWP.Pages.SettingsPages
                         _ = _frame.Navigate(typeof(MainPage), null, new DrillInNavigationTransitionInfo());
                     });
                     break;
-                case "NewAppWindow":
+                case "NewAppWindow" when WindowHelper.IsAppWindowSupported:
+                    (AppWindow appWindow, Frame frame) = await WindowHelper.CreateWindowAsync();
+                    if (Provider.IsExtendsTitleBar)
+                    {
+                        appWindow.TitleBar.ExtendsContentIntoTitleBar = true;
+                    }
+                    ThemeHelper.Initialize(appWindow);
+                    _ = frame.Navigate(typeof(MainPage), null, new DrillInNavigationTransitionInfo());
+                    await appWindow.TryShowAsync();
                     break;
                 case "SearchFlyout" when SettingsPaneRegister.IsSearchPaneSupported:
                     SearchPane.GetForCurrentView().Show();
                     break;
                 case "ExitFullWindow":
-                    //if (IsCoreWindow)
+                    if (this.IsAppWindow())
+                    { _ = this.GetWindowForElement().Presenter.RequestPresentation(AppWindowPresentationKind.Default); }
+                    else
                     { ApplicationView.GetForCurrentView().ExitFullScreenMode(); }
                     break;
                 case "SettingsFlyout" when SettingsPaneRegister.IsSettingsPaneSupported:
                     SettingsPane.Show();
                     break;
                 case "EnterFullWindow":
-                    //if (IsCoreWindow)
-                    { ApplicationView.GetForCurrentView().TryEnterFullScreenMode(); }
+                    _ = this.IsAppWindow()
+                        ? this.GetWindowForElement().Presenter.RequestPresentation(AppWindowPresentationKind.FullScreen)
+                        : ApplicationView.GetForCurrentView().TryEnterFullScreenMode();
                     break;
                 default:
                     break;
