@@ -117,9 +117,9 @@ namespace CoreAppUWP
 
         private static void CurrentDomain_UnhandledException(object sender, System.UnhandledExceptionEventArgs e)
         {
-            if (e.ExceptionObject is Exception Exception)
+            if (e.ExceptionObject is Exception ex)
             {
-                SettingsHelper.LogManager?.GetLogger("Unhandled Exception - CurrentDomain").Error(Exception.ExceptionToMessage(), Exception);
+                SettingsHelper.LogManager?.GetLogger("Unhandled Exception - CurrentDomain").Error(ex.ExceptionToMessage(), ex);
             }
         }
 
