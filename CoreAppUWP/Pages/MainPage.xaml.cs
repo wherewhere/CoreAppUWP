@@ -1,9 +1,11 @@
 ﻿using CoreAppUWP.Helpers;
 using CoreAppUWP.Pages.SettingsPages;
+using Microsoft.UI.Xaml.Controls;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using Windows.ApplicationModel.Core;
+using Windows.Foundation.Metadata;
 using Windows.UI.Core;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -35,6 +37,8 @@ namespace CoreAppUWP.Pages
         {
             base.OnNavigatedTo(e);
             NavigationView_Navigate("Home", new EntranceNavigationTransitionInfo());
+            if (ApiInformation.IsMethodPresent("Windows.UI.Composition.Compositor", "TryCreateBlurredWallpaperBackdropBrush"))
+            { BackdropMaterial.SetApplyToRootOrPageBackground(this, true); }
         }
 
         protected override void OnNavigatedFrom(NavigationEventArgs e)
