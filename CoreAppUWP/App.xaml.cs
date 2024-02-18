@@ -2,6 +2,7 @@
 using CoreAppUWP.Helpers;
 using CoreAppUWP.Pages;
 using System;
+using System.Threading;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
 using Windows.ApplicationModel.Core;
@@ -91,7 +92,11 @@ namespace CoreAppUWP
         {
             if (!isLoaded)
             {
-                //RegisterExceptionHandlingSynchronizationContext();
+                if (SynchronizationContext.Current == null)
+                {
+                    SynchronizationContext.SetSynchronizationContext(new SynchronizationContext());
+                }
+                RegisterExceptionHandlingSynchronizationContext();
                 SettingsHelper.CreateLogManager();
                 isLoaded = true;
             }

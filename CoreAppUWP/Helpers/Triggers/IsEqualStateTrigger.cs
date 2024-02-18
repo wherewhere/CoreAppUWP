@@ -92,7 +92,7 @@ namespace CoreAppUWP.Helpers.Triggers
             // value cannot be the same type of enum now
             return value is string str
                 ? EnumTryParse(enumType, str, out object e) ? e : null
-                : value is int || value is uint || value is byte || value is sbyte || value is long || value is ulong || value is short || value is ushort
+                : value is int or uint or byte or sbyte or long or ulong or short or ushort
                 ? Enum.ToObject(enumType, value)
                 : null;
         }

@@ -1,4 +1,5 @@
 ﻿using CoreAppUWP.Common;
+using CoreAppUWP.Controls;
 using CoreAppUWP.Helpers;
 using CoreAppUWP.ViewModels.SettingsPages;
 using System;
@@ -102,6 +103,9 @@ namespace CoreAppUWP.Pages.SettingsPages
                     break;
                 case "SearchFlyout" when SettingsPaneRegister.IsSearchPaneSupported:
                     SearchPane.GetForCurrentView().Show();
+                    break;
+                case "NewWin32Window":
+                    new DesktopWindow().Show();
                     break;
                 case "ExitFullWindow":
                     if (this.IsAppWindow())

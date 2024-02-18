@@ -114,12 +114,20 @@
                         <controls:Setting
                             ActionIcon="&#xE8A7;"
                             Click="Button_Click"
-                            CornerRadius="{Binding Source={StaticResource ControlCornerRadius}, Converter={StaticResource BottomCornerRadiusFilterConverter}}"
                             Description="Create a new AppWindow."
                             Header="AppWindow"
                             IsClickEnabled="True"
                             Style="{StaticResource ClickableSettingExpanderItemStyle}"
                             Tag="NewAppWindow" />
+                        <controls:Setting
+                            ActionIcon="&#xE8A7;"
+                            Click="Button_Click"
+                            CornerRadius="{Binding Source={StaticResource ControlCornerRadius}, Converter={StaticResource BottomCornerRadiusFilterConverter}}"
+                            Description="Create a new Desktop Window."
+                            Header="Win32 Window"
+                            IsClickEnabled="True"
+                            Style="{StaticResource ClickableSettingExpanderItemStyle}"
+                            Tag="NewWin32Window" />
                     </controls:SettingExpander>
                     <controls:Setting
                         x:Name="SettingsFlyoutSettings"
