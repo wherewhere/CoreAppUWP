@@ -15,11 +15,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-	<PackageReference Include="Dongle.WindowsSDK.NET" Version="10.0.22621.756" PrivateAssets="All"/>
-	<PackageReference Include="Dongle.Windows.CsWinRT" Version="3.0.0-wux.2"/>
-	<PackageReference Include="Microsoft.UI.Xaml" Version="2.8.6" PrivateAssets="All">
-	  <ExcludeAssets>build; buildtransitive; compile; runtime</ExcludeAssets>
-	</PackageReference>
+    <PackageReference Include="Dongle.WindowsSDK.NET" Version="10.0.22621.756" PrivateAssets="All"/>
+    <PackageReference Include="Dongle.Windows.CsWinRT" Version="3.0.0-wux.2"/>
+    <PackageReference Include="Microsoft.UI.Xaml" Version="2.8.6" PrivateAssets="All">
+      <ExcludeAssets>build; buildtransitive; compile; runtime</ExcludeAssets>
+    </PackageReference>
   </ItemGroup>
 
   <ItemGroup>

@@ -90,18 +90,20 @@ namespace CoreAppUWP
 
         private void EnsureWindow(IActivatedEventArgs e)
         {
+            if (Window.Current is not Window window) { return; }
+
+            if (SynchronizationContext.Current == null)
+            {
+                SynchronizationContext.SetSynchronizationContext(new CoreDispatcherSynchronizationContext(window.Dispatcher));
+            }
+
             if (!isLoaded)
             {
-                if (SynchronizationContext.Current == null)
-                {
-                    SynchronizationContext.SetSynchronizationContext(new SynchronizationContext());
-                }
                 RegisterExceptionHandlingSynchronizationContext();
                 SettingsHelper.CreateLogManager();
                 isLoaded = true;
             }
 
-            if (Window.Current is not Window window) { return; }
             WindowHelper.TrackWindow(window);
 
             // 不要在窗口已包含内容时重复应用程序初始化，

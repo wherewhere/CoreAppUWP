@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading;
+using Windows.UI.Core;
 using Windows.UI.Xaml.Controls;
 
 namespace CoreAppUWP.Common
@@ -129,6 +130,15 @@ namespace CoreAppUWP.Common
         /// so they don't crash your application
         /// </summary>
         public event EventHandler<UnhandledExceptionEventArgs> UnhandledException;
+    }
+
+    public sealed class CoreDispatcherSynchronizationContext(CoreDispatcher dispatcher) : SynchronizationContext
+    {
+        public override void Post(SendOrPostCallback d, object state) =>
+            _ = dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => d?.Invoke(state));
+
+        public override void Send(SendOrPostCallback d, object state) =>
+            _ = dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => d?.Invoke(state));
     }
 
     public class UnhandledExceptionEventArgs : EventArgs
