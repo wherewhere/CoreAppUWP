@@ -147,7 +147,7 @@ namespace CoreAppUWP.Helpers
                 }
             });
 
-            SettingsHelper.Set(SettingsHelper.SelectedAppTheme, (int)value);
+            SettingsHelper.Set(SettingsHelper.SelectedAppTheme, value);
             UpdateSystemCaptionButtonColors();
             InvokeUISettingChanged(await IsDarkThemeAsync() ? UISettingChangedType.DarkMode : UISettingChangedType.LightMode);
         }
@@ -172,7 +172,7 @@ namespace CoreAppUWP.Helpers
                 }
             }));
 
-            SettingsHelper.Set(SettingsHelper.SelectedAppTheme, (int)value);
+            SettingsHelper.Set(SettingsHelper.SelectedAppTheme, value);
             UpdateSystemCaptionButtonColors();
             InvokeUISettingChanged(await IsDarkThemeAsync() ? UISettingChangedType.DarkMode : UISettingChangedType.LightMode);
         }
