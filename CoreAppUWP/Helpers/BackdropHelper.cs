@@ -19,28 +19,32 @@ namespace CoreAppUWP.Helpers
         DefaultColor,
     }
 
-    public partial class BackdropHelper
+    public abstract class BackdropHelper<T>
     {
-        private readonly Window window;
-        private readonly DesktopWindow desktopWindow;
+        protected readonly T window;
         private readonly WindowsSystemDispatcherQueueHelper m_wsdqHelper;
-        private MicaController m_micaController;
-        private DesktopAcrylicController m_acrylicController;
-        private SystemBackdropConfiguration m_configurationSource;
+        private ISystemBackdropControllerWithTargets m_controller;
+        protected SystemBackdropConfiguration m_configurationSource;
 
         public BackdropType? Backdrop { get; private set; } = null;
-        public WeakEvent<BackdropType?> BackdropTypeChanged { get; } = [];
 
-        public BackdropHelper(Window window)
+        #region BackdropTypeChanged
+
+        private readonly WeakEvent<BackdropType?> actions = [];
+
+        public event Action<BackdropType?> BackdropTypeChanged
         {
-            this.window = window;
-            m_wsdqHelper = new WindowsSystemDispatcherQueueHelper();
-            m_wsdqHelper.EnsureWindowsSystemDispatcherQueueController();
+            add => actions.Add(value);
+            remove => actions.Remove(value);
         }
 
-        public BackdropHelper(DesktopWindow desktopWindow)
+        private void InvokeBackdropTypeChanged(BackdropType? value) => actions.Invoke(value);
+
+        #endregion
+
+        public BackdropHelper(T window)
         {
-            this.desktopWindow = desktopWindow;
+            this.window = window;
             m_wsdqHelper = new WindowsSystemDispatcherQueueHelper();
             m_wsdqHelper.EnsureWindowsSystemDispatcherQueueController();
         }
@@ -58,28 +62,8 @@ namespace CoreAppUWP.Helpers
             //       controller, reusing any existing m_configurationSource and Activated/Closed
             //       event handlers.
             Backdrop = BackdropType.DefaultColor;
-            if (m_micaController != null)
-            {
-                m_micaController.Dispose();
-                m_micaController = null;
-            }
-            if (m_acrylicController != null)
-            {
-                m_acrylicController.Dispose();
-                m_acrylicController = null;
-            }
 
-            if (window != null)
-            {
-                window.Closed -= Window_Closed;
-                window.Activated -= Window_Activated;
-                ((FrameworkElement)window.Content).ActualThemeChanged -= FrameworkElement_ThemeChanged;
-            }
-            else
-            {
-                desktopWindow.AppWindow.Closing -= AppWindow_Closing;
-                ((FrameworkElement)desktopWindow.Content).ActualThemeChanged -= FrameworkElement_ThemeChanged;
-            }
+            Unregister();
 
             m_configurationSource = null;
 
@@ -89,11 +73,6 @@ namespace CoreAppUWP.Helpers
                 {
                     Backdrop = type;
                 }
-                //else
-                //{
-                //    // Mica isn't supported. Try Acrylic.
-                //    type = BackdropType.DesktopAcrylic;
-                //}
             }
             if (type == BackdropType.DesktopAcrylic)
             {
@@ -103,7 +82,7 @@ namespace CoreAppUWP.Helpers
                 }
             }
 
-            BackdropTypeChanged.Invoke(Backdrop);
+            InvokeBackdropTypeChanged(Backdrop);
         }
 
         private bool TrySetMicaBackdrop(MicaKind kind = MicaKind.Base)
@@ -113,36 +92,22 @@ namespace CoreAppUWP.Helpers
                 // Hooking up the policy object
                 m_configurationSource = new SystemBackdropConfiguration();
 
-                if (window != null)
-                {
-                    window.Closed += Window_Closed;
-                    window.Activated += Window_Activated;
-                    ((FrameworkElement)window.Content).ActualThemeChanged += FrameworkElement_ThemeChanged;
-                }
-                else
-                {
-                    desktopWindow.AppWindow.Closing += AppWindow_Closing;
-                    ((FrameworkElement)desktopWindow.Content).ActualThemeChanged += FrameworkElement_ThemeChanged;
-                }
+                Register();
 
                 // Initial configuration state.
                 m_configurationSource.IsInputActive = true;
                 SetConfigurationSourceTheme();
 
-                m_micaController = new MicaController { Kind = kind };
+                m_controller = new MicaController { Kind = kind };
 
                 // Enable the system backdrop.
                 if (window != null)
                 {
                     // Note: Be sure to have "using WinRT;" to support the Window.As<...>() call.
-                    m_micaController.AddSystemBackdropTarget(window.As<ICompositionSupportsSystemBackdrop>());
-                }
-                else if (desktopWindow != null)
-                {
-                    m_micaController.AddSystemBackdropTarget(desktopWindow.WindowXamlSource.As<ICompositionSupportsSystemBackdrop>());
+                    m_controller.AddSystemBackdropTarget(GetCompositionSupportsSystemBackdrop());
                 }
 
-                m_micaController.SetSystemBackdropConfiguration(m_configurationSource);
+                m_controller.SetSystemBackdropConfiguration(m_configurationSource);
                 return true; // succeeded
             }
 
@@ -155,93 +120,36 @@ namespace CoreAppUWP.Helpers
             {
                 // Hooking up the policy object
                 m_configurationSource = new SystemBackdropConfiguration();
-
-                if (window != null)
-                {
-                    window.Closed += Window_Closed;
-                    window.Activated += Window_Activated;
-                    ((FrameworkElement)window.Content).ActualThemeChanged += FrameworkElement_ThemeChanged;
-                }
-                else
-                {
-                    desktopWindow.AppWindow.Closing += AppWindow_Closing;
-                    ((FrameworkElement)desktopWindow.Content).ActualThemeChanged += FrameworkElement_ThemeChanged;
-                }
+                Register();
 
                 // Initial configuration state.
                 m_configurationSource.IsInputActive = true;
                 SetConfigurationSourceTheme();
 
                 Color BackgroundColor = ThemeHelper.IsDarkTheme() ? Color.FromArgb(255, 32, 32, 32) : Color.FromArgb(255, 243, 243, 243);
-                m_acrylicController = new DesktopAcrylicController { TintColor = BackgroundColor, FallbackColor = BackgroundColor };
+                m_controller = new DesktopAcrylicController { TintColor = BackgroundColor, FallbackColor = BackgroundColor };
 
                 // Enable the system backdrop.
                 if (window != null)
                 {
                     // Note: Be sure to have "using WinRT;" to support the Window.As<...>() call.
-                    m_acrylicController.AddSystemBackdropTarget(window.As<ICompositionSupportsSystemBackdrop>());
-                }
-                else if (desktopWindow != null)
-                {
-                    m_acrylicController.AddSystemBackdropTarget(desktopWindow.WindowXamlSource.As<ICompositionSupportsSystemBackdrop>());
+                    m_controller.AddSystemBackdropTarget(GetCompositionSupportsSystemBackdrop());
                 }
 
-                m_acrylicController.SetSystemBackdropConfiguration(m_configurationSource);
+                m_controller.SetSystemBackdropConfiguration(m_configurationSource);
                 return true; // succeeded
             }
 
             return false; // Acrylic is not supported on this system
         }
 
-        private void Window_Activated(object sender, WindowActivatedEventArgs args)
-        {
-            m_configurationSource.IsInputActive = args.WindowActivationState != WindowActivationState.Deactivated;
-        }
-
-        private void Window_Closed(object sender, WindowEventArgs args)
-        {
-            // Make sure any Mica/Acrylic controller is disposed so it doesn't try to
-            // use this closed window.
-            if (m_micaController != null)
-            {
-                m_micaController.Dispose();
-                m_micaController = null;
-            }
-            if (m_acrylicController != null)
-            {
-                m_acrylicController.Dispose();
-                m_acrylicController = null;
-            }
-            ((FrameworkElement)window.Content).ActualThemeChanged -= FrameworkElement_ThemeChanged;
-            window.Activated -= Window_Activated;
-            m_configurationSource = null;
-        }
-
-        private void AppWindow_Closing(AppWindow sender, AppWindowClosingEventArgs args)
-        {
-            // Make sure any Mica/Acrylic controller is disposed so it doesn't try to
-            // use this closed window.
-            if (m_micaController != null)
-            {
-                m_micaController.Dispose();
-                m_micaController = null;
-            }
-            if (m_acrylicController != null)
-            {
-                m_acrylicController.Dispose();
-                m_acrylicController = null;
-            }
-            ((FrameworkElement)desktopWindow.Content).ActualThemeChanged -= FrameworkElement_ThemeChanged;
-            m_configurationSource = null;
-        }
-
-        private void FrameworkElement_ThemeChanged(FrameworkElement sender, object args)
+        protected void FrameworkElement_ThemeChanged(FrameworkElement sender, object args)
         {
             if (m_configurationSource != null)
             {
                 SetConfigurationSourceTheme();
             }
-            if (m_acrylicController != null)
+            if (m_controller is DesktopAcrylicController m_acrylicController)
             {
                 Color BackgroundColor = sender.ActualTheme.IsDarkTheme() ? Color.FromArgb(255, 32, 32, 32) : Color.FromArgb(255, 243, 243, 243);
                 m_acrylicController.TintColor = m_acrylicController.FallbackColor = BackgroundColor;
@@ -250,7 +158,7 @@ namespace CoreAppUWP.Helpers
 
         private void SetConfigurationSourceTheme()
         {
-            m_configurationSource.Theme = (((window == null ? desktopWindow?.Content : window.Content) as FrameworkElement)?.ActualTheme) switch
+            m_configurationSource.Theme = GetContent()?.ActualTheme switch
             {
                 ElementTheme.Dark => SystemBackdropTheme.Dark,
                 ElementTheme.Light => SystemBackdropTheme.Light,
@@ -258,11 +166,85 @@ namespace CoreAppUWP.Helpers
                 _ => SystemBackdropTheme.Default,
             };
         }
+
+        protected virtual void Unregister()
+        {
+            if (m_controller != null)
+            {
+                m_controller.Dispose();
+                m_controller = null;
+            }
+        }
+
+        public abstract IThreadSwitcher<DispatcherQueueThreadSwitcher> ResumeForegroundAsync();
+        protected abstract void Register();
+        protected abstract FrameworkElement GetContent();
+        protected abstract ICompositionSupportsSystemBackdrop GetCompositionSupportsSystemBackdrop();
     }
 
-    public partial class BackdropHelper
+    public class WindowBackdropHelper(Window window) : BackdropHelper<Window>(window)
     {
-        public static void RegisterWindow(Window window)
+        public override IThreadSwitcher<DispatcherQueueThreadSwitcher> ResumeForegroundAsync() => window.DispatcherQueue.ResumeForegroundAsync();
+
+        protected override void Register()
+        {
+            window.Closed += Window_Closed;
+            window.Activated += Window_Activated;
+            ((FrameworkElement)window.Content).ActualThemeChanged += FrameworkElement_ThemeChanged;
+        }
+
+        protected override void Unregister()
+        {
+            base.Unregister();
+            window.Closed -= Window_Closed;
+            window.Activated -= Window_Activated;
+            ((FrameworkElement)window.Content).ActualThemeChanged -= FrameworkElement_ThemeChanged;
+        }
+
+        protected override FrameworkElement GetContent() => window.Content as FrameworkElement;
+
+        protected override ICompositionSupportsSystemBackdrop GetCompositionSupportsSystemBackdrop() => window.As<ICompositionSupportsSystemBackdrop>();
+
+        private void Window_Activated(object sender, WindowActivatedEventArgs args) => m_configurationSource.IsInputActive = args.WindowActivationState != WindowActivationState.Deactivated;
+
+        private void Window_Closed(object sender, WindowEventArgs args)
+        {
+            Unregister();
+            m_configurationSource = null;
+        }
+    }
+
+    public class DesktopWindowBackdropHelper(DesktopWindow window) : BackdropHelper<DesktopWindow>(window)
+    {
+        public override IThreadSwitcher<DispatcherQueueThreadSwitcher> ResumeForegroundAsync() => window.DispatcherQueue.ResumeForegroundAsync();
+
+        protected override void Register()
+        {
+            window.AppWindow.Closing += AppWindow_Closing;
+            ((FrameworkElement)window.Content).ActualThemeChanged += FrameworkElement_ThemeChanged;
+        }
+
+        protected override void Unregister()
+        {
+            base.Unregister();
+            window.AppWindow.Closing -= AppWindow_Closing;
+            ((FrameworkElement)window.Content).ActualThemeChanged -= FrameworkElement_ThemeChanged;
+        }
+
+        protected override ICompositionSupportsSystemBackdrop GetCompositionSupportsSystemBackdrop() => window.WindowXamlSource.As<ICompositionSupportsSystemBackdrop>();
+
+        protected override FrameworkElement GetContent() => window.Content as FrameworkElement;
+
+        private void AppWindow_Closing(AppWindow sender, AppWindowClosingEventArgs args)
+        {
+            Unregister();
+            m_configurationSource = null;
+        }
+    }
+
+    public static class BackdropHelper
+    {
+        public static void Register(Window window)
         {
             if (!ActiveWindows.ContainsKey(window))
             {
@@ -271,11 +253,11 @@ namespace CoreAppUWP.Helpers
                     ActiveWindows.Remove(window);
                     window = null;
                 };
-                ActiveWindows[window] = new BackdropHelper(window);
+                ActiveWindows[window] = new WindowBackdropHelper(window);
             }
         }
 
-        public static void RegisterWindow(DesktopWindow window)
+        public static void Register(DesktopWindow window)
         {
             if (!ActiveDesktopWindows.ContainsKey(window))
             {
@@ -284,84 +266,84 @@ namespace CoreAppUWP.Helpers
                     ActiveDesktopWindows.Remove(window);
                     window = null;
                 };
-                ActiveDesktopWindows[window] = new BackdropHelper(window);
+                ActiveDesktopWindows[window] = new DesktopWindowBackdropHelper(window);
             }
         }
 
-        public static void SetBackdrop(Window window, BackdropType type)
+        public static void SetBackdrop(this Window window, BackdropType type)
         {
-            if (ActiveWindows.TryGetValue(window, out BackdropHelper backdrop))
+            if (ActiveWindows.TryGetValue(window, out BackdropHelper<Window> backdrop))
             {
                 backdrop.SetBackdrop(type);
             }
         }
 
-        public static void SetBackdrop(DesktopWindow window, BackdropType type)
+        public static void SetBackdrop(this DesktopWindow window, BackdropType type)
         {
-            if (ActiveDesktopWindows.TryGetValue(window, out BackdropHelper backdrop))
+            if (ActiveDesktopWindows.TryGetValue(window, out BackdropHelper<DesktopWindow> backdrop))
             {
                 backdrop.SetBackdrop(type);
             }
         }
 
-        public static void SetAllBackdrop(BackdropType type)
+        public static void SetAllBackdrop(this BackdropType type)
         {
             ActiveWindows.Values.ForEach(async x =>
             {
-                await x.window.DispatcherQueue.ResumeForegroundAsync();
+                await x.ResumeForegroundAsync();
                 x.SetBackdrop(type);
             });
 
             ActiveDesktopWindows.Values.ForEach(async x =>
             {
-                await x.desktopWindow.DispatcherQueue.ResumeForegroundAsync();
+                await x.ResumeForegroundAsync();
                 x.SetBackdrop(type);
             });
         }
 
-        public static BackdropType? GetBackdrop(Window window)
+        public static BackdropType? GetBackdrop(this Window window)
         {
-            return ActiveWindows.TryGetValue(window, out BackdropHelper backdrop) ? backdrop.Backdrop : null;
+            return ActiveWindows.TryGetValue(window, out BackdropHelper<Window> backdrop) ? backdrop.Backdrop : null;
         }
 
-        public static BackdropType? GetBackdrop(DesktopWindow window)
+        public static BackdropType? GetBackdrop(this DesktopWindow window)
         {
-            return ActiveDesktopWindows.TryGetValue(window, out BackdropHelper backdrop) ? backdrop.Backdrop : null;
+            return ActiveDesktopWindows.TryGetValue(window, out BackdropHelper<DesktopWindow> backdrop) ? backdrop.Backdrop : null;
         }
 
-        public static void AddBackdropTypeChanged(Window window, Action<BackdropType?> typedEventHandler)
+        public static void AddBackdropTypeChanged(this Window window, Action<BackdropType?> typedEventHandler)
         {
-            if (ActiveWindows.TryGetValue(window, out BackdropHelper backdrop))
+            if (ActiveWindows.TryGetValue(window, out BackdropHelper<Window> backdrop))
             {
-                backdrop.BackdropTypeChanged.Add(typedEventHandler);
+                backdrop.BackdropTypeChanged += typedEventHandler;
             }
         }
 
-        public static void AddBackdropTypeChanged(DesktopWindow window, Action<BackdropType?> typedEventHandler)
+        public static void AddBackdropTypeChanged(this DesktopWindow window, Action<BackdropType?> typedEventHandler)
         {
-            if (ActiveDesktopWindows.TryGetValue(window, out BackdropHelper backdrop))
+            if (ActiveDesktopWindows.TryGetValue(window, out BackdropHelper<DesktopWindow> backdrop))
             {
-                backdrop.BackdropTypeChanged.Add(typedEventHandler);
+                backdrop.BackdropTypeChanged += typedEventHandler;
             }
         }
 
-        public static void RemoveBackdropTypeChanged(Window window, Action<BackdropType?> typedEventHandler)
+        public static void RemoveBackdropTypeChanged(this Window window, Action<BackdropType?> typedEventHandler)
         {
-            if (ActiveWindows.TryGetValue(window, out BackdropHelper backdrop))
+            if (ActiveWindows.TryGetValue(window, out BackdropHelper<Window> backdrop))
             {
-                backdrop.BackdropTypeChanged.Remove(typedEventHandler);
+                backdrop.BackdropTypeChanged -= typedEventHandler;
             }
         }
 
-        public static void RemoveBackdropTypeChanged(DesktopWindow window, Action<BackdropType?> typedEventHandler)
+        public static void RemoveBackdropTypeChanged(this DesktopWindow window, Action<BackdropType?> typedEventHandler)
         {
-            if (ActiveDesktopWindows.TryGetValue(window, out BackdropHelper backdrop))
+            if (ActiveDesktopWindows.TryGetValue(window, out BackdropHelper<DesktopWindow> backdrop))
             {
-                backdrop.BackdropTypeChanged.Remove(typedEventHandler);
+                backdrop.BackdropTypeChanged -= typedEventHandler;
             }
         }
 
-        public static Dictionary<Window, BackdropHelper> ActiveWindows { get; } = [];
-        public static Dictionary<DesktopWindow, BackdropHelper> ActiveDesktopWindows { get; } = [];
+        public static Dictionary<Window, BackdropHelper<Window>> ActiveWindows { get; } = [];
+        public static Dictionary<DesktopWindow, BackdropHelper<DesktopWindow>> ActiveDesktopWindows { get; } = [];
     }
 }

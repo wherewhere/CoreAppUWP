@@ -1,5 +1,4 @@
-﻿using CoreAppUWP.WinRT;
-using Microsoft.UI.Content;
+﻿using Microsoft.UI.Content;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
@@ -127,7 +126,7 @@ namespace CoreAppUWP.Controls
                     DesktopWindowXamlSource source;
                     AppWindow window = AppWindow.Create();
 
-                    using (HookWindowingModel hook = new())
+                    using (WinRT.HookWindowingModel hook = new())
                     {
                         hook.StartHook();
                         controller = DispatcherQueueController.CreateOnCurrentThread();
@@ -194,7 +193,7 @@ namespace CoreAppUWP.Controls
                     window.AssociateWithDispatcherQueue(dispatcherQueue);
                     TrackWindow(window);
 
-                    using (HookWindowingModel hook = new())
+                    using (WinRT.HookWindowingModel hook = new())
                     {
                         hook.StartHook();
                         source = new();

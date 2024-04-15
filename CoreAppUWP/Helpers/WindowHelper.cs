@@ -66,7 +66,7 @@ namespace CoreAppUWP.Helpers
                     window = null;
                 };
                 ActiveWindows[window.Dispatcher] = window;
-                BackdropHelper.RegisterWindow(window);
+                BackdropHelper.Register(window);
             }
         }
 
@@ -80,7 +80,7 @@ namespace CoreAppUWP.Helpers
                     window = null;
                 };
                 ActiveDesktopWindows[window.XamlRoot] = window;
-                BackdropHelper.RegisterWindow(window);
+                BackdropHelper.Register(window);
             }
         }
 
