@@ -59,6 +59,9 @@
     <EntryPointProjectUniqueName>..\CoreAppUWP\CoreAppUWP.csproj</EntryPointProjectUniqueName>
     <EntryPointOverride>CoreAppUWP.App</EntryPointOverride>
   </PropertyGroup>
+  <PropertyGroup>
+    <PkgMicrosoft_XboxGameBar Condition="'$(PkgMicrosoft_XboxGameBar)'==''">$([MSBuild]::NormalizeDirectory('$(NuGetPackageRoot)', 'microsoft.gaming.xboxgamebar', '6.1.240122001'))</PkgMicrosoft_XboxGameBar>
+  </PropertyGroup>
   <ItemGroup>
     <AppxManifest Include="Package.appxmanifest">
       <SubType>Designer</SubType>
@@ -66,6 +69,7 @@
   </ItemGroup>
   <Import Project="$(WapProjPath)\Microsoft.DesktopBridge.targets" />
   <ItemGroup>
+    <PackageReference Include="Microsoft.Gaming.XboxGameBar" Version="6.1.240122001" />
     <PackageReference Include="Microsoft.UI.Xaml" Version="2.8.6" />
   </ItemGroup>
   <ItemGroup>
@@ -73,6 +77,12 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Assets\**" />
+    <AppxSystemBinary Include="Microsoft.Gaming.XboxGameBar.dll"/>
+    <AppxSystemBinary Include="Microsoft.Gaming.XboxGameBar.winmd"/>
+  </ItemGroup>
+  <ItemGroup>
+    <ReferenceCopyLocalPaths Include="$(PkgMicrosoft_XboxGameBar)\**\*.winmd" />
+    <ReferenceCopyLocalPaths Include="$(PkgMicrosoft_XboxGameBar)\runtimes\win10-$(Platform)\**\*" />
   </ItemGroup>
   <Import Project="UpdateEntryPoint.targets" Condition="Exists('UpdateEntryPoint.targets')" />
 </Project>

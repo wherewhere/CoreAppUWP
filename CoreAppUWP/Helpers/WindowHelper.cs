@@ -1,4 +1,5 @@
-﻿using CoreAppUWP.Common;
+﻿using Microsoft.Gaming.XboxGameBar;
+using CoreAppUWP.Common;
 using System;
 using System.Collections.Generic;
 using System.Runtime.Versioning;

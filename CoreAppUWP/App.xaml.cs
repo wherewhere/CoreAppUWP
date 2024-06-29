@@ -1,6 +1,7 @@
 ﻿using CoreAppUWP.Common;
 using CoreAppUWP.Helpers;
 using CoreAppUWP.Pages;
+using Microsoft.Gaming.XboxGameBar;
 using System;
 using System.Threading;
 using Windows.ApplicationModel;
@@ -92,6 +93,12 @@ namespace CoreAppUWP
         {
             if (Window.Current is not Window window) { return; }
 
+            XboxGameBarWidgetActivatedEventArgs widgetArgs = e as XboxGameBarWidgetActivatedEventArgs;
+            if (widgetArgs?.IsLaunchActivation == false)
+            {
+                return;
+            }
+
             if (SynchronizationContext.Current == null)
             {
                 SynchronizationContext.SetSynchronizationContext(new CoreDispatcherSynchronizationContext(window.Dispatcher));
@@ -146,6 +153,11 @@ namespace CoreAppUWP
                 // 并通过将所需信息作为导航参数传入来配置
                 // 参数
                 rootFrame.Navigate(typeof(MainPage), e, new DrillInNavigationTransitionInfo());
+            }
+
+            if (widgetArgs != null)
+            {
+                XboxGameBarWidget widget = new(widgetArgs, window.CoreWindow, rootFrame);
             }
 
             // 确保当前窗口处于活动状态
