@@ -1,0 +1,20 @@
+<Project>
+  <PropertyGroup>
+    <Authors>wherewhere</Authors>
+    <Copyright>Copyright © 2017 - 2024 wherewhere. All Rights Reserved.</Copyright>
+    <Description>UWP running on .NET Core App</Description>
+    <LangVersion>preview</LangVersion>
+    <RepositoryType>git</RepositoryType>
+    <PublishRepositoryUrl>True</PublishRepositoryUrl>
+    <RepositoryUrl>https://github.com/wherewhere/CoreAppUWP</RepositoryUrl>
+  </PropertyGroup>
+
+  <!-- 
+    Defining the "HasPackageAndPublishMenuAddedByProject" property here allows the Solution 
+    Explorer "Package and Publish" context menu entry to be enabled for this project even if 
+    the Windows App SDK Nuget package has not yet been restored.
+  -->
+  <PropertyGroup Condition="'$(DisableHasPackageAndPublishMenuAddedByProject)'!='true' and '$(EnableMsixTooling)'=='true'">
+    <HasPackageAndPublishMenu>true</HasPackageAndPublishMenu>
+  </PropertyGroup>
+</Project>
