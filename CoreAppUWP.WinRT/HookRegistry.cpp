@@ -96,7 +96,6 @@ namespace winrt::CoreAppUWP::WinRT::implementation
 
     LSTATUS APIENTRY HookRegistry::OverrideRegQueryValueExW(HKEY hKey, LPCWSTR lpValueName, LPDWORD lpReserved, LPDWORD lpType, LPBYTE lpData, LPDWORD lpcbData)
     {
-        LSTATUS result;
         if (lpValueName != NULL && !_wcsicmp(lpValueName, L"EnableUWPWindow"))
         {
             bool isRealKey = false;
@@ -111,6 +110,7 @@ namespace winrt::CoreAppUWP::WinRT::implementation
 
             if (isXamlKey)
             {
+                LSTATUS result;
                 if (isRealKey)
                 {
                     // real key
@@ -162,17 +162,10 @@ namespace winrt::CoreAppUWP::WinRT::implementation
                         }
                     }
                 }
+                return result;
             }
-            else
-            {
-                result = BaseRegQueryValueExW(hKey, lpValueName, lpReserved, lpType, lpData, lpcbData);
-            }
-        }
-        else
-        {
-            result = BaseRegQueryValueExW(hKey, lpValueName, lpReserved, lpType, lpData, lpcbData);
         }
 
-        return result;
+        return BaseRegQueryValueExW(hKey, lpValueName, lpReserved, lpType, lpData, lpcbData);
     }
 }
