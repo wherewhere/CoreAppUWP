@@ -1,5 +1,6 @@
 ﻿using CoreAppUWP.Common;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Versioning;
 using System.Threading.Tasks;
@@ -33,7 +34,7 @@ namespace CoreAppUWP.Helpers
             remove => actions.Remove(value);
         }
 
-        public static void InvokeUISettingChanged(UISettingChangedType value) => actions.Invoke(value);
+        private static void InvokeUISettingChanged(UISettingChangedType value) => actions.Invoke(value);
 
         #endregion
 
@@ -138,9 +139,9 @@ namespace CoreAppUWP.Helpers
                     rootElement.RequestedTheme = value;
                 }
 
-                if (WindowHelper.IsAppWindowSupported && WindowHelper.ActiveAppWindows.TryGetValue(window.Dispatcher, out System.Collections.Generic.Dictionary<UIElement, AppWindow> appWindows))
+                if (WindowHelper.IsAppWindowSupported && WindowHelper.ActiveAppWindows.TryGetValue(window.Dispatcher, out Dictionary<XamlRoot, AppWindow> appWindows))
                 {
-                    foreach (FrameworkElement element in appWindows.Keys.OfType<FrameworkElement>())
+                    foreach (FrameworkElement element in appWindows.Keys.Select(GetContent).OfType<FrameworkElement>())
                     {
                         element.RequestedTheme = value;
                     }
@@ -163,9 +164,9 @@ namespace CoreAppUWP.Helpers
                     rootElement.RequestedTheme = value;
                 }
 
-                if (WindowHelper.IsAppWindowSupported && WindowHelper.ActiveAppWindows.TryGetValue(window.Dispatcher, out System.Collections.Generic.Dictionary<UIElement, AppWindow> appWindows))
+                if (WindowHelper.IsAppWindowSupported && WindowHelper.ActiveAppWindows.TryGetValue(window.Dispatcher, out Dictionary<XamlRoot, AppWindow> appWindows))
                 {
-                    foreach (FrameworkElement element in appWindows.Keys.OfType<FrameworkElement>())
+                    foreach (FrameworkElement element in appWindows.Keys.Select(GetContent).OfType<FrameworkElement>())
                     {
                         element.RequestedTheme = value;
                     }
@@ -175,6 +176,12 @@ namespace CoreAppUWP.Helpers
             SettingsHelper.Set(SettingsHelper.SelectedAppTheme, value);
             UpdateSystemCaptionButtonColors();
             InvokeUISettingChanged(await IsDarkThemeAsync() ? UISettingChangedType.DarkMode : UISettingChangedType.LightMode);
+        }
+
+        [SupportedOSPlatform("Windows10.0.18362.0")]
+        private static UIElement GetContent(XamlRoot xamlRoot)
+        {
+            return xamlRoot.Content;
         }
 
         #endregion
@@ -262,7 +269,7 @@ namespace CoreAppUWP.Helpers
 
                 CoreApplication.GetCurrentView().TitleBar.ExtendViewIntoTitleBar = IsExtendsTitleBar;
 
-                if (WindowHelper.IsAppWindowSupported && WindowHelper.ActiveAppWindows.TryGetValue(window.Dispatcher, out System.Collections.Generic.Dictionary<UIElement, AppWindow> appWindows))
+                if (WindowHelper.IsAppWindowSupported && WindowHelper.ActiveAppWindows.TryGetValue(window.Dispatcher, out Dictionary<XamlRoot, AppWindow> appWindows))
                 {
                     foreach (AppWindow appWindow in appWindows.Values)
                     {
@@ -300,7 +307,7 @@ namespace CoreAppUWP.Helpers
                     TitleBar.ButtonBackgroundColor = TitleBar.ButtonInactiveBackgroundColor = ExtendViewIntoTitleBar ? Colors.Transparent : BackgroundColor;
                 }
 
-                if (WindowHelper.IsAppWindowSupported && WindowHelper.ActiveAppWindows.TryGetValue(window.Dispatcher, out System.Collections.Generic.Dictionary<UIElement, AppWindow> appWindows))
+                if (WindowHelper.IsAppWindowSupported && WindowHelper.ActiveAppWindows.TryGetValue(window.Dispatcher, out Dictionary<XamlRoot, AppWindow> appWindows))
                 {
                     foreach (AppWindow appWindow in appWindows.Values)
                     {

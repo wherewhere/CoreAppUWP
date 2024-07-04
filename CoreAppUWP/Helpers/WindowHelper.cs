@@ -1,5 +1,4 @@
-﻿using Microsoft.Gaming.XboxGameBar;
-using CoreAppUWP.Common;
+﻿using CoreAppUWP.Common;
 using System;
 using System.Collections.Generic;
 using System.Runtime.Versioning;
@@ -72,55 +71,42 @@ namespace CoreAppUWP.Helpers
         [SupportedOSPlatform("Windows10.0.18362.0")]
         public static void TrackWindow(this AppWindow window, Frame frame)
         {
-            if (!ActiveAppWindows.ContainsKey(frame.Dispatcher))
+            if (!ActiveAppWindows.TryGetValue(frame.Dispatcher, out Dictionary<XamlRoot, AppWindow> windows))
             {
-                ActiveAppWindows[frame.Dispatcher] = [];
+                ActiveAppWindows[frame.Dispatcher] = windows = [];
             }
 
-            if (!ActiveAppWindows[frame.Dispatcher].ContainsKey(frame))
+            if (!windows.ContainsKey(frame.XamlRoot))
             {
                 window.Closed += (sender, args) =>
                 {
-                    if (ActiveAppWindows.TryGetValue(frame.Dispatcher, out Dictionary<UIElement, AppWindow> windows))
-                    {
-                        windows?.Remove(frame);
-                    }
+                    windows.Remove(frame.XamlRoot);
+                    if (windows.Count <= 0)
+                    { ActiveAppWindows.Remove(frame.Dispatcher); }
                     frame.Content = null;
                     window = null;
                 };
-                ActiveAppWindows[frame.Dispatcher][frame] = window;
+                windows[frame.XamlRoot] = window;
             }
         }
 
         [SupportedOSPlatformGuard("Windows10.0.18362.0")]
         public static bool IsAppWindow(this UIElement element) =>
             IsAppWindowSupported
-            && element?.XamlRoot?.Content != null
-            && ActiveAppWindows.ContainsKey(element.Dispatcher)
-            && ActiveAppWindows[element.Dispatcher].ContainsKey(element.XamlRoot.Content);
+            && element?.XamlRoot != null
+            && ActiveAppWindows.TryGetValue(element.Dispatcher, out Dictionary<XamlRoot, AppWindow> windows)
+            && windows.ContainsKey(element.XamlRoot);
 
         public static AppWindow GetWindowForElement(this UIElement element) =>
             IsAppWindowSupported
-            && element?.XamlRoot?.Content != null
-            && ActiveAppWindows.TryGetValue(element.Dispatcher, out Dictionary<UIElement, AppWindow> windows)
-            && windows.TryGetValue(element.XamlRoot.Content, out AppWindow window)
+            && element?.XamlRoot != null
+            && ActiveAppWindows.TryGetValue(element.Dispatcher, out Dictionary<XamlRoot, AppWindow> windows)
+            && windows.TryGetValue(element.XamlRoot, out AppWindow window)
                 ? window : null;
 
         [SupportedOSPlatform("Windows10.0.18362.0")]
-        public static UIElement GetXamlRootForWindow(this AppWindow window)
-        {
-            foreach (Dictionary<UIElement, AppWindow> windows in ActiveAppWindows.Values)
-            {
-                foreach (KeyValuePair<UIElement, AppWindow> element in windows)
-                {
-                    if (element.Value == window)
-                    {
-                        return element.Key;
-                    }
-                }
-            }
-            return null;
-        }
+        public static UIElement GetXamlRootForWindow(this AppWindow window) =>
+            ElementCompositionPreview.GetAppWindowContent(window);
 
         public static UIElement GetXAMLRoot(this UIElement element) =>
             IsXamlRootSupported && element.XamlRoot != null
@@ -139,6 +125,6 @@ namespace CoreAppUWP.Helpers
         public static Dictionary<CoreDispatcher, Window> ActiveWindows { get; } = [];
 
         [SupportedOSPlatform("Windows10.0.18362.0")]
-        public static Dictionary<CoreDispatcher, Dictionary<UIElement, AppWindow>> ActiveAppWindows { get; } = IsAppWindowSupported ? [] : null;
+        public static Dictionary<CoreDispatcher, Dictionary<XamlRoot, AppWindow>> ActiveAppWindows { get; } = IsAppWindowSupported ? [] : null;
     }
 }
