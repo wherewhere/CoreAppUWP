@@ -293,10 +293,10 @@ namespace CoreAppUWP.Helpers
 
                 if (UIHelper.HasStatusBar)
                 {
-                    StatusBar StatusBar = StatusBar.GetForCurrentView();
-                    StatusBar.ForegroundColor = ForegroundColor;
-                    StatusBar.BackgroundColor = BackgroundColor;
-                    StatusBar.BackgroundOpacity = 0; // 透明度
+                    //StatusBar StatusBar = StatusBar.GetForCurrentView();
+                    //StatusBar.ForegroundColor = ForegroundColor;
+                    //StatusBar.BackgroundColor = BackgroundColor;
+                    //StatusBar.BackgroundOpacity = 0; // 透明度
                 }
                 else
                 {
@@ -333,10 +333,10 @@ namespace CoreAppUWP.Helpers
 
             if (UIHelper.HasStatusBar)
             {
-                StatusBar StatusBar = StatusBar.GetForCurrentView();
-                StatusBar.ForegroundColor = ForegroundColor;
-                StatusBar.BackgroundColor = BackgroundColor;
-                StatusBar.BackgroundOpacity = 0; // 透明度
+                //StatusBar StatusBar = StatusBar.GetForCurrentView();
+                //StatusBar.ForegroundColor = ForegroundColor;
+                //StatusBar.BackgroundColor = BackgroundColor;
+                //StatusBar.BackgroundOpacity = 0; // 透明度
             }
             else
             {

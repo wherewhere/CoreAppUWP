@@ -3,7 +3,6 @@
     <ApplicationIcon>favicon.ico</ApplicationIcon>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <BuiltInComInteropSupport>True</BuiltInComInteropSupport>
-    <DefaultXamlRuntime>UAP</DefaultXamlRuntime>
     <EnableMsixTooling>True</EnableMsixTooling>
     <LangVersion>latest</LangVersion>
     <OutputType>WinExe</OutputType>
@@ -14,26 +13,18 @@
     <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
     <TrimMode>partial</TrimMode>
     <VersionPrefix>0.0.1</VersionPrefix>
+    <WindowsSdkPackageVersion>10.0.22621.37-preview</WindowsSdkPackageVersion>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Dongle.Windows.CsWinRT" Version="3.0.0-wux.2" />
-    <PackageReference Include="Dongle.WindowsSDK.NET" Version="10.0.22621.756" />
+		<PackageReference Include="DisposableMemory.ModernNetUAP.WinUI" Version="2.8.6-preview" />
+    <PackageReference Include="DisposableMemory.ModernNetUAP.XamlCompiler" Version="0.1.0-preview3" PrivateAssets="all" />
     <PackageReference Include="MetroLog.Net6" Version="2.1.0" />
     <PackageReference Include="Microsoft.Windows.CsWin32" Version="0.3.106" PrivateAssets="all">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="WindowsXaml.ModernDotNet.BuildTools" Version="0.0.2" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.Windows.CsWinRT" Version="2.1.0-prerelease.240722.1" />
     <Manifest Include="$(ApplicationManifest)" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\CoreAppUWP.Projection\CoreAppUWP.Projection.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ApplicationDefinition Include="App.xaml" />
-    <Page Include="**\*.xaml" Exclude="App.xaml; obj\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -44,6 +35,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="favicon.ico" />
+    <Content Include="favicon.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 </Project>

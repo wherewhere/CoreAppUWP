@@ -1,4 +1,7 @@
-﻿using System.Diagnostics;
+﻿using CoreAppUWP.Helpers;
+using Microsoft.Win32.SafeHandles;
+using System;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using Windows.Win32;
 using Windows.Win32.Foundation;
@@ -19,6 +22,19 @@ namespace CoreAppUWP.Controls
         }
 
         public void Show() => PInvoke.ShowWindow(hwnd, SHOW_WINDOW_CMD.SW_NORMAL);
+
+        public void SetIcon(string iconPath)
+        {
+            try
+            {
+                using SafeFileHandle icon = PInvoke.LoadImage(null, iconPath, GDI_IMAGE_TYPE.IMAGE_ICON, 0, 0, IMAGE_FLAGS.LR_LOADFROMFILE);
+                _ = PInvoke.SendMessage(hwnd, PInvoke.WM_SETICON, PInvoke.ICON_BIG, icon.DangerousGetHandle());
+            }
+            catch (Exception ex)
+            {
+                SettingsHelper.LogManager.GetLogger(nameof(DesktopWindow)).Error(ex.ExceptionToMessage(), ex);
+            }
+        }
     }
 
     public partial class DesktopWindow

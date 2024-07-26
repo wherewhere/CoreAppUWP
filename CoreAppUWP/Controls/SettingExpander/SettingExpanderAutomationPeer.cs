@@ -5,7 +5,7 @@ namespace CoreAppUWP.Controls
     /// <summary>
     /// AutomationPeer for SettingExpander
     /// </summary>
-    public class SettingExpanderAutomationPeer : ItemsControlAutomationPeer
+    public partial class SettingExpanderAutomationPeer : ItemsControlAutomationPeer
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="SettingExpander"/> class.

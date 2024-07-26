@@ -1,10 +1,12 @@
 ﻿IDesktopWindowXamlSourceNative
 
+ICON_BIG
 SHOW_WINDOW_CMD
 SYS_COLOR_INDEX
 WM_CREATE
 WM_DESTROY
 WM_PAINT
+WM_SETICON
 
 CW_USEDEFAULT
 IDC_ARROW
@@ -18,6 +20,8 @@ GetClassInfoExW
 GetClientRect
 GetStockObject
 LoadCursor
+LoadImage
 RegisterClassEx
+SendMessage
 SetWindowPos
 ShowWindow

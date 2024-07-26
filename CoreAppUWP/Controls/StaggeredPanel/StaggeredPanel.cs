@@ -13,7 +13,7 @@ namespace CoreAppUWP.Controls
     /// <summary>
     /// Arranges child elements into a staggered grid pattern where items are added to the column that has used least amount of space.
     /// </summary>
-    public class StaggeredPanel : Panel
+    public partial class StaggeredPanel : Panel
     {
         private double _columnWidth;
 

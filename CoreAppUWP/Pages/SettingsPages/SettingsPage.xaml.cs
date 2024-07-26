@@ -105,7 +105,9 @@ namespace CoreAppUWP.Pages.SettingsPages
                     SearchPane.GetForCurrentView().Show();
                     break;
                 case "NewWin32Window":
-                    new DesktopWindow().Show();
+                    DesktopWindow window = new();
+                    window.SetIcon("favicon.ico");
+                    window.Show();
                     break;
                 case "ExitFullWindow":
                     if (this.IsAppWindow())
