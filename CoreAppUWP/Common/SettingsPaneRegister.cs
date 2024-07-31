@@ -1,4 +1,5 @@
-﻿using Microsoft.UI.Xaml;
+﻿using CoreAppUWP.Helpers;
+using Microsoft.UI.Xaml;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -20,22 +21,36 @@ namespace CoreAppUWP.Common
 
         public static void Register(Window window)
         {
-            if (IsSettingsPaneSupported)
+            try
             {
-                SettingsPane settingsPane = SettingsPane.GetForCurrentView();
-                settingsPane.CommandsRequested -= OnCommandsRequested;
-                settingsPane.CommandsRequested += OnCommandsRequested;
-                window.Dispatcher.AcceleratorKeyActivated -= Dispatcher_AcceleratorKeyActivated;
-                window.Dispatcher.AcceleratorKeyActivated += Dispatcher_AcceleratorKeyActivated;
+                if (IsSettingsPaneSupported)
+                {
+                    SettingsPane settingsPane = SettingsPane.GetForCurrentView();
+                    settingsPane.CommandsRequested -= OnCommandsRequested;
+                    settingsPane.CommandsRequested += OnCommandsRequested;
+                    window.Dispatcher.AcceleratorKeyActivated -= Dispatcher_AcceleratorKeyActivated;
+                    window.Dispatcher.AcceleratorKeyActivated += Dispatcher_AcceleratorKeyActivated;
+                }
+            }
+            catch (Exception ex)
+            {
+                SettingsHelper.LogManager.GetLogger(nameof(SettingsPaneRegister)).Error(ex.ExceptionToMessage(), ex);
             }
         }
 
         public static void Unregister(Window window)
         {
-            if (IsSettingsPaneSupported)
+            try
             {
-                SettingsPane.GetForCurrentView().CommandsRequested -= OnCommandsRequested;
-                window.Dispatcher.AcceleratorKeyActivated -= Dispatcher_AcceleratorKeyActivated;
+                if (IsSettingsPaneSupported)
+                {
+                    SettingsPane.GetForCurrentView().CommandsRequested -= OnCommandsRequested;
+                    window.Dispatcher.AcceleratorKeyActivated -= Dispatcher_AcceleratorKeyActivated;
+                }
+            }
+            catch (Exception ex)
+            {
+                SettingsHelper.LogManager.GetLogger(nameof(SettingsPaneRegister)).Error(ex.ExceptionToMessage(), ex);
             }
         }
 
@@ -86,19 +101,26 @@ namespace CoreAppUWP.Common
 
         private static bool CheckSearchExtension()
         {
-            XDocument doc = XDocument.Load(Path.Combine(Package.Current.InstalledLocation.Path, "AppxManifest.xml"));
-            XNamespace ns = XNamespace.Get("http://schemas.microsoft.com/appx/manifest/uap/windows10");
-            IEnumerable<XElement> extensions = doc.Root.Descendants(ns + "Extension");
-            if (extensions != null)
+            try
             {
-                foreach (XElement extension in extensions)
+                XDocument doc = XDocument.Load(Path.Combine(Package.Current.InstalledLocation.Path, "AppxManifest.xml"));
+                XNamespace ns = XNamespace.Get("http://schemas.microsoft.com/appx/manifest/uap/windows10");
+                IEnumerable<XElement> extensions = doc.Root.Descendants(ns + "Extension");
+                if (extensions != null)
                 {
-                    XAttribute category = extension.Attribute("Category");
-                    if (category != null && category.Value == "windows.search")
+                    foreach (XElement extension in extensions)
                     {
-                        return true;
+                        XAttribute category = extension.Attribute("Category");
+                        if (category != null && category.Value == "windows.search")
+                        {
+                            return true;
+                        }
                     }
                 }
+            }
+            catch (Exception ex)
+            {
+                SettingsHelper.LogManager.GetLogger(nameof(SettingsPaneRegister)).Error(ex.ExceptionToMessage(), ex);
             }
             return false;
         }

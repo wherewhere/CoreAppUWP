@@ -1,4 +1,5 @@
-﻿using Microsoft.UI.Dispatching;
+﻿using CoreAppUWP.Common;
+using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.Win32;
 using System;
@@ -60,13 +61,12 @@ namespace CoreAppUWP
             ComWrappersSupport.InitializeComWrappers();
             if (IsPackagedApp)
             {
-                WinRT.HookRegistry hookRegistry = null;
+                HookRegistry hookRegistry = null;
                 try
                 {
                     if (!IsSupportCoreWindow)
                     {
-                        hookRegistry = new WinRT.HookRegistry();
-                        hookRegistry.StartHook();
+                        hookRegistry = new HookRegistry();
                     }
                     XamlCheckProcessRequirements();
                     Application.Start(p =>

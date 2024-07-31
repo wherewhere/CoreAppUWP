@@ -1,112 +1,93 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using Windows.Win32;
 using Windows.Win32.Foundation;
 using Windows.Win32.Storage.Packaging.Appx;
-using Windows.Win32.System.Registry;
 using Detours = Microsoft.Detours.PInvoke;
 
 namespace CoreAppUWP.Common
 {
-    public class HookWindowingModel : IDisposable
+    public sealed class HookWindowingModel : IDisposable
     {
-        private unsafe delegate WIN32_ERROR AppPolicyGetWindowingModel(HANDLE processToken, AppPolicyWindowingModel* policy);
+        private bool disposed;
+        private static int refCount;
+        private const int currentProcessToken = -6;
+        private static unsafe delegate* unmanaged[Stdcall]<HANDLE, AppPolicyWindowingModel*, WIN32_ERROR> AppPolicyGetWindowingModel;
 
-        //private static readonly HANDLE currentProcessToken = PInvoke.GetCurrentThreadEffectiveToken();
-
-        [ThreadStatic]
-        private static HANDLE currentThread;
-
-        [ThreadStatic]
-        private static unsafe FARPROC baseAppPolicyGetWindowingModel;
-        [ThreadStatic]
-        private static unsafe delegate*<HANDLE, AppPolicyWindowingModel*, WIN32_ERROR> overrideAppPolicyGetWindowingModel;
+        public HookWindowingModel()
+        {
+            refCount++;
+            StartHook();
+        }
 
         ~HookWindowingModel()
         {
-            Dispose(disposing: true);
+            Dispose();
         }
 
-        [ThreadStatic]
-        private static bool isHooked;
-        public bool IsHooked
-        {
-            get => isHooked;
-            set => isHooked = value;
-        }
+        public static bool IsHooked { get; private set; }
+        internal static AppPolicyWindowingModel WindowingModel { get; set; } = AppPolicyWindowingModel.AppPolicyWindowingModel_ClassicDesktop;
 
-        [ThreadStatic]
-        private static AppPolicyWindowingModel windowingModel;
-        internal AppPolicyWindowingModel WindowingModel
-        {
-            get => windowingModel;
-            set => windowingModel = value;
-        }
-
-        public unsafe void StartHook()
+        private unsafe static void StartHook()
         {
             if (!IsHooked)
             {
-                currentThread = PInvoke.GetCurrentThread();
-
-                _ = Detours.DetourTransactionBegin();
-                _ = Detours.DetourUpdateThread(currentThread);
-
-                using (FreeLibrarySafeHandle library = PInvoke.LoadLibrary("KERNEL32.dll"))
+                using FreeLibrarySafeHandle library = PInvoke.GetModuleHandle("KERNEL32.dll");
+                if (!library.IsInvalid && NativeLibrary.TryGetExport(library.DangerousGetHandle(), nameof(PInvoke.AppPolicyGetWindowingModel), out nint appPolicyGetWindowingModel))
                 {
-                    baseAppPolicyGetWindowingModel = PInvoke.GetProcAddress(library, "AppPolicyGetWindowingModel");
-                    void* baseAppPolicyGetWindowingModelPointer = (void*)baseAppPolicyGetWindowingModel.Value;
-                    overrideAppPolicyGetWindowingModel = &OverrideAppPolicyGetWindowingModel;
-                    void* overrideAppPolicyGetWindowingModelPointer = overrideAppPolicyGetWindowingModel;
-                    _ = Detours.DetourAttach(ref baseAppPolicyGetWindowingModelPointer, overrideAppPolicyGetWindowingModelPointer);
-                }
+                    void* appPolicyGetWindowingModelPtr = (void*)appPolicyGetWindowingModel;
+                    delegate* unmanaged[Stdcall]<HANDLE, AppPolicyWindowingModel*, WIN32_ERROR> overrideAppPolicyGetWindowingModel = &OverrideAppPolicyGetWindowingModel;
 
-                _ = Detours.DetourTransactionCommit();
-                IsHooked = true;
+                    _ = Detours.DetourRestoreAfterWith();
+
+                    _ = Detours.DetourTransactionBegin();
+                    _ = Detours.DetourUpdateThread(PInvoke.GetCurrentThread());
+                    _ = Detours.DetourAttach(ref appPolicyGetWindowingModelPtr, overrideAppPolicyGetWindowingModel);
+                    _ = Detours.DetourTransactionCommit();
+
+                    AppPolicyGetWindowingModel = (delegate* unmanaged[Stdcall]<HANDLE, AppPolicyWindowingModel*, WIN32_ERROR>)appPolicyGetWindowingModelPtr;
+                    IsHooked = true;
+                }
             }
         }
 
-        public unsafe void EndHook()
+        private static unsafe void EndHook()
         {
-            if (IsHooked)
+            if (--refCount == 0 && IsHooked)
             {
+                void* appPolicyGetWindowingModelPtr = AppPolicyGetWindowingModel;
+                delegate* unmanaged[Stdcall]<HANDLE, AppPolicyWindowingModel*, WIN32_ERROR> overrideAppPolicyGetWindowingModel = &OverrideAppPolicyGetWindowingModel;
+
                 _ = Detours.DetourTransactionBegin();
-                _ = Detours.DetourUpdateThread(currentThread);
-
-                void* baseAppPolicyGetWindowingModelPointer = (void*)baseAppPolicyGetWindowingModel.Value;
-                void* overrideAppPolicyGetWindowingModelPointer = overrideAppPolicyGetWindowingModel;
-                _ = Detours.DetourDetach(ref baseAppPolicyGetWindowingModelPointer, overrideAppPolicyGetWindowingModelPointer);
-                baseAppPolicyGetWindowingModel = default;
-                overrideAppPolicyGetWindowingModel = default;
-
+                _ = Detours.DetourUpdateThread(PInvoke.GetCurrentThread());
+                _ = Detours.DetourDetach(&appPolicyGetWindowingModelPtr, overrideAppPolicyGetWindowingModel);
                 _ = Detours.DetourTransactionCommit();
 
+                AppPolicyGetWindowingModel = null;
                 IsHooked = false;
             }
         }
 
+        [UnmanagedCallersOnly(CallConvs = [typeof(CallConvStdcall)])]
         private static unsafe WIN32_ERROR OverrideAppPolicyGetWindowingModel(HANDLE processToken, AppPolicyWindowingModel* policy)
         {
-            //if (processToken == currentProcessToken)
+            if ((int)processToken.Value == currentProcessToken)
             {
-                *policy = windowingModel;
+                *policy = WindowingModel;
                 return WIN32_ERROR.ERROR_SUCCESS;
             }
-            return baseAppPolicyGetWindowingModel.CreateDelegate<AppPolicyGetWindowingModel>()(processToken, policy);
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (disposing && IsHooked)
-            {
-                EndHook();
-            }
+            return AppPolicyGetWindowingModel(processToken, policy);
         }
 
         public void Dispose()
         {
-            Dispose(disposing: true);
+            if (!disposed && IsHooked)
+            {
+                EndHook();
+            }
             GC.SuppressFinalize(this);
+            disposed = true;
         }
     }
 }

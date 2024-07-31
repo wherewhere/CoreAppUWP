@@ -19,15 +19,15 @@ namespace CoreAppUWP.Helpers
             return Convert.ToInt32(pixel * currentDpi);
         }
 
-        public static int GetActualPixel(this double pixel, nint window)
+        public static unsafe int GetActualPixel(this double pixel, nint window)
         {
-            uint currentDpi = PInvoke.GetDpiForWindow(new HWND(window));
+            uint currentDpi = PInvoke.GetDpiForWindow(new HWND((void*)window));
             return Convert.ToInt32(pixel * (currentDpi / 96.0));
         }
 
-        public static double GetDisplayPixel(this int pixel, nint window)
+        public static unsafe double GetDisplayPixel(this int pixel, nint window)
         {
-            uint currentDpi = PInvoke.GetDpiForWindow(new HWND(window));
+            uint currentDpi = PInvoke.GetDpiForWindow(new HWND((void*)window));
             return pixel / (currentDpi / 96.0);
         }
 

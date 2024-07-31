@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Windows.Win32;
 using Windows.Win32.Foundation;
@@ -10,121 +11,96 @@ namespace CoreAppUWP.Common
 {
     public class HookRegistry : IDisposable
     {
-        private unsafe delegate WIN32_ERROR RegOpenKeyEx(HKEY hKey, PCWSTR lpSubKey, uint ulOptions, REG_SAM_FLAGS samDesired, HKEY* phkResult);
-        private delegate WIN32_ERROR RegCloseKey(HKEY hKey);
-        private unsafe delegate WIN32_ERROR RegQueryValueEx(HKEY hKey, PCWSTR lpValueName, [Optional] uint* lpReserved, [Optional] REG_VALUE_TYPE* lpType, [Optional] byte* lpData, [Optional] uint* lpcbData);
+        private bool disposed;
+        private static int refCount;
+        private static readonly Dictionary<HKEY, bool> xamlKeyMap = [];
+        private static readonly object locker = new();
 
-        [ThreadStatic]
-        private static HANDLE currentThread;
-        [ThreadStatic]
-        private static Dictionary<HKEY, bool> xamlKeyMap;
-        [ThreadStatic]
-        private static object locker;
+        private static unsafe delegate* unmanaged[Stdcall]<HKEY, PCWSTR, uint, REG_SAM_FLAGS, HKEY*, WIN32_ERROR> RegOpenKeyExW;
+        private static unsafe delegate* unmanaged[Stdcall]<HKEY, WIN32_ERROR> RegCloseKey;
+        private static unsafe delegate* unmanaged[Stdcall]<HKEY, PCWSTR, uint*, REG_VALUE_TYPE*, byte*, uint*, WIN32_ERROR> RegQueryValueExW;
 
-        [ThreadStatic]
-        private static unsafe FARPROC baseRegOpenKeyExW;
-        [ThreadStatic]
-        private static unsafe delegate*<HKEY, PCWSTR, uint, REG_SAM_FLAGS, HKEY*, WIN32_ERROR> overrideRegOpenKeyExW;
-
-        [ThreadStatic]
-        private static unsafe FARPROC baseRegCloseKey;
-        [ThreadStatic]
-        private static unsafe delegate*<HKEY, WIN32_ERROR> overrideRegCloseKey;
-
-        [ThreadStatic]
-        private static unsafe FARPROC baseRegQueryValueExW;
-        [ThreadStatic]
-        private static unsafe delegate*<HKEY, PCWSTR, uint*, REG_VALUE_TYPE*, byte*, uint*, WIN32_ERROR> overrideRegQueryValueExW;
+        public HookRegistry()
+        {
+            refCount++;
+            StartHook();
+        }
 
         ~HookRegistry()
         {
-            Dispose(disposing: true);
+            Dispose();
         }
 
-        [ThreadStatic]
-        private static bool isHooked;
-        public bool IsHooked
-        {
-            get => isHooked;
-            set => isHooked = value;
-        }
+        public static bool IsHooked { get; private set; }
 
-        public unsafe void StartHook()
+        private unsafe static void StartHook()
         {
             if (!IsHooked)
             {
-                xamlKeyMap ??= [];
-                locker ??= new object();
-
-                currentThread = PInvoke.GetCurrentThread();
-
-                _ = Detours.DetourTransactionBegin();
-                _ = Detours.DetourUpdateThread(currentThread);
-
-                using (FreeLibrarySafeHandle library = PInvoke.LoadLibrary("ADVAPI32.dll"))
+                using FreeLibrarySafeHandle library = PInvoke.GetModuleHandle("ADVAPI32.dll");
+                if (!library.IsInvalid
+                    && NativeLibrary.TryGetExport(library.DangerousGetHandle(), "RegOpenKeyExW", out nint regOpenKeyExW)
+                    && NativeLibrary.TryGetExport(library.DangerousGetHandle(), nameof(PInvoke.RegCloseKey), out nint regCloseKey)
+                    && NativeLibrary.TryGetExport(library.DangerousGetHandle(), "RegQueryValueExW", out nint regQueryValueExW))
                 {
-                    baseRegOpenKeyExW = PInvoke.GetProcAddress(library, "RegOpenKeyExW");
-                    void* baseRegOpenKeyExWPointer = (void*)baseRegOpenKeyExW.Value;
-                    overrideRegOpenKeyExW = &OverrideRegOpenKeyEx;
-                    void* overrideRegOpenKeyExWPointer = overrideRegOpenKeyExW;
-                    _ = Detours.DetourAttach(ref baseRegOpenKeyExWPointer, overrideRegOpenKeyExWPointer);
+                    void* regOpenKeyExWPtr = (void*)regOpenKeyExW;
+                    void* regCloseKeyPtr = (void*)regCloseKey;
+                    void* regQueryValueExWPtr = (void*)regQueryValueExW;
 
-                    baseRegCloseKey = PInvoke.GetProcAddress(library, "RegCloseKey");
-                    void* baseRegCloseKeyPointer = (void*)baseRegCloseKey.Value;
-                    overrideRegCloseKey = &OverrideRegCloseKey;
-                    void* overrideRegCloseKeyPointer = overrideRegCloseKey;
-                    _ = Detours.DetourAttach(ref baseRegCloseKeyPointer, overrideRegCloseKeyPointer);
+                    delegate* unmanaged[Stdcall]<HKEY, PCWSTR, uint, REG_SAM_FLAGS, HKEY*, WIN32_ERROR> overrideRegOpenKeyExW = &OverrideRegOpenKeyExW;
+                    delegate* unmanaged[Stdcall]<HKEY, WIN32_ERROR> overrideRegCloseKey = &OverrideRegCloseKey;
+                    delegate* unmanaged[Stdcall]<HKEY, PCWSTR, uint*, REG_VALUE_TYPE*, byte*, uint*, WIN32_ERROR> overrideRegQueryValueExW = &OverrideRegQueryValueExW;
 
-                    baseRegQueryValueExW = PInvoke.GetProcAddress(library, "RegQueryValueExW");
-                    void* baseRegQueryValueExWPointer = (void*)baseRegQueryValueExW.Value;
-                    overrideRegQueryValueExW = &OverrideRegQueryValueExW;
-                    void* overrideRegQueryValueExWPointer = overrideRegQueryValueExW;
-                    _ = Detours.DetourAttach(ref baseRegQueryValueExWPointer, overrideRegQueryValueExWPointer);
+                    _ = Detours.DetourRestoreAfterWith();
+
+                    _ = Detours.DetourTransactionBegin();
+                    _ = Detours.DetourUpdateThread(PInvoke.GetCurrentThread());
+                    _ = Detours.DetourAttach(ref regOpenKeyExWPtr, overrideRegOpenKeyExW);
+                    _ = Detours.DetourAttach(ref regCloseKeyPtr, overrideRegCloseKey);
+                    _ = Detours.DetourAttach(ref regQueryValueExWPtr, overrideRegQueryValueExW);
+                    _ = Detours.DetourTransactionCommit();
+
+                    RegOpenKeyExW = (delegate* unmanaged[Stdcall]<HKEY, PCWSTR, uint, REG_SAM_FLAGS, HKEY*, WIN32_ERROR>)regOpenKeyExWPtr;
+                    RegCloseKey = (delegate* unmanaged[Stdcall]<HKEY, WIN32_ERROR>)regCloseKeyPtr;
+                    RegQueryValueExW = (delegate* unmanaged[Stdcall]<HKEY, PCWSTR, uint*, REG_VALUE_TYPE*, byte*, uint*, WIN32_ERROR>)regQueryValueExWPtr;
+                    
+                    IsHooked = true;
                 }
-
-                _ = Detours.DetourTransactionCommit();
-                IsHooked = true;
             }
         }
 
-        public unsafe void EndHook()
+        public unsafe static void EndHook()
         {
-            if (IsHooked)
+            if (--refCount == 0 && IsHooked)
             {
+                void* regOpenKeyExWPtr = RegOpenKeyExW;
+                void* regCloseKeyPtr = RegCloseKey;
+                void* regQueryValueExWPtr = RegQueryValueExW;
+
+                delegate* unmanaged[Stdcall]<HKEY, PCWSTR, uint, REG_SAM_FLAGS, HKEY*, WIN32_ERROR> overrideRegOpenKeyExW = &OverrideRegOpenKeyExW;
+                delegate* unmanaged[Stdcall]<HKEY, WIN32_ERROR> overrideRegCloseKey = &OverrideRegCloseKey;
+                delegate* unmanaged[Stdcall]<HKEY, PCWSTR, uint*, REG_VALUE_TYPE*, byte*, uint*, WIN32_ERROR> overrideRegQueryValueExW = &OverrideRegQueryValueExW;
+
                 _ = Detours.DetourTransactionBegin();
-                _ = Detours.DetourUpdateThread(currentThread);
-
-                void* baseRegOpenKeyExWPointer = (void*)baseRegOpenKeyExW.Value;
-                void* overrideRegOpenKeyExWPointer = overrideRegOpenKeyExW;
-                _ = Detours.DetourDetach(ref baseRegOpenKeyExWPointer, overrideRegOpenKeyExWPointer);
-                baseRegOpenKeyExW = default;
-                overrideRegOpenKeyExW = default;
-
-                void* baseRegCloseKeyPointer = (void*)baseRegCloseKey.Value;
-                void* overrideRegCloseKeyPointer = overrideRegCloseKey;
-                _ = Detours.DetourDetach(ref baseRegCloseKeyPointer, overrideRegCloseKeyPointer);
-                baseRegCloseKey = default;
-                overrideRegCloseKey = default;
-
-                void* baseRegQueryValueExWPointer = (void*)baseRegQueryValueExW.Value;
-                void* overrideRegQueryValueExWPointer = overrideRegQueryValueExW;
-                _ = Detours.DetourDetach(ref baseRegQueryValueExWPointer, overrideRegQueryValueExWPointer);
-                baseRegQueryValueExW = default;
-                overrideRegOpenKeyExW = default;
-
+                _ = Detours.DetourUpdateThread(PInvoke.GetCurrentThread());
+                _ = Detours.DetourDetach(&regOpenKeyExWPtr, overrideRegOpenKeyExW);
+                _ = Detours.DetourDetach(&regCloseKeyPtr, overrideRegCloseKey);
+                _ = Detours.DetourDetach(&regQueryValueExWPtr, overrideRegQueryValueExW);
                 _ = Detours.DetourTransactionCommit();
 
-                locker = xamlKeyMap = null;
+                RegOpenKeyExW = null;
+                RegCloseKey = null;
+                RegQueryValueExW = null;
+
                 IsHooked = false;
             }
         }
 
-        private static unsafe WIN32_ERROR OverrideRegOpenKeyEx(HKEY hKey, PCWSTR lpSubKey, uint ulOptions, REG_SAM_FLAGS samDesired, HKEY* phkResult)
+        [UnmanagedCallersOnly(CallConvs = [typeof(CallConvStdcall)])]
+        private static unsafe WIN32_ERROR OverrideRegOpenKeyExW(HKEY hKey, PCWSTR lpSubKey, uint ulOptions, REG_SAM_FLAGS samDesired, HKEY* phkResult)
         {
-            if (!isHooked) { return PInvoke.RegOpenKeyEx(hKey, lpSubKey, ulOptions, samDesired, phkResult); }
-            RegOpenKeyEx RegOpenKeyEx = baseRegOpenKeyExW.CreateDelegate<RegOpenKeyEx>();
-            WIN32_ERROR result = RegOpenKeyEx(hKey, lpSubKey, ulOptions, samDesired, phkResult);
-            if (hKey == HKEY.HKEY_LOCAL_MACHINE && lpSubKey.ToString() == @"Software\Microsoft\WinUI\Xaml")
+            WIN32_ERROR result = RegOpenKeyExW(hKey, lpSubKey, ulOptions, samDesired, phkResult);
+            if (hKey == HKEY.HKEY_LOCAL_MACHINE && lpSubKey.ToString().Equals(@"Software\Microsoft\WinUI\Xaml", StringComparison.OrdinalIgnoreCase))
             {
                 if (result == WIN32_ERROR.ERROR_FILE_NOT_FOUND)
                 {
@@ -141,10 +117,9 @@ namespace CoreAppUWP.Common
             return result;
         }
 
+        [UnmanagedCallersOnly(CallConvs = [typeof(CallConvStdcall)])]
         private unsafe static WIN32_ERROR OverrideRegCloseKey(HKEY hKey)
         {
-            if (!isHooked) { return PInvoke.RegCloseKey(hKey); }
-            static WIN32_ERROR RegCloseKey(HKEY hKey) => baseRegCloseKey.CreateDelegate<RegCloseKey>()(hKey);
             bool isXamlKey;
             lock (locker)
             {
@@ -162,11 +137,10 @@ namespace CoreAppUWP.Common
             }
         }
 
+        [UnmanagedCallersOnly(CallConvs = [typeof(CallConvStdcall)])]
         private static unsafe WIN32_ERROR OverrideRegQueryValueExW(HKEY hKey, PCWSTR lpValueName, [Optional] uint* lpReserved, [Optional] REG_VALUE_TYPE* lpType, [Optional] byte* lpData, [Optional] uint* lpcbData)
         {
-            if (!isHooked) { return PInvoke.RegQueryValueEx(hKey, lpValueName, lpReserved, lpType, lpData, lpcbData); }
-            RegQueryValueEx RegQueryValueEx = baseRegQueryValueExW.CreateDelegate<RegQueryValueEx>();
-            if (lpValueName.Value == default && lpValueName.ToString().Equals("EnableUWPWindow", StringComparison.OrdinalIgnoreCase))
+            if (lpValueName.Value != default && lpValueName.ToString().Equals("EnableUWPWindow", StringComparison.OrdinalIgnoreCase))
             {
                 lock (locker)
                 {
@@ -176,7 +150,7 @@ namespace CoreAppUWP.Common
                         if (isRealKey)
                         {
                             // real key
-                            result = RegQueryValueEx(hKey, lpValueName, lpReserved, lpType, lpData, lpcbData);
+                            result = RegQueryValueExW(hKey, lpValueName, lpReserved, lpType, lpData, lpcbData);
                             if (result == WIN32_ERROR.ERROR_SUCCESS && lpData != default)
                             {
                                 *lpData = 1;
@@ -228,21 +202,17 @@ namespace CoreAppUWP.Common
                     }
                 }
             }
-            return RegQueryValueEx(hKey, lpValueName, lpReserved, lpType, lpData, lpcbData);
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (disposing && IsHooked)
-            {
-                EndHook();
-            }
+            return RegQueryValueExW(hKey, lpValueName, lpReserved, lpType, lpData, lpcbData);
         }
 
         public void Dispose()
         {
-            Dispose(disposing: true);
+            if (!disposed && IsHooked)
+            {
+                EndHook();
+            }
             GC.SuppressFinalize(this);
+            disposed = true;
         }
     }
 }

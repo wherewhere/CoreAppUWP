@@ -1,4 +1,20 @@
 ﻿ICoreWindowInterop
 
+HKEY_LOCAL_MACHINE
+INVALID_HANDLE_VALUE
+
+DetourAttach
+DetourDetach
+DetourRestoreAfterWith
+DetourTransactionBegin
+DetourTransactionCommit
+DetourUpdateThread
+
+AppPolicyGetWindowingModel
 GetCurrentPackageFullName
+GetCurrentThread
 GetDpiForWindow
+GetModuleHandle
+RegCloseKey
+RegOpenKeyEx
+RegQueryValueEx
