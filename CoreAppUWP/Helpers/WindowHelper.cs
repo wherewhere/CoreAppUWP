@@ -1,4 +1,5 @@
 ﻿using CoreAppUWP.Common;
+using CoreAppUWP.Controls;
 using System;
 using System.Collections.Generic;
 using System.Runtime.Versioning;
@@ -51,6 +52,13 @@ namespace CoreAppUWP.Helpers
             ElementCompositionPreview.SetAppWindowContent(newWindow, newFrame);
             newWindow.TrackWindow(newFrame);
             return (newWindow, newFrame);
+        }
+
+        public static async Task<DesktopWindow> CreateWindowAsync(Action<DesktopWindowXamlSource> launched)
+        {
+            DesktopWindow newWindow = await DesktopWindow.CreateAsync(launched).ConfigureAwait(false);
+            //TrackWindow(newWindow);
+            return newWindow;
         }
 
         public static void TrackWindow(this Window window)

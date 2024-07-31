@@ -13,6 +13,7 @@ using Windows.UI.ViewManagement;
 using Windows.UI.WindowManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Hosting;
 using Windows.UI.Xaml.Media.Animation;
 using Windows.UI.Xaml.Navigation;
 
@@ -105,9 +106,15 @@ namespace CoreAppUWP.Pages.SettingsPages
                     SearchPane.GetForCurrentView().Show();
                     break;
                 case "NewWin32Window":
-                    DesktopWindow window = new();
-                    window.SetIcon("favicon.ico");
-                    window.Show();
+                    DesktopWindow window = await WindowHelper.CreateWindowAsync(OnLaunched);
+                    static void OnLaunched(DesktopWindowXamlSource source)
+                    {
+                        Frame _frame = new();
+                        source.Content = _frame;
+                        _ = _frame.Navigate(typeof(MainPage), null, new DrillInNavigationTransitionInfo());
+                    }
+                    // window.SetIcon("favicon.ico");
+                    //window.Show();
                     break;
                 case "ExitFullWindow":
                     if (this.IsAppWindow())

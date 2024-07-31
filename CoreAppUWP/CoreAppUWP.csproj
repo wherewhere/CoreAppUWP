@@ -17,6 +17,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+		<PackageReference Include="Detours.Win32Metadata" Version="4.0.1.16" />
 		<PackageReference Include="DisposableMemory.ModernNetUAP.WinUI" Version="2.8.6-preview" />
     <PackageReference Include="DisposableMemory.ModernNetUAP.XamlCompiler" Version="0.1.0-preview3" PrivateAssets="all" />
     <PackageReference Include="MetroLog.Net6" Version="2.1.0" />

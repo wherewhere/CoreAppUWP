@@ -46,7 +46,8 @@ namespace CoreAppUWP.Pages
             base.OnNavigatedFrom(e);
             if (!this.IsAppWindow())
             {
-                Window.Current.SetTitleBar(null);
+                try { Window.Current.SetTitleBar(null); }
+                catch (Exception ex) { SettingsHelper.LogManager.GetLogger(nameof(MainPage)).Error(ex.ExceptionToMessage()); }
                 SystemNavigationManager.GetForCurrentView().BackRequested -= System_BackRequested;
                 CoreApplication.GetCurrentView().TitleBar.LayoutMetricsChanged -= TitleBar_LayoutMetricsChanged;
             }
@@ -56,7 +57,8 @@ namespace CoreAppUWP.Pages
         {
             if (!this.IsAppWindow())
             {
-                Window.Current.SetTitleBar(DragRegion);
+                try { Window.Current.SetTitleBar(DragRegion); }
+                catch (Exception ex) { SettingsHelper.LogManager.GetLogger(nameof(MainPage)).Error(ex.ExceptionToMessage()); }
                 SystemNavigationManager.GetForCurrentView().BackRequested += System_BackRequested;
                 CoreApplication.GetCurrentView().TitleBar.LayoutMetricsChanged += TitleBar_LayoutMetricsChanged;
             }

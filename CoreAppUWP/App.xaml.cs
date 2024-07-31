@@ -133,11 +133,19 @@ namespace CoreAppUWP
 
             if (e is LaunchActivatedEventArgs args)
             {
-                if (!args.PrelaunchActivated)
+                try
                 {
-                    CoreApplication.EnablePrelaunch(true);
+                    if (!args.PrelaunchActivated)
+                    {
+                        CoreApplication.EnablePrelaunch(true);
+                    }
+                    else { return; }
                 }
-                else { return; }
+                catch (Exception ex)
+                {
+                    SettingsHelper.LogManager.GetLogger(nameof(App)).Error(ex.ExceptionToMessage(), ex);
+                    goto end;
+                }
             }
 
             if (rootFrame.Content == null)
@@ -148,6 +156,7 @@ namespace CoreAppUWP
                 rootFrame.Navigate(typeof(MainPage), e, new DrillInNavigationTransitionInfo());
             }
 
+        end:
             // 确保当前窗口处于活动状态
             window.Activate();
         }

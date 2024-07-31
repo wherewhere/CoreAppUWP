@@ -3,17 +3,28 @@ using Microsoft.Win32.SafeHandles;
 using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
+using System.Threading;
+using Windows.UI.Xaml.Hosting;
 using Windows.Win32;
 using Windows.Win32.Foundation;
 using Windows.Win32.Graphics.Gdi;
 using Windows.Win32.UI.WindowsAndMessaging;
+using CoreAppUWP.Common;
+using Windows.Win32.System.WinRT.Xaml;
+using WinRT;
+using Windows.System;
+using System.Xml.Linq;
+using Windows.UI.Xaml;
+using Windows.UI.Core;
+using Windows.UI.Xaml.Controls;
+using Windows.Foundation;
 
 namespace CoreAppUWP.Controls
 {
     public partial class DesktopWindow
     {
         private readonly HWND hwnd;
-        public nint Hwnd => hwnd;
 
         public DesktopWindow()
         {
@@ -21,25 +32,31 @@ namespace CoreAppUWP.Controls
             hwnd = CreateDesktopWindow();
         }
 
+        /// <summary>
+        /// Get the handle of the window.
+        /// </summary>
+        public nint Hwnd => hwnd;
+
+        /// <summary>
+        /// Gets the <see cref="DesktopWindowXamlSource"/> to provide XAML for this window.
+        /// </summary>
+        public DesktopWindowXamlSource WindowXamlSource { get; private set; }
+
         public void Show() => PInvoke.ShowWindow(hwnd, SHOW_WINDOW_CMD.SW_NORMAL);
 
-        public void SetIcon(string iconPath)
+        public unsafe void SetIcon(string iconPath)
         {
-            try
+            fixed (char* ptr = iconPath)
             {
-                using SafeFileHandle icon = PInvoke.LoadImage(null, iconPath, GDI_IMAGE_TYPE.IMAGE_ICON, 0, 0, IMAGE_FLAGS.LR_LOADFROMFILE);
-                _ = PInvoke.SendMessage(hwnd, PInvoke.WM_SETICON, PInvoke.ICON_BIG, icon.DangerousGetHandle());
-            }
-            catch (Exception ex)
-            {
-                SettingsHelper.LogManager.GetLogger(nameof(DesktopWindow)).Error(ex.ExceptionToMessage(), ex);
+                HANDLE icon = PInvoke.LoadImage(new HINSTANCE(), ptr, GDI_IMAGE_TYPE.IMAGE_ICON, 0, 0, IMAGE_FLAGS.LR_LOADFROMFILE);
+                _ = PInvoke.SendMessage(hwnd, PInvoke.WM_SETICON, PInvoke.ICON_BIG, new LPARAM((nint)icon.Value));
             }
         }
     }
 
     public partial class DesktopWindow
     {
-        private static readonly HINSTANCE g_hInstance = new(Process.GetCurrentProcess().Handle);
+        private static unsafe readonly HINSTANCE g_hInstance = new((void*)Process.GetCurrentProcess().Handle);
 
         // win32 window class name for top-level WinUI desktop windows
         private const string s_windowClassName = "WinUIDesktopWin32WindowClass";
@@ -47,7 +64,7 @@ namespace CoreAppUWP.Controls
         // Default window title for top-level WinUI desktop windows
         private const string s_defaultWindowTitle = "WinUI Desktop";
 
-        public static unsafe void RegisterDesktopWindowClass()
+        public unsafe void RegisterDesktopWindowClass()
         {
             if (!PInvoke.GetClassInfoEx(new DefaultSafeHandel(g_hInstance), s_windowClassName, out WNDCLASSEXW wndClassEx))
             {
@@ -55,8 +72,8 @@ namespace CoreAppUWP.Controls
                 wndClassEx.style = WNDCLASS_STYLES.CS_HREDRAW | WNDCLASS_STYLES.CS_VREDRAW;
                 wndClassEx.cbClsExtra = 0;
                 wndClassEx.cbWndExtra = 0;
-                wndClassEx.hCursor = PInvoke.LoadCursor(HINSTANCE.Null, PInvoke.IDC_ARROW);
-                wndClassEx.hbrBackground = (HBRUSH)((int)SYS_COLOR_INDEX.COLOR_WINDOW + 1);
+                wndClassEx.hCursor = PInvoke.LoadCursor(new HINSTANCE(), PInvoke.IDC_ARROW);
+                wndClassEx.hbrBackground = (HBRUSH)((nint)SYS_COLOR_INDEX.COLOR_WINDOW + 1);
                 wndClassEx.hInstance = g_hInstance;
 
                 fixed (char* lps_windowClassName = s_windowClassName)
@@ -100,18 +117,71 @@ namespace CoreAppUWP.Controls
                                                     // then the window manager calls ShowWindow with that value as the nCmdShow parameter
                 int.MinValue,                       // default width
                 int.MinValue,                       // default height
-                HWND.Null,                          // no owner window
+                new HWND(),                          // no owner window
                 null,                               // use class menu
                 new DefaultSafeHandel(g_hInstance),
                 null);
 
-        private class DefaultSafeHandel(nint invalidHandleValue, bool ownsHandle) : SafeHandle(invalidHandleValue, ownsHandle)
+        private partial class DefaultSafeHandel(nint invalidHandleValue, bool ownsHandle) : SafeHandle(invalidHandleValue, ownsHandle)
         {
             public DefaultSafeHandel(nint handle) : this(handle, true) => SetHandle(handle);
 
             public override bool IsInvalid => handle != nint.Zero;
 
             protected override bool ReleaseHandle() => true;
+        }
+    }
+
+    public partial class DesktopWindow
+    {
+        /// <summary>
+        /// Create a new <see cref="DesktopWindow"/> instance.
+        /// </summary>
+        /// <param name="launched">Do something after <see cref="DesktopWindowXamlSource"/> created.</param>
+        /// <returns>The new instance of <see cref="DesktopWindow"/>.</returns>
+        public static Task<DesktopWindow> CreateAsync(Action<DesktopWindowXamlSource> launched)
+        {
+            TaskCompletionSource<DesktopWindow> taskCompletionSource = new();
+
+            new Thread(async () =>
+            {
+                try
+                {
+                    DesktopWindowXamlSource source;
+                    using (HookWindowingModel hook = new())
+                    {
+                        source = new DesktopWindowXamlSource();
+                    }
+
+                    DesktopWindow window = new() { WindowXamlSource = source };
+                    window.Show();
+
+                    IDesktopWindowXamlSourceNative native = source.As<IDesktopWindowXamlSourceNative>();
+                    native.AttachToWindow(window.hwnd);
+
+                        PInvoke.SetWindowPos(
+                            native.WindowHandle,
+                            new HWND(),
+                            0, 0,
+                            (int)1000, (int)1000,
+                            SET_WINDOW_POS_FLAGS.SWP_NOACTIVATE | SET_WINDOW_POS_FLAGS.SWP_NOZORDER | SET_WINDOW_POS_FLAGS.SWP_SHOWWINDOW);
+                    
+                    launched(source);
+
+                    taskCompletionSource.SetResult(window);
+
+                    CoreWindow.GetForCurrentThread().Dispatcher.ProcessEvents(CoreProcessEventsOption.ProcessUntilQuit);
+                }
+                catch (Exception e)
+                {
+                    taskCompletionSource.SetException(e);
+                }
+            })
+            {
+                Name = nameof(DesktopWindowXamlSource)
+            }.Start();
+
+            return taskCompletionSource.Task;
         }
     }
 }
