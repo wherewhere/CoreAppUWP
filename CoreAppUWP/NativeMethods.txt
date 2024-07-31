@@ -1,17 +1,17 @@
 ﻿IDesktopWindowXamlSourceNative
 
+CW_USEDEFAULT
 ICON_BIG
+IDC_ARROW
 SHOW_WINDOW_CMD
 SIZE_MINIMIZED
 SYS_COLOR_INDEX
 WM_CREATE
 WM_DESTROY
 WM_PAINT
+WM_QUIT
 WM_SETICON
 WM_SIZE
-
-CW_USEDEFAULT
-IDC_ARROW
 
 DetourAttach
 DetourDetach
@@ -22,18 +22,23 @@ DetourUpdateThread
 
 AppPolicyGetWindowingModel
 BeginPaint
+CallNextHookEx
 CreateWindowEx
 DefWindowProc
+DispatchMessage
 EndPaint
 FillRect
 GetClassInfoExW
 GetClientRect
 GetCurrentThread
+GetCurrentThreadId
 GetModuleHandle
 GetStockObject
 LoadCursor
 LoadImage
+PeekMessage
 RegisterClassEx
 SendMessage
 SetWindowPos
+SetWindowText
 ShowWindow

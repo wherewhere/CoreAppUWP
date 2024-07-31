@@ -4,6 +4,7 @@ using CoreAppUWP.Helpers;
 using CoreAppUWP.ViewModels.SettingsPages;
 using System;
 using System.Threading.Tasks;
+using Windows.ApplicationModel;
 using Windows.ApplicationModel.Core;
 using Windows.ApplicationModel.Search;
 using Windows.Storage;
@@ -113,8 +114,9 @@ namespace CoreAppUWP.Pages.SettingsPages
                         source.Content = _frame;
                         _ = _frame.Navigate(typeof(MainPage), null, new DrillInNavigationTransitionInfo());
                     }
-                    // window.SetIcon("favicon.ico");
-                    //window.Show();
+                    window.Title = Package.Current.DisplayName;
+                    window.SetIcon("favicon.ico");
+                    window.Show();
                     break;
                 case "ExitFullWindow":
                     if (this.IsAppWindow())

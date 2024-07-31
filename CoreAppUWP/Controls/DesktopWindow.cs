@@ -1,24 +1,16 @@
-﻿using CoreAppUWP.Helpers;
-using Microsoft.Win32.SafeHandles;
+﻿using CoreAppUWP.Common;
 using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
-using System.Threading.Tasks;
 using System.Threading;
+using System.Threading.Tasks;
 using Windows.UI.Xaml.Hosting;
 using Windows.Win32;
 using Windows.Win32.Foundation;
 using Windows.Win32.Graphics.Gdi;
-using Windows.Win32.UI.WindowsAndMessaging;
-using CoreAppUWP.Common;
 using Windows.Win32.System.WinRT.Xaml;
+using Windows.Win32.UI.WindowsAndMessaging;
 using WinRT;
-using Windows.System;
-using System.Xml.Linq;
-using Windows.UI.Xaml;
-using Windows.UI.Core;
-using Windows.UI.Xaml.Controls;
-using Windows.Foundation;
 
 namespace CoreAppUWP.Controls
 {
@@ -36,6 +28,11 @@ namespace CoreAppUWP.Controls
         /// Get the handle of the window.
         /// </summary>
         public nint Hwnd => hwnd;
+
+        public string Title
+        {
+            set => _ = PInvoke.SetWindowText(hwnd, value);
+        }
 
         /// <summary>
         /// Gets the <see cref="DesktopWindowXamlSource"/> to provide XAML for this window.
@@ -56,7 +53,7 @@ namespace CoreAppUWP.Controls
 
     public partial class DesktopWindow
     {
-        private static unsafe readonly HINSTANCE g_hInstance = new((void*)Process.GetCurrentProcess().Handle);
+        private static readonly unsafe HINSTANCE g_hInstance = new((void*)Process.GetCurrentProcess().Handle);
 
         // win32 window class name for top-level WinUI desktop windows
         private const string s_windowClassName = "WinUIDesktopWin32WindowClass";
@@ -64,7 +61,25 @@ namespace CoreAppUWP.Controls
         // Default window title for top-level WinUI desktop windows
         private const string s_defaultWindowTitle = "WinUI Desktop";
 
-        public unsafe void RegisterDesktopWindowClass()
+        private static LRESULT WNDPROC(HWND hWnd, uint message, WPARAM wParam, LPARAM lParam)
+        {
+            switch (message)
+            {
+                case PInvoke.WM_PAINT:
+                    HDC hdc = PInvoke.BeginPaint(hWnd, out PAINTSTRUCT ps);
+                    _ = PInvoke.GetClientRect(hWnd, out RECT rect);
+                    _ = PInvoke.FillRect(hdc, rect, new DefaultSafeHandel(PInvoke.GetStockObject(GET_STOCK_OBJECT_FLAGS.WHITE_BRUSH)));
+                    _ = PInvoke.EndPaint(hWnd, ps);
+                    return new LRESULT();
+                case PInvoke.WM_CREATE:
+                case PInvoke.WM_DESTROY:
+                    return new LRESULT();
+                default:
+                    return PInvoke.DefWindowProc(hWnd, message, wParam, lParam);
+            }
+        }
+
+        private static unsafe void RegisterDesktopWindowClass()
         {
             if (!PInvoke.GetClassInfoEx(new DefaultSafeHandel(g_hInstance), s_windowClassName, out WNDCLASSEXW wndClassEx))
             {
@@ -81,32 +96,13 @@ namespace CoreAppUWP.Controls
                     wndClassEx.lpszClassName = lps_windowClassName;
                 }
 
-                wndClassEx.lpfnWndProc = (hWnd, message, wParam, lParam) =>
-                {
-                    HDC hdc;
-                    PAINTSTRUCT ps;
-                    RECT rect;
-                    switch (message)
-                    {
-                        case PInvoke.WM_PAINT:
-                            hdc = PInvoke.BeginPaint(hWnd, out ps);
-                            _ = PInvoke.GetClientRect(hWnd, out rect);
-                            _ = PInvoke.FillRect(hdc, rect, new DefaultSafeHandel(PInvoke.GetStockObject(GET_STOCK_OBJECT_FLAGS.WHITE_BRUSH)));
-                            _ = PInvoke.EndPaint(hWnd, ps);
-                            return new LRESULT();
-                        case PInvoke.WM_CREATE:
-                        case PInvoke.WM_DESTROY:
-                            return new LRESULT();
-                        default:
-                            return PInvoke.DefWindowProc(hWnd, message, wParam, lParam);
-                    }
-                };
+                wndClassEx.lpfnWndProc = WNDPROC;
 
                 _ = PInvoke.RegisterClassEx(wndClassEx);
             }
         }
 
-        internal static unsafe HWND CreateDesktopWindow() =>
+        private static unsafe HWND CreateDesktopWindow() =>
             PInvoke.CreateWindowEx(
                 0,                                  // Extended Style
                 s_windowClassName,                  // name of window class
@@ -143,7 +139,7 @@ namespace CoreAppUWP.Controls
         {
             TaskCompletionSource<DesktopWindow> taskCompletionSource = new();
 
-            new Thread(async () =>
+            new Thread(() =>
             {
                 try
                 {
@@ -154,23 +150,33 @@ namespace CoreAppUWP.Controls
                     }
 
                     DesktopWindow window = new() { WindowXamlSource = source };
-                    window.Show();
-
                     IDesktopWindowXamlSourceNative native = source.As<IDesktopWindowXamlSourceNative>();
                     native.AttachToWindow(window.hwnd);
+                    UpdateHostSize();
 
-                        PInvoke.SetWindowPos(
+                    launched(source);
+                    taskCompletionSource.SetResult(window);
+
+                    MSG msg = new();
+                    while (msg.message != PInvoke.WM_QUIT)
+                    {
+                        if (PInvoke.PeekMessage(out msg, new HWND(), 0, 0, PEEK_MESSAGE_REMOVE_TYPE.PM_REMOVE))
+                        {
+                            _ = PInvoke.DispatchMessage(msg);
+                            UpdateHostSize();
+                        }
+                    }
+
+                    void UpdateHostSize()
+                    {
+                        _ = PInvoke.GetClientRect(window.hwnd, out RECT rect);
+                        _ = PInvoke.SetWindowPos(
                             native.WindowHandle,
                             new HWND(),
                             0, 0,
-                            (int)1000, (int)1000,
+                            rect.Width, rect.Height,
                             SET_WINDOW_POS_FLAGS.SWP_NOACTIVATE | SET_WINDOW_POS_FLAGS.SWP_NOZORDER | SET_WINDOW_POS_FLAGS.SWP_SHOWWINDOW);
-                    
-                    launched(source);
-
-                    taskCompletionSource.SetResult(window);
-
-                    CoreWindow.GetForCurrentThread().Dispatcher.ProcessEvents(CoreProcessEventsOption.ProcessUntilQuit);
+                    }
                 }
                 catch (Exception e)
                 {

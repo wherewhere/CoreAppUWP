@@ -54,12 +54,8 @@ namespace CoreAppUWP.Helpers
             return (newWindow, newFrame);
         }
 
-        public static async Task<DesktopWindow> CreateWindowAsync(Action<DesktopWindowXamlSource> launched)
-        {
-            DesktopWindow newWindow = await DesktopWindow.CreateAsync(launched).ConfigureAwait(false);
-            //TrackWindow(newWindow);
-            return newWindow;
-        }
+        public static Task<DesktopWindow> CreateWindowAsync(Action<DesktopWindowXamlSource> launched) =>
+            DesktopWindow.CreateAsync(launched);
 
         public static void TrackWindow(this Window window)
         {
