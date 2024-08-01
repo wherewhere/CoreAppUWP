@@ -29,7 +29,7 @@ namespace CoreAppUWP.Common
         public static bool IsHooked { get; private set; }
         internal static AppPolicyWindowingModel WindowingModel { get; set; } = AppPolicyWindowingModel.AppPolicyWindowingModel_ClassicDesktop;
 
-        private unsafe static void StartHook()
+        private static unsafe void StartHook()
         {
             if (!IsHooked)
             {

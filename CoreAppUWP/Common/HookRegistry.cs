@@ -33,7 +33,7 @@ namespace CoreAppUWP.Common
 
         public static bool IsHooked { get; private set; }
 
-        private unsafe static void StartHook()
+        private static unsafe void StartHook()
         {
             if (!IsHooked)
             {
@@ -63,13 +63,13 @@ namespace CoreAppUWP.Common
                     RegOpenKeyExW = (delegate* unmanaged[Stdcall]<HKEY, PCWSTR, uint, REG_SAM_FLAGS, HKEY*, WIN32_ERROR>)regOpenKeyExWPtr;
                     RegCloseKey = (delegate* unmanaged[Stdcall]<HKEY, WIN32_ERROR>)regCloseKeyPtr;
                     RegQueryValueExW = (delegate* unmanaged[Stdcall]<HKEY, PCWSTR, uint*, REG_VALUE_TYPE*, byte*, uint*, WIN32_ERROR>)regQueryValueExWPtr;
-                    
+
                     IsHooked = true;
                 }
             }
         }
 
-        public unsafe static void EndHook()
+        public static unsafe void EndHook()
         {
             if (--refCount == 0 && IsHooked)
             {
@@ -118,7 +118,7 @@ namespace CoreAppUWP.Common
         }
 
         [UnmanagedCallersOnly(CallConvs = [typeof(CallConvStdcall)])]
-        private unsafe static WIN32_ERROR OverrideRegCloseKey(HKEY hKey)
+        private static unsafe WIN32_ERROR OverrideRegCloseKey(HKEY hKey)
         {
             bool isXamlKey;
             lock (locker)

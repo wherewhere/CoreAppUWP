@@ -40,14 +40,14 @@ namespace CoreAppUWP.Helpers
             return await ApplicationViewSwitcher.TryShowAsStandaloneAsync(newViewId);
         }
 
-        public static async Task<DesktopWindow> CreateDesktopWindowAsync(Action<DesktopWindowXamlSource> launched)
+        public static async Task<DesktopWindow> CreateWindowAsync(Action<DesktopWindowXamlSource> launched)
         {
             DesktopWindow newWindow = await DesktopWindow.CreateAsync(launched).ConfigureAwait(false);
             TrackWindow(newWindow);
             return newWindow;
         }
 
-        public static async Task<DesktopWindow> CreateDesktopWindowAsync(this DispatcherQueue dispatcherQueue, Action<DesktopWindowXamlSource> launched)
+        public static async Task<DesktopWindow> CreateWindowAsync(this DispatcherQueue dispatcherQueue, Action<DesktopWindowXamlSource> launched)
         {
             DesktopWindow newWindow = await DesktopWindow.CreateAsync(dispatcherQueue, launched).ConfigureAwait(false);
             TrackWindow(newWindow);

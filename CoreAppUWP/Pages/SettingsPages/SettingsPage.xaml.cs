@@ -112,8 +112,8 @@ namespace CoreAppUWP.Pages.SettingsPages
                 case "NewAppWindow":
                     isProcessKept = Provider.IsProcessKept;
                     DesktopWindow window = await (IsCoreWindow
-                        ? WindowHelper.CreateDesktopWindowAsync(OnLaunched)
-                        : DispatcherQueue.CreateDesktopWindowAsync(OnLaunched)).ConfigureAwait(false);
+                        ? WindowHelper.CreateWindowAsync(OnLaunched)
+                        : DispatcherQueue.CreateWindowAsync(OnLaunched)).ConfigureAwait(false);
                     void OnLaunched(DesktopWindowXamlSource source)
                     {
                         Frame _frame = new();

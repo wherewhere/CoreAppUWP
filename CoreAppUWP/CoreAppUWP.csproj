@@ -6,6 +6,7 @@
     <CsWinRTIncludes>CoreAppUWP.WinRT</CsWinRTIncludes>
     <DefineConstants>DISABLE_XAML_GENERATED_MAIN</DefineConstants>
     <EnableMsixTooling>True</EnableMsixTooling>
+    <NoWarn>$(NoWarn);NU1902;NU1903;NU1904</NoWarn>
     <OutputType>WinExe</OutputType>
     <Platforms>x86;x64;ARM64</Platforms>
     <PublishProfile>win10-$(Platform).pubxml</PublishProfile>
