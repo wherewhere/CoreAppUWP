@@ -97,9 +97,10 @@ namespace CoreAppUWP
                 SynchronizationContext.SetSynchronizationContext(new CoreDispatcherSynchronizationContext(window.Dispatcher));
             }
 
+            RegisterExceptionHandlingSynchronizationContext();
+
             if (!isLoaded)
             {
-                RegisterExceptionHandlingSynchronizationContext();
                 SettingsHelper.CreateLogManager();
                 isLoaded = true;
             }

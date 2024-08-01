@@ -57,7 +57,7 @@ namespace CoreAppUWP.Helpers.Triggers
         /// Identifies the <see cref="To"/> DependencyProperty
         /// </summary>
         public static readonly DependencyProperty ToProperty =
-                    DependencyProperty.Register(nameof(To), typeof(object), typeof(IsEqualStateTrigger), new PropertyMetadata(null, OnValuePropertyChanged));
+            DependencyProperty.Register(nameof(To), typeof(object), typeof(IsEqualStateTrigger), new PropertyMetadata(null, OnValuePropertyChanged));
 
         internal static bool AreValuesEqual(object value1, object value2, bool convertType)
         {

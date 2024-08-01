@@ -4,8 +4,11 @@ CW_USEDEFAULT
 ICON_BIG
 IDC_ARROW
 SHOW_WINDOW_CMD
+SIZE_RESTORED
+SIZE_MAXIMIZED
 SIZE_MINIMIZED
 SYS_COLOR_INDEX
+WM_CLOSE
 WM_CREATE
 WM_DESTROY
 WM_PAINT
@@ -34,6 +37,8 @@ GetCurrentThread
 GetCurrentThreadId
 GetModuleHandle
 GetStockObject
+GetWindowText
+GetWindowTextLength
 LoadCursor
 LoadImage
 PeekMessage

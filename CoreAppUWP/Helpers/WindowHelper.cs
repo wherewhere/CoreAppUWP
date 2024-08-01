@@ -54,8 +54,12 @@ namespace CoreAppUWP.Helpers
             return (newWindow, newFrame);
         }
 
-        public static Task<DesktopWindow> CreateWindowAsync(Action<DesktopWindowXamlSource> launched) =>
-            DesktopWindow.CreateAsync(launched);
+        public static async Task<DesktopWindow> CreateWindowAsync(Action<DesktopWindowXamlSource> launched)
+        {
+            DesktopWindow newWindow = await DesktopWindow.CreateAsync(launched).ConfigureAwait(false);
+            TrackWindow(newWindow);
+            return newWindow;
+        }
 
         public static void TrackWindow(this Window window)
         {
@@ -69,6 +73,19 @@ namespace CoreAppUWP.Helpers
                     window = null;
                 };
                 ActiveWindows[window.Dispatcher] = window;
+            }
+        }
+
+        public static void TrackWindow(this DesktopWindow window)
+        {
+            if (!ActiveDesktopWindows.ContainsKey(window.Dispatcher))
+            {
+                window.Closed += (sender, args) =>
+                {
+                    ActiveDesktopWindows.Remove(window.Dispatcher);
+                    window = null;
+                };
+                ActiveDesktopWindows[window.Dispatcher] = window;
             }
         }
 
@@ -127,7 +144,7 @@ namespace CoreAppUWP.Helpers
         }
 
         public static Dictionary<CoreDispatcher, Window> ActiveWindows { get; } = [];
-
+        public static Dictionary<CoreDispatcher, DesktopWindow> ActiveDesktopWindows { get; } = [];
         [SupportedOSPlatform("Windows10.0.18362.0")]
         public static Dictionary<CoreDispatcher, Dictionary<XamlRoot, AppWindow>> ActiveAppWindows { get; } = IsAppWindowSupported ? [] : null;
     }

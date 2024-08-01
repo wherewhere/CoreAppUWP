@@ -1,4 +1,5 @@
 ﻿using CoreAppUWP.Common;
+using CoreAppUWP.Controls;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -148,6 +149,15 @@ namespace CoreAppUWP.Helpers
                 }
             });
 
+            WindowHelper.ActiveDesktopWindows.Values.ForEach(async window =>
+            {
+                await window.Dispatcher.ResumeForegroundAsync();
+                if (window.Content is FrameworkElement rootElement)
+                {
+                    rootElement.RequestedTheme = value;
+                }
+            });
+
             SettingsHelper.Set(SettingsHelper.SelectedAppTheme, value);
             UpdateSystemCaptionButtonColors();
             InvokeUISettingChanged(await IsDarkThemeAsync() ? UISettingChangedType.DarkMode : UISettingChangedType.LightMode);
@@ -170,6 +180,15 @@ namespace CoreAppUWP.Helpers
                     {
                         element.RequestedTheme = value;
                     }
+                }
+            }));
+
+            await Task.WhenAll(WindowHelper.ActiveDesktopWindows.Values.Select(async window =>
+            {
+                await window.Dispatcher.ResumeForegroundAsync();
+                if (window.Content is FrameworkElement rootElement)
+                {
+                    rootElement.RequestedTheme = value;
                 }
             }));
 
@@ -207,6 +226,22 @@ namespace CoreAppUWP.Helpers
                 rootElement.RequestedTheme = await GetActualThemeAsync();
             }
             UpdateSystemCaptionButtonColors(window);
+        }
+
+        public static async void Initialize(DesktopWindow window)
+        {
+            if (window?.Content is FrameworkElement rootElement)
+            {
+                rootElement.RequestedTheme = await GetActualThemeAsync();
+            }
+        }
+
+        public static async void Initialize(FrameworkElement rootElement)
+        {
+            if (rootElement != null)
+            {
+                rootElement.RequestedTheme = await GetActualThemeAsync();
+            }
         }
 
         [SupportedOSPlatform("Windows10.0.18362.0")]

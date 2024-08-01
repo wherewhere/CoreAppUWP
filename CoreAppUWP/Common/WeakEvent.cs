@@ -6,7 +6,7 @@ using System.Reflection;
 
 namespace CoreAppUWP.Common
 {
-    public class WeakEvent<TEventArgs> : IList<Action<TEventArgs>>
+    public partial class WeakEvent<TEventArgs> : IList<Action<TEventArgs>>
     {
         private class Method(Action<TEventArgs> callback) : IEquatable<Method>, IEquatable<Action<TEventArgs>>
         {

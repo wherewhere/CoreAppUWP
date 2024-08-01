@@ -107,12 +107,13 @@ namespace CoreAppUWP.Pages.SettingsPages
                     SearchPane.GetForCurrentView().Show();
                     break;
                 case "NewWin32Window":
-                    DesktopWindow window = await WindowHelper.CreateWindowAsync(OnLaunched);
+                    DesktopWindow window = await WindowHelper.CreateWindowAsync(OnLaunched).ConfigureAwait(false);
                     static void OnLaunched(DesktopWindowXamlSource source)
                     {
                         Frame _frame = new();
                         source.Content = _frame;
                         _ = _frame.Navigate(typeof(MainPage), null, new DrillInNavigationTransitionInfo());
+                        ThemeHelper.Initialize(_frame);
                     }
                     window.Title = Package.Current.DisplayName;
                     window.SetIcon("favicon.ico");
