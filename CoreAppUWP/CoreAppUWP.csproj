@@ -4,6 +4,7 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <BuiltInComInteropSupport>True</BuiltInComInteropSupport>
     <EnableMsixTooling>True</EnableMsixTooling>
+    <IsAotCompatible>True</IsAotCompatible>
     <LangVersion>latest</LangVersion>
     <OutputType>WinExe</OutputType>
     <Platforms>x86;x64;ARM64</Platforms>
@@ -15,6 +16,12 @@
     <VersionPrefix>0.0.1</VersionPrefix>
     <WindowsSdkPackageVersion>10.0.22621.42</WindowsSdkPackageVersion>
   </PropertyGroup>
+
+  <!-- Temporary workaround, remove when https://github.com/dotnet/sdk/pull/41936 is available in the .NET SDK -->
+  <ItemGroup>
+    <CompilerVisibleProperty Include="CsWinRTUseWindowsUIXamlProjections" />
+    <RuntimeHostConfigurationOption Include="CSWINRT_USE_WINDOWS_UI_XAML_PROJECTIONS" Value="$(CsWinRTUseWindowsUIXamlProjections)" Trim="true" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Detours.Win32Metadata" Version="4.0.1.16" />

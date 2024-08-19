@@ -58,11 +58,7 @@ namespace CoreAppUWP.Helpers
         {
             bool => JsonSerializer.Serialize(value, SourceGenerationContext.Default.Boolean),
             ElementTheme => JsonSerializer.Serialize(value, SourceGenerationContext.Default.ElementTheme),
-#if DEBUG
-            _ => JsonSerializer.Serialize(value)
-#else
             _ => value?.ToString(),
-#endif
         };
 
         public static T Deserialize<T>(string value)
@@ -73,11 +69,7 @@ namespace CoreAppUWP.Helpers
                 ? @bool
                 : type == typeof(ElementTheme) && JsonSerializer.Deserialize(value, SourceGenerationContext.Default.ElementTheme) is T ElementTheme
                     ? ElementTheme
-#if DEBUG
-                    : JsonSerializer.Deserialize<T>(value);
-#else
                     : default;
-#endif
         }
     }
 
