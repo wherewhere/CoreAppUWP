@@ -201,14 +201,10 @@ namespace CoreAppUWP
         }
 
         /// <summary>
-        /// Should be called from OnActivated and OnLaunched
+        /// Should be called from OnActivated and OnLaunched.
         /// </summary>
-        private static void RegisterExceptionHandlingSynchronizationContext()
-        {
-            ExceptionHandlingSynchronizationContext
-                .Register()
-                .UnhandledException += SynchronizationContext_UnhandledException;
-        }
+        private static void RegisterExceptionHandlingSynchronizationContext() =>
+            ExceptionHandlingSynchronizationContext.Register(SynchronizationContext_UnhandledException);
 
         private static void SynchronizationContext_UnhandledException(object sender, Common.UnhandledExceptionEventArgs e)
         {
