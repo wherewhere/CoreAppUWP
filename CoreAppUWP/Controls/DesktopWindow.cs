@@ -232,7 +232,7 @@ namespace CoreAppUWP.Controls
                                                     // then the window manager calls ShowWindow with that value as the nCmdShow parameter
                 int.MinValue,                       // default width
                 int.MinValue,                       // default height
-                new HWND(),                          // no owner window
+                new HWND(),                         // no owner window
                 null,                               // use class menu
                 new DefaultSafeHandle(g_hInstance),
                 null);

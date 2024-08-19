@@ -11,7 +11,17 @@ using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media.Animation;
 using Windows.UI.Xaml.Navigation;
-using muxc = Microsoft.UI.Xaml.Controls;
+#region using muxc = Microsoft.UI.Xaml.Controls;
+using NavigationView = Microsoft.UI.Xaml.Controls.NavigationView;
+using NavigationViewBackButtonVisible = Microsoft.UI.Xaml.Controls.NavigationViewBackButtonVisible;
+using NavigationViewBackRequestedEventArgs = Microsoft.UI.Xaml.Controls.NavigationViewBackRequestedEventArgs;
+using NavigationViewDisplayMode = Microsoft.UI.Xaml.Controls.NavigationViewDisplayMode;
+using NavigationViewDisplayModeChangedEventArgs = Microsoft.UI.Xaml.Controls.NavigationViewDisplayModeChangedEventArgs;
+using NavigationViewItem = Microsoft.UI.Xaml.Controls.NavigationViewItem;
+using NavigationViewItemInvokedEventArgs = Microsoft.UI.Xaml.Controls.NavigationViewItemInvokedEventArgs;
+using NavigationViewPaneClosingEventArgs = Microsoft.UI.Xaml.Controls.NavigationViewPaneClosingEventArgs;
+using NavigationViewPaneDisplayMode = Microsoft.UI.Xaml.Controls.NavigationViewPaneDisplayMode;
+#endregion
 
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -30,15 +40,13 @@ namespace CoreAppUWP.Pages
         public MainPage()
         {
             InitializeComponent();
-            NavigationView.PaneDisplayMode = muxc.NavigationViewPaneDisplayMode.Left;
+            NavigationView.PaneDisplayMode = NavigationViewPaneDisplayMode.Left;
         }
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
             NavigationView_Navigate("Home", new EntranceNavigationTransitionInfo());
-            if (ApiInformation.IsMethodPresent("Windows.UI.Composition.Compositor", "TryCreateBlurredWallpaperBackdropBrush"))
-            { BackdropMaterial.SetApplyToRootOrPageBackground(this, true); }
         }
 
         protected override void OnNavigatedFrom(NavigationEventArgs e)
@@ -57,7 +65,12 @@ namespace CoreAppUWP.Pages
         {
             if (!this.IsAppWindow())
             {
-                try { Window.Current.SetTitleBar(DragRegion); }
+                try
+                {
+                    Window.Current.SetTitleBar(DragRegion);
+                    if (ApiInformation.IsMethodPresent("Windows.UI.Composition.Compositor", "TryCreateBlurredWallpaperBackdropBrush"))
+                    { BackdropMaterial.SetApplyToRootOrPageBackground(this, true); }
+                }
                 catch (Exception ex) { SettingsHelper.LogManager.GetLogger(nameof(MainPage)).Error(ex.ExceptionToMessage()); }
                 SystemNavigationManager.GetForCurrentView().BackRequested += System_BackRequested;
                 CoreApplication.GetCurrentView().TitleBar.LayoutMetricsChanged += TitleBar_LayoutMetricsChanged;
@@ -74,7 +87,7 @@ namespace CoreAppUWP.Pages
             // Add handler for ContentFrame navigation.
             NavigationViewFrame.Navigated += On_Navigated;
             NavigationView.SelectedItem = NavigationView.MenuItems[0];
-            NavigationView.PaneDisplayMode = muxc.NavigationViewPaneDisplayMode.Auto;
+            NavigationView.PaneDisplayMode = NavigationViewPaneDisplayMode.Auto;
         }
 
         private void NavigationView_Navigate(string NavItemTag, NavigationTransitionInfo TransitionInfo, object vs = null)
@@ -94,9 +107,9 @@ namespace CoreAppUWP.Pages
             }
         }
 
-        private void NavigationView_BackRequested(muxc.NavigationView sender, muxc.NavigationViewBackRequestedEventArgs args) => _ = TryGoBack();
+        private void NavigationView_BackRequested(NavigationView sender, NavigationViewBackRequestedEventArgs args) => _ = TryGoBack();
 
-        private void NavigationView_ItemInvoked(muxc.NavigationView sender, muxc.NavigationViewItemInvokedEventArgs args)
+        private void NavigationView_ItemInvoked(NavigationView sender, NavigationViewItemInvokedEventArgs args)
         {
             if (args.IsSettingsInvoked)
             {
@@ -116,8 +129,8 @@ namespace CoreAppUWP.Pages
 
             // Don't go back if the nav pane is overlayed.
             if (NavigationView.IsPaneOpen &&
-                (NavigationView.DisplayMode == muxc.NavigationViewDisplayMode.Compact ||
-                 NavigationView.DisplayMode == muxc.NavigationViewDisplayMode.Minimal))
+                (NavigationView.DisplayMode == NavigationViewDisplayMode.Compact ||
+                 NavigationView.DisplayMode == NavigationViewDisplayMode.Minimal))
             { return false; }
 
             NavigationViewFrame.GoBack();
@@ -131,48 +144,48 @@ namespace CoreAppUWP.Pages
             if (NavigationViewFrame.SourcePageType == typeof(SettingsPage))
             {
                 // SettingsItem is not part of NavView.MenuItems, and doesn't have a Tag.
-                NavigationView.SelectedItem = (muxc.NavigationViewItem)NavigationView.SettingsItem;
+                NavigationView.SelectedItem = (NavigationViewItem)NavigationView.SettingsItem;
             }
             else if (NavigationViewFrame.SourcePageType != null)
             {
                 (string Tag, Type Page) item = _pages.FirstOrDefault(p => p.Page == e.SourcePageType);
                 if (item.Tag != null)
                 {
-                    muxc.NavigationViewItem SelectedItem = NavigationView.MenuItems
-                        .OfType<muxc.NavigationViewItem>()
+                    NavigationViewItem SelectedItem = NavigationView.MenuItems
+                        .OfType<NavigationViewItem>()
                         .FirstOrDefault(n => n.Tag.Equals(item.Tag))
                             ?? NavigationView.FooterMenuItems
-                                .OfType<muxc.NavigationViewItem>()
+                                .OfType<NavigationViewItem>()
                                 .FirstOrDefault(n => n.Tag.Equals(item.Tag));
                     NavigationView.SelectedItem = SelectedItem;
                 }
             }
         }
 
-        private void NavigationViewControl_PaneClosing(muxc.NavigationView sender, muxc.NavigationViewPaneClosingEventArgs args)
+        private void NavigationViewControl_PaneClosing(NavigationView sender, NavigationViewPaneClosingEventArgs args)
         {
             UpdateTitlePaddingColumn();
         }
 
-        private void NavigationViewControl_PaneOpening(muxc.NavigationView sender, object args)
+        private void NavigationViewControl_PaneOpening(NavigationView sender, object args)
         {
             UpdateTitlePaddingColumn();
         }
 
-        private void NavigationViewControl_DisplayModeChanged(muxc.NavigationView sender, muxc.NavigationViewDisplayModeChangedEventArgs args)
+        private void NavigationViewControl_DisplayModeChanged(NavigationView sender, NavigationViewDisplayModeChangedEventArgs args)
         {
             UpdateLeftPaddingColumn();
         }
 
         private void UpdateLeftPaddingColumn()
         {
-            LeftPaddingColumn.Width = NavigationView.IsBackButtonVisible == muxc.NavigationViewBackButtonVisible.Collapsed
-                ? NavigationView.DisplayMode == muxc.NavigationViewDisplayMode.Minimal
+            LeftPaddingColumn.Width = NavigationView.IsBackButtonVisible == NavigationViewBackButtonVisible.Collapsed
+                ? NavigationView.DisplayMode == NavigationViewDisplayMode.Minimal
                     ? NavigationView.IsPaneToggleButtonVisible
                         ? new GridLength(48)
                         : new GridLength(0)
                     : new GridLength(0)
-                : NavigationView.DisplayMode == muxc.NavigationViewDisplayMode.Minimal
+                : NavigationView.DisplayMode == NavigationViewDisplayMode.Minimal
                     ? NavigationView.IsPaneToggleButtonVisible
                         ? new GridLength(88)
                         : new GridLength(44)
@@ -183,8 +196,8 @@ namespace CoreAppUWP.Pages
         private void UpdateTitlePaddingColumn()
         {
             TitlePaddingColumn.Width =
-                NavigationView.IsBackButtonVisible != muxc.NavigationViewBackButtonVisible.Collapsed
-                && NavigationView.DisplayMode != muxc.NavigationViewDisplayMode.Minimal
+                NavigationView.IsBackButtonVisible != NavigationViewBackButtonVisible.Collapsed
+                && NavigationView.DisplayMode != NavigationViewDisplayMode.Minimal
                 && !NavigationView.IsPaneOpen
                     ? new GridLength(16)
                     : new GridLength(0);

@@ -15,26 +15,24 @@ namespace CoreAppUWP.Helpers
         public const string SelectedAppTheme = nameof(SelectedAppTheme);
         public const string IsExtendsTitleBar = nameof(IsExtendsTitleBar);
 
-        public static Type Get<Type>(string key) => serializer.Deserialize<Type>(LocalObject.Values[key]?.ToString());
-        public static void Set<Type>(string key, Type value) => LocalObject.Values[key] = serializer.Serialize(value);
+        public static Type Get<Type>(string key) => SystemTextJsonObjectSerializer.Deserialize<Type>(LocalObject.Values[key]?.ToString());
+        public static void Set<Type>(string key, Type value) => LocalObject.Values[key] = SystemTextJsonObjectSerializer.Serialize(value);
 
         public static void SetDefaultSettings()
         {
             if (!LocalObject.Values.ContainsKey(SelectedAppTheme))
             {
-                LocalObject.Values[SelectedAppTheme] = serializer.Serialize(ElementTheme.Default);
+                LocalObject.Values[SelectedAppTheme] = SystemTextJsonObjectSerializer.Serialize(ElementTheme.Default);
             }
             if (!LocalObject.Values.ContainsKey(IsExtendsTitleBar))
             {
-                LocalObject.Values[IsExtendsTitleBar] = serializer.Serialize(true);
+                LocalObject.Values[IsExtendsTitleBar] = SystemTextJsonObjectSerializer.Serialize(true);
             }
         }
     }
 
     public static partial class SettingsHelper
     {
-        private static readonly SystemTextJsonObjectSerializer serializer = new();
-
         public static UISettings UISettings { get; } = new();
         public static ILogManager LogManager { get; private set; }
         public static ApplicationDataContainer LocalObject { get; } = ApplicationData.Current.LocalSettings;
@@ -54,9 +52,9 @@ namespace CoreAppUWP.Helpers
         }
     }
 
-    public class SystemTextJsonObjectSerializer
+    public static class SystemTextJsonObjectSerializer
     {
-        public string Serialize<T>(T value) => value switch
+        public static string Serialize<T>(T value) => value switch
         {
             bool => JsonSerializer.Serialize(value, SourceGenerationContext.Default.Boolean),
             ElementTheme => JsonSerializer.Serialize(value, SourceGenerationContext.Default.ElementTheme),
@@ -67,7 +65,7 @@ namespace CoreAppUWP.Helpers
 #endif
         };
 
-        public T Deserialize<T>(string value)
+        public static T Deserialize<T>(string value)
         {
             if (string.IsNullOrEmpty(value)) { return default; }
             Type type = typeof(T);

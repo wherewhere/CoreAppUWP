@@ -13,18 +13,18 @@
     <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
     <TrimMode>partial</TrimMode>
     <VersionPrefix>0.0.1</VersionPrefix>
-    <WindowsSdkPackageVersion>10.0.22621.37-preview</WindowsSdkPackageVersion>
+    <WindowsSdkPackageVersion>10.0.22621.42</WindowsSdkPackageVersion>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Detours.Win32Metadata" Version="4.0.1.16" />
-    <PackageReference Include="DisposableMemory.ModernNetUAP.WinUI" Version="2.8.6-preview" />
-    <PackageReference Include="DisposableMemory.ModernNetUAP.XamlCompiler" Version="0.1.0-preview3" PrivateAssets="all" />
+    <PackageReference Include="DisposableMemory.ModernNetUAP.WinUI" Version="2.8.6.1" />
+    <PackageReference Include="DisposableMemory.ModernNetUAP.XamlCompiler" Version="0.2.1" PrivateAssets="all" />
     <PackageReference Include="MetroLog.Net6" Version="2.1.0" />
     <PackageReference Include="Microsoft.Windows.CsWin32" Version="0.3.106" PrivateAssets="all">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.Windows.CsWinRT" Version="2.1.0-prerelease.240722.1" />
+    <PackageReference Include="Microsoft.Windows.CsWinRT" Version="2.1.1" />
     <Manifest Include="$(ApplicationManifest)" />
   </ItemGroup>
 
