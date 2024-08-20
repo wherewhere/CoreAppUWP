@@ -30,13 +30,10 @@ namespace CoreAppUWP
                 PWSTR str = new();
                 _ = PInvoke.GetCurrentPackageFullName(ref length, str);
 
-                char[] array = new char[length];
-                fixed (char* ptr = array)
-                {
-                    str = new(ptr);
-                    WIN32_ERROR result = PInvoke.GetCurrentPackageFullName(ref length, str);
-                    return result != WIN32_ERROR.APPMODEL_ERROR_NO_PACKAGE;
-                }
+                char* ptr = stackalloc char[(int)length];
+                str = new(ptr);
+                WIN32_ERROR result = PInvoke.GetCurrentPackageFullName(ref length, str);
+                return result != WIN32_ERROR.APPMODEL_ERROR_NO_PACKAGE;
             }
         }
 
