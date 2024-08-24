@@ -3,15 +3,15 @@
 namespace CoreAppUWP.Controls
 {
     /// <summary>
-    /// AutomationPeer for SettingsCard
+    /// AutomationPeer for <see cref="SettingsCard"/>
     /// </summary>
-    public partial class SettingAutomationPeer : ButtonBaseAutomationPeer
+    public partial class SettingsCardAutomationPeer : ButtonBaseAutomationPeer
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="Setting"/> class.
+        /// Initializes a new instance of the <see cref="SettingsCard"/> class.
         /// </summary>
-        /// <param name="owner">Setting</param>
-        public SettingAutomationPeer(Setting owner) : base(owner)
+        /// <param name="owner"><see cref="SettingsCard"/></param>
+        public SettingsCardAutomationPeer(SettingsCard owner) : base(owner)
         {
         }
 

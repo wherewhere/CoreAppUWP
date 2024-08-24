@@ -37,32 +37,32 @@
                     </TransitionCollection>
                 </StackPanel.ChildrenTransitions>
                 <controls:SettingsGroup Margin="0,-28,0,0" Header="Display">
-                    <controls:Setting Header="Theme" Icon="&#xE790;">
-                        <controls:Setting.Description>
+                    <controls:SettingsCard Header="Theme" HeaderIcon="&#xE790;">
+                        <controls:SettingsCard.Description>
                             <HyperlinkButton
                                 Click="HyperlinkButton_Click"
                                 Content="Windows Color Settings"
                                 Tag="ms-settings:colors"
                                 ToolTipService.ToolTip="{Binding Tag, RelativeSource={RelativeSource Mode=Self}}" />
-                        </controls:Setting.Description>
+                        </controls:SettingsCard.Description>
                         <ComboBox SelectedIndex="{x:Bind Provider.SelectedTheme, Mode=TwoWay}">
                             <ComboBoxItem Content="Dark" />
                             <ComboBoxItem Content="Light" />
                             <ComboBoxItem Content="Windows Default" />
                         </ComboBox>
-                    </controls:Setting>
-                    <controls:Setting
+                    </controls:SettingsCard>
+                    <controls:SettingsCard
                         Description="Extends content into titlebar."
                         Header="TitleBar"
-                        Icon="&#xE737;">
-                        <ToggleSwitch IsOn="{x:Bind Provider.IsExtendsTitleBar, Mode=TwoWay}" Style="{StaticResource ToggleSwitchSettingStyle}" />
-                    </controls:Setting>
+                        HeaderIcon="&#xE737;">
+                        <ToggleSwitch IsOn="{x:Bind Provider.IsExtendsTitleBar, Mode=TwoWay}" Style="{StaticResource RightAlignedCompactToggleSwitchStyle}" />
+                    </controls:SettingsCard>
                 </controls:SettingsGroup>
                 <controls:SettingsGroup Header="Window">
-                    <controls:Setting
+                    <controls:SettingsCard
                         Description="Enter or exit compact overlay."
                         Header="Compact Overlay"
-                        Icon="&#xE944;">
+                        HeaderIcon="&#xE944;">
                         <StackPanel
                             Margin="0,2"
                             Orientation="Horizontal"
@@ -76,11 +76,11 @@
                                 Content="Exit"
                                 Tag="ExitPIP" />
                         </StackPanel>
-                    </controls:Setting>
-                    <controls:Setting
+                    </controls:SettingsCard>
+                    <controls:SettingsCard
                         Description="Enter or exit full screen."
                         Header="Full Screen"
-                        Icon="&#xE9A6;">
+                        HeaderIcon="&#xE9A6;">
                         <StackPanel
                             Margin="0,2"
                             Orientation="Horizontal"
@@ -94,38 +94,35 @@
                                 Content="Exit"
                                 Tag="ExitFullWindow" />
                         </StackPanel>
-                    </controls:Setting>
-                    <controls:SettingExpander
+                    </controls:SettingsCard>
+                    <controls:SettingsExpander
                         Description="Create a new window."
                         Header="Multiple Window"
-                        Icon="&#xE78B;">
-                        <controls:Setting
+                        HeaderIcon="&#xE78B;">
+                        <controls:SettingsCard
                             ActionIcon="&#xE8A7;"
                             Click="Button_Click"
                             Description="Create a new CoreWindow."
                             Header="CoreWindow"
                             IsClickEnabled="True"
-                            Style="{StaticResource ClickableSettingExpanderItemStyle}"
                             Tag="NewWindow" />
-                        <controls:Setting
+                        <controls:SettingsCard
                             ActionIcon="&#xE8A7;"
                             Click="Button_Click"
                             Description="Create a new AppWindow."
                             Header="AppWindow"
                             IsClickEnabled="True"
-                            Style="{StaticResource ClickableSettingExpanderItemStyle}"
                             Tag="NewAppWindow" />
-                        <controls:Setting
+                        <controls:SettingsCard
                             ActionIcon="&#xE8A7;"
                             Click="Button_Click"
                             CornerRadius="{Binding Source={StaticResource ControlCornerRadius}, Converter={StaticResource BottomCornerRadiusFilterConverter}}"
                             Description="Create a new Desktop Window."
                             Header="Win32 Window"
                             IsClickEnabled="True"
-                            Style="{StaticResource ClickableSettingExpanderItemStyle}"
                             Tag="NewWin32Window" />
-                    </controls:SettingExpander>
-                    <controls:Setting
+                    </controls:SettingsExpander>
+                    <controls:SettingsCard
                         x:Name="SettingsFlyoutSettings"
                         x:Load="{x:Bind common:SettingsPaneRegister.IsSettingsPaneSupported}"
                         Click="Button_Click"
@@ -133,7 +130,7 @@
                         Header="Open Settings"
                         IsClickEnabled="True"
                         Tag="SettingsFlyout">
-                        <controls:Setting.Icon>
+                        <controls:SettingsCard.HeaderIcon>
                             <muxc:AnimatedIcon>
                                 <muxc:AnimatedIcon.Source>
                                     <animatedvisuals:AnimatedSettingsVisualSource />
@@ -142,9 +139,9 @@
                                     <muxc:FontIconSource FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE713;" />
                                 </muxc:AnimatedIcon.FallbackIconSource>
                             </muxc:AnimatedIcon>
-                        </controls:Setting.Icon>
-                    </controls:Setting>
-                    <controls:Setting
+                        </controls:SettingsCard.HeaderIcon>
+                    </controls:SettingsCard>
+                    <controls:SettingsCard
                         x:Name="SearchFlyoutSettings"
                         x:Load="{x:Bind common:SettingsPaneRegister.IsSearchPaneSupported}"
                         Click="Button_Click"
@@ -152,7 +149,7 @@
                         Header="Open Search"
                         IsClickEnabled="True"
                         Tag="SearchFlyout">
-                        <controls:Setting.Icon>
+                        <controls:SettingsCard.HeaderIcon>
                             <muxc:AnimatedIcon>
                                 <muxc:AnimatedIcon.Source>
                                     <animatedvisuals:AnimatedFindVisualSource />
@@ -161,14 +158,14 @@
                                     <muxc:FontIconSource FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE721;" />
                                 </muxc:AnimatedIcon.FallbackIconSource>
                             </muxc:AnimatedIcon>
-                        </controls:Setting.Icon>
-                    </controls:Setting>
+                        </controls:SettingsCard.HeaderIcon>
+                    </controls:SettingsCard>
                 </controls:SettingsGroup>
                 <controls:SettingsGroup Header="Configs">
-                    <controls:Setting
+                    <controls:SettingsCard
                         Description="Reset settings of this application."
                         Header="Reset Application"
-                        Icon="&#xE777;">
+                        HeaderIcon="&#xE777;">
                         <Button Name="Reset" Content="Reset">
                             <Button.Flyout>
                                 <Flyout>
@@ -185,16 +182,15 @@
                                 </Flyout>
                             </Button.Flyout>
                         </Button>
-                    </controls:Setting>
-                    <controls:SettingExpander
+                    </controls:SettingsCard>
+                    <controls:SettingsExpander
                         Description="Information about the frameworks of this app."
                         Header="Framework Information"
-                        Icon="&#xE950;">
+                        HeaderIcon="&#xE950;">
                         <Grid
                             Margin="0,0,0,8"
                             ColumnSpacing="32"
-                            RowSpacing="8"
-                            Style="{StaticResource SettingExpanderContentGridStyle}">
+                            RowSpacing="8">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto" />
                                 <ColumnDefinition Width="*" />
@@ -210,7 +206,7 @@
                             <TextBlock
                                 Grid.Row="0"
                                 Grid.Column="0"
-                                Foreground="{ThemeResource SettingCardForeground}"
+                                Foreground="{ThemeResource SettingsCardForeground}"
                                 Text="Device Family" />
                             <TextBlock
                                 Grid.Row="0"
@@ -223,7 +219,7 @@
                             <TextBlock
                                 Grid.Row="1"
                                 Grid.Column="0"
-                                Foreground="{ThemeResource SettingCardForeground}"
+                                Foreground="{ThemeResource SettingsCardForeground}"
                                 Text="Framework" />
                             <TextBlock
                                 Grid.Row="1"
@@ -236,7 +232,7 @@
                             <TextBlock
                                 Grid.Row="2"
                                 Grid.Column="0"
-                                Foreground="{ThemeResource SettingCardForeground}"
+                                Foreground="{ThemeResource SettingsCardForeground}"
                                 Text="CS/WinRT" />
                             <TextBlock
                                 Grid.Row="2"
@@ -249,7 +245,7 @@
                             <TextBlock
                                 Grid.Row="3"
                                 Grid.Column="0"
-                                Foreground="{ThemeResource SettingCardForeground}"
+                                Foreground="{ThemeResource SettingsCardForeground}"
                                 Text="Windows SDK" />
                             <TextBlock
                                 Grid.Row="3"
@@ -262,7 +258,7 @@
                             <TextBlock
                                 Grid.Row="4"
                                 Grid.Column="0"
-                                Foreground="{ThemeResource SettingCardForeground}"
+                                Foreground="{ThemeResource SettingsCardForeground}"
                                 Text="OS Platform" />
                             <TextBlock
                                 Grid.Row="4"
@@ -275,7 +271,7 @@
                             <TextBlock
                                 Grid.Row="5"
                                 Grid.Column="0"
-                                Foreground="{ThemeResource SettingCardForeground}"
+                                Foreground="{ThemeResource SettingsCardForeground}"
                                 Text="OS Architecture" />
                             <TextBlock
                                 Grid.Row="5"
@@ -286,14 +282,14 @@
                                 Text="{x:Bind interopservices:RuntimeInformation.OSArchitecture}"
                                 TextWrapping="WrapWholeWords" />
                         </Grid>
-                    </controls:SettingExpander>
+                    </controls:SettingsExpander>
                 </controls:SettingsGroup>
                 <controls:SettingsGroup Header="About">
-                    <controls:SettingExpander Header="{x:Bind settingspages:SettingsViewModel.VersionTextBlockText, Mode=OneWay}">
-                        <controls:SettingExpander.Icon>
+                    <controls:SettingsExpander Header="{x:Bind settingspages:SettingsViewModel.VersionTextBlockText, Mode=OneWay}">
+                        <controls:SettingsExpander.HeaderIcon>
                             <controls:AppLogo FontFamily="{StaticResource ContentControlThemeFontFamily}" />
-                        </controls:SettingExpander.Icon>
-                        <controls:SettingExpander.Description>
+                        </controls:SettingsExpander.HeaderIcon>
+                        <controls:SettingsExpander.Description>
                             <ScrollViewer
                                 HorizontalScrollBarVisibility="Hidden"
                                 HorizontalScrollMode="Auto"
@@ -314,8 +310,8 @@
                                         ToolTipService.ToolTip="{Binding NavigateUri, RelativeSource={RelativeSource Mode=Self}}" />
                                 </StackPanel>
                             </ScrollViewer>
-                        </controls:SettingExpander.Description>
-                        <Grid Style="{StaticResource SettingExpanderContentGridStyle}">
+                        </controls:SettingsExpander.Description>
+                        <Grid>
                             <TextBlock
                                 x:Name="AboutTextBlock"
                                 HorizontalAlignment="Left"
@@ -323,7 +319,7 @@
                                 Text="{x:Bind Provider.AboutTextBlockText, Mode=OneWay}"
                                 TextWrapping="Wrap" />
                         </Grid>
-                    </controls:SettingExpander>
+                    </controls:SettingsExpander>
                 </controls:SettingsGroup>
             </StackPanel>
         </ScrollViewer>

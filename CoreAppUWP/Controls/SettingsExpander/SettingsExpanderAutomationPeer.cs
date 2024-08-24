@@ -3,15 +3,15 @@
 namespace CoreAppUWP.Controls
 {
     /// <summary>
-    /// AutomationPeer for SettingExpander
+    /// AutomationPeer for <see cref="SettingsExpander"/>
     /// </summary>
-    public partial class SettingExpanderAutomationPeer : ItemsControlAutomationPeer
+    public partial class SettingsExpanderAutomationPeer : ItemsControlAutomationPeer
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="SettingExpander"/> class.
+        /// Initializes a new instance of the <see cref="SettingsExpander"/> class.
         /// </summary>
-        /// <param name="owner">SettingExpander</param>
-        public SettingExpanderAutomationPeer(SettingExpander owner) : base(owner)
+        /// <param name="owner"><see cref="SettingsExpander"/></param>
+        public SettingsExpanderAutomationPeer(SettingsExpander owner) : base(owner)
         {
         }
 

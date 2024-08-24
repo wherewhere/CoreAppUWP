@@ -33,7 +33,6 @@ namespace CoreAppUWP.Helpers
 
     public static partial class SettingsHelper
     {
-        public static UISettings UISettings { get; } = new();
         public static ILogManager LogManager { get; private set; }
         public static ApplicationDataContainer LocalObject { get; } = ApplicationData.Current.LocalSettings;
 
