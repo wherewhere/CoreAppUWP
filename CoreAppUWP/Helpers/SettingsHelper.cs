@@ -1,5 +1,4 @@
-﻿using CommunityToolkit.WinUI.Helpers;
-using MetroLog;
+﻿using MetroLog;
 using MetroLog.Targets;
 using Microsoft.UI.Xaml;
 using System;
@@ -8,7 +7,6 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Windows.Storage;
-using Windows.UI.ViewManagement;
 using IObjectSerializer = CommunityToolkit.Common.Helpers.IObjectSerializer;
 
 namespace CoreAppUWP.Helpers
@@ -43,9 +41,7 @@ namespace CoreAppUWP.Helpers
 
     public static partial class SettingsHelper
     {
-        public static UISettings UISettings { get; } = new();
         public static ILogManager LogManager { get; private set; }
-        public static OSVersion OperatingSystemVersion => SystemInformation.Instance.OperatingSystemVersion;
         public static ApplicationDataStorageHelper LocalObject { get; } = ApplicationDataStorageHelper.GetCurrent(new SystemTextJsonObjectSerializer());
 
         static SettingsHelper() => SetDefaultSettings();

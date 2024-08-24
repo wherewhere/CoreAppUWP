@@ -6,6 +6,7 @@ using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using Windows.UI;
 using WinRT; // required to support Window.As<ICompositionSupportsSystemBackdrop>()
 
@@ -345,5 +346,60 @@ namespace CoreAppUWP.Helpers
 
         public static Dictionary<Window, BackdropHelper<Window>> ActiveWindows { get; } = [];
         public static Dictionary<DesktopWindow, BackdropHelper<DesktopWindow>> ActiveDesktopWindows { get; } = [];
+    }
+
+    public partial class WindowsSystemDispatcherQueueHelper
+    {
+        /// <summary>
+        /// Specifies the threading and apartment type for a new DispatcherQueueController.
+        /// </summary>
+        /// <remarks>Introduced in Windows 10, version 1709.</remarks>
+        [StructLayout(LayoutKind.Sequential)]
+        private struct DispatcherQueueOptions
+        {
+            /// <summary>
+            /// Size of this <see cref="DispatcherQueueOptions"/> structure.
+            /// </summary>
+            public int DWSize;
+
+            /// <summary>
+            /// Thread affinity for the created <a href="https://docs.microsoft.com/uwp/api/windows.system.dispatcherqueuecontroller">DispatcherQueueController</a>.
+            /// </summary>
+            public int ThreadType;
+
+            /// <summary>
+            /// Specifies whether to initialize COM apartment on the new thread as an application single-threaded apartment (ASTA)
+            /// or single-threaded apartment (STA). This field is only relevant if <b>threadType</b> is <b>DQTYPE_THREAD_DEDICATED</b>.
+            /// Use <b>DQTAT_COM_NONE</b> when <b>DispatcherQueueOptions.threadType</b> is <b>DQTYPE_THREAD_CURRENT</b>.
+            /// </summary>
+            public int ApartmentType;
+        }
+
+        [LibraryImport("CoreMessaging.dll")]
+        private static unsafe partial int CreateDispatcherQueueController(DispatcherQueueOptions options, out nint instance);
+
+        private nint m_dispatcherQueueController = 0;
+        public void EnsureWindowsSystemDispatcherQueueController()
+        {
+            if (Windows.System.DispatcherQueue.GetForCurrentThread() != null)
+            {
+                // one already exists, so we'll just use it.
+                return;
+            }
+
+            if (m_dispatcherQueueController == 0)
+            {
+                DispatcherQueueOptions options;
+                options.DWSize = Marshal.SizeOf(typeof(DispatcherQueueOptions));
+                options.ThreadType = 2;     // DQTYPE_THREAD_CURRENT
+                options.ApartmentType = 2;  // DQTAT_COM_STA
+
+                unsafe
+                {
+                    _ = CreateDispatcherQueueController(options, out nint dispatcherQueueController);
+                    m_dispatcherQueueController = dispatcherQueueController;
+                }
+            }
+        }
     }
 }

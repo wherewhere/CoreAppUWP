@@ -44,7 +44,7 @@ namespace CoreAppUWP
                 try
                 {
                     RegistryKey registryKey = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\WinUI\Xaml");
-                    return registryKey?.GetValue("EnableUWPWindow") is int value && value > 0;
+                    return registryKey?.GetValue("EnableUWPWindow") is > 0;
                 }
                 catch
                 {

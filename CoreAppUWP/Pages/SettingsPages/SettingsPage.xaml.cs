@@ -1,4 +1,3 @@
-using CommunityToolkit.WinUI.UI.Controls;
 using CoreAppUWP.Common;
 using CoreAppUWP.Controls;
 using CoreAppUWP.Helpers;
@@ -173,7 +172,5 @@ namespace CoreAppUWP.Pages.SettingsPages
         }
 
         public Task Refresh(bool reset = false) => Provider.Refresh(reset);
-
-        private void MarkdownText_LinkClicked(object sender, LinkClickedEventArgs e) => _ = Launcher.LaunchUriAsync(new Uri(e.Link));
     }
 }

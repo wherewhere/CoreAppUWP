@@ -3,11 +3,13 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:animatedvisuals="using:Microsoft.UI.Xaml.Controls.AnimatedVisuals"
+    xmlns:clwm="using:CommunityToolkit.Labs.WinUI.MarkdownTextBlock"
     xmlns:common="using:CoreAppUWP.Common"
     xmlns:controls="using:CoreAppUWP.Controls"
-    xmlns:converters="using:CommunityToolkit.WinUI.UI.Converters"
-    xmlns:cwuc="using:CommunityToolkit.WinUI.UI.Controls"
+    xmlns:converters="using:CommunityToolkit.WinUI.Converters"
+    xmlns:cwuc="using:CommunityToolkit.WinUI.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:helpers="using:CoreAppUWP.Helpers"
     xmlns:interopservices="using:System.Runtime.InteropServices"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:settingspages="using:CoreAppUWP.ViewModels.SettingsPages"
@@ -41,43 +43,46 @@
                     </TransitionCollection>
                 </StackPanel.ChildrenTransitions>
                 <controls:SettingsGroup Margin="0,-28,0,0" Header="Display">
-                    <controls:Setting Header="Theme" Icon="&#xE790;">
-                        <controls:Setting.Description>
+                    <cwuc:SettingsCard Header="Theme">
+                        <cwuc:SettingsCard.HeaderIcon>
+                            <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE790;" />
+                        </cwuc:SettingsCard.HeaderIcon>
+                        <cwuc:SettingsCard.Description>
                             <HyperlinkButton
                                 Click="HyperlinkButton_Click"
                                 Content="Windows Color Settings"
                                 Tag="ms-settings:colors"
                                 ToolTipService.ToolTip="{Binding Tag, RelativeSource={RelativeSource Mode=Self}}" />
-                        </controls:Setting.Description>
+                        </cwuc:SettingsCard.Description>
                         <ComboBox SelectedIndex="{x:Bind Provider.SelectedTheme, Mode=TwoWay}">
                             <ComboBoxItem Content="Dark" />
                             <ComboBoxItem Content="Light" />
                             <ComboBoxItem Content="Windows Default" />
                         </ComboBox>
-                    </controls:Setting>
-                    <controls:Setting
-                        Description="Select backdrop type for Windows 11"
-                        Header="Backdrop"
-                        Icon="&#xE81E;">
+                    </cwuc:SettingsCard>
+                    <cwuc:SettingsCard Description="Select backdrop type for Windows 11" Header="Backdrop">
+                        <cwuc:SettingsCard.HeaderIcon>
+                            <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE81E;" />
+                        </cwuc:SettingsCard.HeaderIcon>
                         <ComboBox SelectedIndex="{x:Bind Provider.SelectedBackdrop, Mode=TwoWay}">
                             <x:String>Mica</x:String>
                             <x:String>MicaAlt</x:String>
                             <x:String>Acrylic</x:String>
                             <x:String>DefaultColor</x:String>
                         </ComboBox>
-                    </controls:Setting>
-                    <controls:Setting
-                        Description="Extends content into titlebar."
-                        Header="TitleBar"
-                        Icon="&#xE737;">
-                        <ToggleSwitch IsOn="{x:Bind Provider.IsExtendsTitleBar, Mode=TwoWay}" Style="{StaticResource ToggleSwitchSettingStyle}" />
-                    </controls:Setting>
+                    </cwuc:SettingsCard>
+                    <cwuc:SettingsCard Description="Extends content into titlebar." Header="TitleBar">
+                        <cwuc:SettingsCard.HeaderIcon>
+                            <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE737;" />
+                        </cwuc:SettingsCard.HeaderIcon>
+                        <ToggleSwitch IsOn="{x:Bind Provider.IsExtendsTitleBar, Mode=TwoWay}" />
+                    </cwuc:SettingsCard>
                 </controls:SettingsGroup>
                 <controls:SettingsGroup Header="Window">
-                    <controls:Setting
-                        Description="Enter or exit compact overlay."
-                        Header="Compact Overlay"
-                        Icon="&#xE944;">
+                    <cwuc:SettingsCard Description="Enter or exit compact overlay." Header="Compact Overlay">
+                        <cwuc:SettingsCard.HeaderIcon>
+                            <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE944;" />
+                        </cwuc:SettingsCard.HeaderIcon>
                         <StackPanel
                             Margin="0,2"
                             Orientation="Horizontal"
@@ -91,11 +96,11 @@
                                 Content="Exit"
                                 Tag="ExitPIP" />
                         </StackPanel>
-                    </controls:Setting>
-                    <controls:Setting
-                        Description="Enter or exit full screen."
-                        Header="Full Screen"
-                        Icon="&#xE9A6;">
+                    </cwuc:SettingsCard>
+                    <cwuc:SettingsCard Description="Enter or exit full screen." Header="Full Screen">
+                        <cwuc:SettingsCard.HeaderIcon>
+                            <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE9A6;" />
+                        </cwuc:SettingsCard.HeaderIcon>
                         <StackPanel
                             Margin="0,2"
                             Orientation="Horizontal"
@@ -109,30 +114,36 @@
                                 Content="Exit"
                                 Tag="ExitFullWindow" />
                         </StackPanel>
-                    </controls:Setting>
-                    <controls:SettingExpander
-                        Description="Create a new window."
-                        Header="Multiple Window"
-                        Icon="&#xE78B;">
-                        <controls:Setting
-                            ActionIcon="&#xE8A7;"
-                            Click="Button_Click"
-                            Description="Create a new CoreWindow."
-                            Header="CoreWindow"
-                            IsClickEnabled="True"
-                            Style="{StaticResource ClickableSettingExpanderItemStyle}"
-                            Tag="NewWindow" />
-                        <controls:Setting
-                            ActionIcon="&#xE8A7;"
-                            Click="Button_Click"
-                            CornerRadius="{Binding Source={StaticResource ControlCornerRadius}, Converter={StaticResource BottomCornerRadiusFilterConverter}}"
-                            Description="Create a new AppWindow."
-                            Header="Desktop Window"
-                            IsClickEnabled="True"
-                            Style="{StaticResource ClickableSettingExpanderItemStyle}"
-                            Tag="NewAppWindow" />
-                    </controls:SettingExpander>
-                    <controls:Setting
+                    </cwuc:SettingsCard>
+                    <cwuc:SettingsExpander Description="Create a new window." Header="Multiple Window">
+                        <cwuc:SettingsExpander.HeaderIcon>
+                            <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE78B;" />
+                        </cwuc:SettingsExpander.HeaderIcon>
+                        <cwuc:SettingsExpander.Items>
+                            <cwuc:SettingsCard
+                                Click="Button_Click"
+                                Description="Create a new CoreWindow."
+                                Header="CoreWindow"
+                                IsClickEnabled="True"
+                                Tag="NewWindow">
+                                <cwuc:SettingsCard.ActionIcon>
+                                    <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE8A7;" />
+                                </cwuc:SettingsCard.ActionIcon>
+                            </cwuc:SettingsCard>
+                            <cwuc:SettingsCard
+                                Click="Button_Click"
+                                CornerRadius="{Binding Source={StaticResource ControlCornerRadius}, Converter={StaticResource BottomCornerRadiusFilterConverter}}"
+                                Description="Create a new AppWindow."
+                                Header="Desktop Window"
+                                IsClickEnabled="True"
+                                Tag="NewAppWindow">
+                                <cwuc:SettingsCard.ActionIcon>
+                                    <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE8A7;" />
+                                </cwuc:SettingsCard.ActionIcon>
+                            </cwuc:SettingsCard>
+                        </cwuc:SettingsExpander.Items>
+                    </cwuc:SettingsExpander>
+                    <cwuc:SettingsCard
                         x:Name="SettingsFlyoutSettings"
                         x:Load="{x:Bind common:SettingsPaneRegister.IsSettingsPaneSupported}"
                         Click="Button_Click"
@@ -141,7 +152,7 @@
                         IsClickEnabled="True"
                         IsEnabled="{x:Bind IsCoreWindow}"
                         Tag="SettingsFlyout">
-                        <controls:Setting.Icon>
+                        <cwuc:SettingsCard.HeaderIcon>
                             <AnimatedIcon>
                                 <AnimatedIcon.Source>
                                     <animatedvisuals:AnimatedSettingsVisualSource />
@@ -150,9 +161,9 @@
                                     <FontIconSource FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE713;" />
                                 </AnimatedIcon.FallbackIconSource>
                             </AnimatedIcon>
-                        </controls:Setting.Icon>
-                    </controls:Setting>
-                    <controls:Setting
+                        </cwuc:SettingsCard.HeaderIcon>
+                    </cwuc:SettingsCard>
+                    <cwuc:SettingsCard
                         x:Name="SearchFlyoutSettings"
                         x:Load="{x:Bind common:SettingsPaneRegister.IsSearchPaneSupported}"
                         Click="Button_Click"
@@ -161,7 +172,7 @@
                         IsClickEnabled="True"
                         IsEnabled="{x:Bind IsCoreWindow}"
                         Tag="SearchFlyout">
-                        <controls:Setting.Icon>
+                        <cwuc:SettingsCard.HeaderIcon>
                             <AnimatedIcon>
                                 <AnimatedIcon.Source>
                                     <animatedvisuals:AnimatedFindVisualSource />
@@ -170,14 +181,14 @@
                                     <FontIconSource FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE721;" />
                                 </AnimatedIcon.FallbackIconSource>
                             </AnimatedIcon>
-                        </controls:Setting.Icon>
-                    </controls:Setting>
+                        </cwuc:SettingsCard.HeaderIcon>
+                    </cwuc:SettingsCard>
                 </controls:SettingsGroup>
                 <controls:SettingsGroup Header="Configs">
-                    <controls:Setting
-                        Description="Reset settings of this application."
-                        Header="Reset Application"
-                        Icon="&#xE777;">
+                    <cwuc:SettingsCard Description="Reset settings of this application." Header="Reset Application">
+                        <cwuc:SettingsCard.HeaderIcon>
+                            <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE777;" />
+                        </cwuc:SettingsCard.HeaderIcon>
                         <Button Name="Reset" Content="Reset">
                             <Button.Flyout>
                                 <Flyout>
@@ -194,155 +205,161 @@
                                 </Flyout>
                             </Button.Flyout>
                         </Button>
-                    </controls:Setting>
-                    <controls:SettingExpander
+                    </cwuc:SettingsCard>
+                    <cwuc:SettingsExpander
                         Description="Information about the frameworks of this app."
                         Header="Framework Information"
-                        Icon="&#xE950;">
-                        <Grid
-                            Margin="0,0,0,8"
-                            ColumnSpacing="32"
-                            RowSpacing="8"
-                            Style="{StaticResource SettingExpanderContentGridStyle}">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="*" />
-                            </Grid.ColumnDefinitions>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="Auto" />
-                            </Grid.RowDefinitions>
-                            <TextBlock
-                                Grid.Row="0"
-                                Grid.Column="0"
-                                Foreground="{ThemeResource SettingCardForeground}"
-                                Text="Device Family" />
-                            <TextBlock
-                                Grid.Row="0"
-                                Grid.Column="1"
-                                HorizontalAlignment="Left"
-                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                IsTextSelectionEnabled="True"
-                                Text="{x:Bind settingspages:SettingsViewModel.DeviceFamily}"
-                                TextWrapping="WrapWholeWords" />
-                            <TextBlock
-                                Grid.Row="1"
-                                Grid.Column="0"
-                                Foreground="{ThemeResource SettingCardForeground}"
-                                Text="Framework" />
-                            <TextBlock
-                                Grid.Row="1"
-                                Grid.Column="1"
-                                HorizontalAlignment="Left"
-                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                IsTextSelectionEnabled="True"
-                                Text="{x:Bind interopservices:RuntimeInformation.FrameworkDescription}"
-                                TextWrapping="WrapWholeWords" />
-                            <TextBlock
-                                Grid.Row="2"
-                                Grid.Column="0"
-                                Foreground="{ThemeResource SettingCardForeground}"
-                                Text="CS/WinRT" />
-                            <TextBlock
-                                Grid.Row="2"
-                                Grid.Column="1"
-                                HorizontalAlignment="Left"
-                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                IsTextSelectionEnabled="True"
-                                Text="{x:Bind settingspages:SettingsViewModel.WinRTVersion}"
-                                TextWrapping="WrapWholeWords" />
-                            <TextBlock
-                                Grid.Row="3"
-                                Grid.Column="0"
-                                Foreground="{ThemeResource SettingCardForeground}"
-                                Text="Windows SDK" />
-                            <TextBlock
-                                Grid.Row="3"
-                                Grid.Column="1"
-                                HorizontalAlignment="Left"
-                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                IsTextSelectionEnabled="True"
-                                Text="{x:Bind settingspages:SettingsViewModel.SDKVersion}"
-                                TextWrapping="Wrap" />
-                            <TextBlock
-                                Grid.Row="4"
-                                Grid.Column="0"
-                                Foreground="{ThemeResource SettingCardForeground}"
-                                Text="Windows App SDK" />
-                            <TextBlock
-                                Grid.Row="4"
-                                Grid.Column="1"
-                                HorizontalAlignment="Left"
-                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                IsTextSelectionEnabled="True"
-                                Text="{x:Bind settingspages:SettingsViewModel.WASVersion}"
-                                TextWrapping="Wrap" />
-                            <TextBlock
-                                Grid.Row="5"
-                                Grid.Column="0"
-                                Foreground="{ThemeResource SettingCardForeground}"
-                                Text="Community Toolkit" />
-                            <TextBlock
-                                Grid.Row="5"
-                                Grid.Column="1"
-                                HorizontalAlignment="Left"
-                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                IsTextSelectionEnabled="True"
-                                Text="{x:Bind settingspages:SettingsViewModel.ToolkitVersion}"
-                                TextWrapping="WrapWholeWords" />
-                            <TextBlock
-                                Grid.Row="6"
-                                Grid.Column="0"
-                                Foreground="{ThemeResource SettingCardForeground}"
-                                Text="OS Platform" />
-                            <TextBlock
-                                Grid.Row="6"
-                                Grid.Column="1"
-                                HorizontalAlignment="Left"
-                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                IsTextSelectionEnabled="True"
-                                Text="{x:Bind interopservices:RuntimeInformation.OSDescription}"
-                                TextWrapping="Wrap" />
-                            <TextBlock
-                                Grid.Row="7"
-                                Grid.Column="0"
-                                Foreground="{ThemeResource SettingCardForeground}"
-                                Text="OS Architecture" />
-                            <TextBlock
-                                Grid.Row="7"
-                                Grid.Column="1"
-                                HorizontalAlignment="Left"
-                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                IsTextSelectionEnabled="True"
-                                Text="{x:Bind interopservices:RuntimeInformation.OSArchitecture}"
-                                TextWrapping="WrapWholeWords" />
-                        </Grid>
-                    </controls:SettingExpander>
-                    <controls:Setting
+                        ItemContainerStyleSelector="{StaticResource SettingsExpanderItemStyleSelector}">
+                        <cwuc:SettingsExpander.HeaderIcon>
+                            <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE950;" />
+                        </cwuc:SettingsExpander.HeaderIcon>
+                        <cwuc:SettingsExpander.Items>
+                            <Grid
+                                Margin="0,0,0,8"
+                                ColumnSpacing="32"
+                                RowSpacing="8">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+                                <TextBlock
+                                    Grid.Row="0"
+                                    Grid.Column="0"
+                                    Foreground="{ThemeResource TextFillColorPrimaryBrush}"
+                                    Text="Device Family" />
+                                <TextBlock
+                                    Grid.Row="0"
+                                    Grid.Column="1"
+                                    HorizontalAlignment="Left"
+                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                    IsTextSelectionEnabled="True"
+                                    Text="{x:Bind settingspages:SettingsViewModel.DeviceFamily}"
+                                    TextWrapping="WrapWholeWords" />
+                                <TextBlock
+                                    Grid.Row="1"
+                                    Grid.Column="0"
+                                    Foreground="{ThemeResource TextFillColorPrimaryBrush}"
+                                    Text="Framework" />
+                                <TextBlock
+                                    Grid.Row="1"
+                                    Grid.Column="1"
+                                    HorizontalAlignment="Left"
+                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                    IsTextSelectionEnabled="True"
+                                    Text="{x:Bind interopservices:RuntimeInformation.FrameworkDescription}"
+                                    TextWrapping="WrapWholeWords" />
+                                <TextBlock
+                                    Grid.Row="2"
+                                    Grid.Column="0"
+                                    Foreground="{ThemeResource TextFillColorPrimaryBrush}"
+                                    Text="CS/WinRT" />
+                                <TextBlock
+                                    Grid.Row="2"
+                                    Grid.Column="1"
+                                    HorizontalAlignment="Left"
+                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                    IsTextSelectionEnabled="True"
+                                    Text="{x:Bind settingspages:SettingsViewModel.WinRTVersion}"
+                                    TextWrapping="WrapWholeWords" />
+                                <TextBlock
+                                    Grid.Row="3"
+                                    Grid.Column="0"
+                                    Foreground="{ThemeResource TextFillColorPrimaryBrush}"
+                                    Text="Windows SDK" />
+                                <TextBlock
+                                    Grid.Row="3"
+                                    Grid.Column="1"
+                                    HorizontalAlignment="Left"
+                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                    IsTextSelectionEnabled="True"
+                                    Text="{x:Bind settingspages:SettingsViewModel.SDKVersion}"
+                                    TextWrapping="Wrap" />
+                                <TextBlock
+                                    Grid.Row="4"
+                                    Grid.Column="0"
+                                    Foreground="{ThemeResource TextFillColorPrimaryBrush}"
+                                    Text="Windows App SDK" />
+                                <TextBlock
+                                    Grid.Row="4"
+                                    Grid.Column="1"
+                                    HorizontalAlignment="Left"
+                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                    IsTextSelectionEnabled="True"
+                                    Text="{x:Bind settingspages:SettingsViewModel.WASVersion}"
+                                    TextWrapping="Wrap" />
+                                <TextBlock
+                                    Grid.Row="5"
+                                    Grid.Column="0"
+                                    Foreground="{ThemeResource TextFillColorPrimaryBrush}"
+                                    Text="Community Toolkit" />
+                                <TextBlock
+                                    Grid.Row="5"
+                                    Grid.Column="1"
+                                    HorizontalAlignment="Left"
+                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                    IsTextSelectionEnabled="True"
+                                    Text="{x:Bind settingspages:SettingsViewModel.ToolkitVersion}"
+                                    TextWrapping="WrapWholeWords" />
+                                <TextBlock
+                                    Grid.Row="6"
+                                    Grid.Column="0"
+                                    Foreground="{ThemeResource TextFillColorPrimaryBrush}"
+                                    Text="OS Platform" />
+                                <TextBlock
+                                    Grid.Row="6"
+                                    Grid.Column="1"
+                                    HorizontalAlignment="Left"
+                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                    IsTextSelectionEnabled="True"
+                                    Text="{x:Bind interopservices:RuntimeInformation.OSDescription}"
+                                    TextWrapping="Wrap" />
+                                <TextBlock
+                                    Grid.Row="7"
+                                    Grid.Column="0"
+                                    Foreground="{ThemeResource TextFillColorPrimaryBrush}"
+                                    Text="OS Architecture" />
+                                <TextBlock
+                                    Grid.Row="7"
+                                    Grid.Column="1"
+                                    HorizontalAlignment="Left"
+                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                    IsTextSelectionEnabled="True"
+                                    Text="{x:Bind interopservices:RuntimeInformation.OSArchitecture}"
+                                    TextWrapping="WrapWholeWords" />
+                            </Grid>
+                        </cwuc:SettingsExpander.Items>
+                    </cwuc:SettingsExpander>
+                    <cwuc:SettingsCard
                         Click="Button_Click"
                         Description="Keep the process and the application will not exit after CoreWindow is closed."
                         Header="Keep Process"
-                        Icon="&#xE9F5;"
                         IsClickEnabled="True"
                         Tag="KeepProcess">
+                        <cwuc:SettingsCard.HeaderIcon>
+                            <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE9F5;" />
+                        </cwuc:SettingsCard.HeaderIcon>
                         <Grid>
-                            <ToggleSwitch IsOn="{x:Bind Provider.IsProcessKept, Mode=OneWay}" Style="{StaticResource ToggleSwitchSettingStyle}" />
+                            <ToggleSwitch IsOn="{x:Bind Provider.IsProcessKept, Mode=OneWay}" />
                             <Border Background="{ThemeResource SystemControlTransparentBrush}" />
                         </Grid>
-                    </controls:Setting>
+                    </cwuc:SettingsCard>
                 </controls:SettingsGroup>
                 <controls:SettingsGroup Header="About">
-                    <controls:SettingExpander Header="{x:Bind settingspages:SettingsViewModel.VersionTextBlockText, Mode=OneWay}">
-                        <controls:SettingExpander.Icon>
+                    <cwuc:SettingsExpander Header="{x:Bind settingspages:SettingsViewModel.VersionTextBlockText, Mode=OneWay}" ItemContainerStyleSelector="{StaticResource SettingsExpanderItemStyleSelector}">
+                        <helpers:SettingsExpanderHelper.HeaderIcon>
                             <controls:AppLogo FontFamily="{StaticResource ContentControlThemeFontFamily}" />
-                        </controls:SettingExpander.Icon>
-                        <controls:SettingExpander.Description>
+                        </helpers:SettingsExpanderHelper.HeaderIcon>
+                        <cwuc:SettingsExpander.Description>
                             <ScrollViewer
                                 HorizontalScrollBarVisibility="Hidden"
                                 HorizontalScrollMode="Auto"
@@ -365,25 +382,28 @@
                                         ToolTipService.ToolTip="{Binding Tag, RelativeSource={RelativeSource Mode=Self}}" />
                                 </StackPanel>
                             </ScrollViewer>
-                        </controls:SettingExpander.Description>
-                        <Grid Style="{StaticResource SettingExpanderContentGridStyle}">
-                            <cwuc:MarkdownTextBlock
-                                x:Name="AboutMarkdown"
-                                HorizontalAlignment="Left"
-                                x:Load="{x:Bind IsCoreWindow}"
-                                Background="{ThemeResource SystemControlTransparentBrush}"
-                                LinkClicked="MarkdownText_LinkClicked"
-                                LinkForeground="{ThemeResource HyperlinkForeground}"
-                                Text="{x:Bind Provider.AboutTextBlockText, Mode=OneWay}" />
-                            <TextBlock
-                                x:Name="AboutTextBlock"
-                                HorizontalAlignment="Left"
-                                x:Load="{x:Bind IsCoreWindow, Converter={StaticResource BoolNegationConverter}}"
-                                IsTextSelectionEnabled="True"
-                                Text="{x:Bind Provider.AboutTextBlockText, Mode=OneWay}"
-                                TextWrapping="Wrap" />
-                        </Grid>
-                    </controls:SettingExpander>
+                        </cwuc:SettingsExpander.Description>
+                        <cwuc:SettingsExpander.Items>
+                            <Grid>
+                                <clwm:MarkdownTextBlock
+                                    x:Name="AboutMarkdown"
+                                    HorizontalAlignment="Left"
+                                    x:Load="{x:Bind IsCoreWindow}"
+                                    Text="{x:Bind Provider.AboutTextBlockText, Mode=OneWay}">
+                                    <clwm:MarkdownTextBlock.Config>
+                                        <clwm:MarkdownConfig />
+                                    </clwm:MarkdownTextBlock.Config>
+                                </clwm:MarkdownTextBlock>
+                                <TextBlock
+                                    x:Name="AboutTextBlock"
+                                    HorizontalAlignment="Left"
+                                    x:Load="{x:Bind IsCoreWindow, Converter={StaticResource BoolNegationConverter}}"
+                                    IsTextSelectionEnabled="True"
+                                    Text="{x:Bind Provider.AboutTextBlockText, Mode=OneWay}"
+                                    TextWrapping="Wrap" />
+                            </Grid>
+                        </cwuc:SettingsExpander.Items>
+                    </cwuc:SettingsExpander>
                 </controls:SettingsGroup>
             </StackPanel>
         </ScrollViewer>

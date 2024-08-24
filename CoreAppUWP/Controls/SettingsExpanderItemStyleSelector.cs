@@ -1,0 +1,24 @@
+﻿using CommunityToolkit.WinUI.Controls;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
+
+namespace CoreAppUWP.Controls
+{
+    public class SettingsExpanderItemStyleSelector : CommunityToolkit.WinUI.Controls.SettingsExpanderItemStyleSelector
+    {
+        public Style GridStyle { get; set; }
+        public Style BorderStyle { get; set; }
+        public Style StackPanelStyle { get; set; }
+
+        protected override Style SelectStyleCore(object item, DependencyObject container) =>
+            container switch
+            {
+                SettingsCard card => card.IsClickEnabled ? ClickableStyle : DefaultStyle,
+                Grid => GridStyle,
+                Border => BorderStyle,
+                StackPanel => StackPanelStyle,
+                FrameworkElement element => element.Style,
+                _ => null
+            };
+    }
+}
