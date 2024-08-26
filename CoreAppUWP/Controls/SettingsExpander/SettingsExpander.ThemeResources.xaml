@@ -18,8 +18,8 @@
     <x:Double x:Key="SettingsExpanderChevronButtonWidth">32</x:Double>
     <x:Double x:Key="SettingsExpanderChevronButtonHeight">32</x:Double>
 
-    <Thickness x:Key="SettingsExpanderItemExpanderContentDownBorderThickness">0,1,0,0</Thickness>
-    <Thickness x:Key="SettingsExpanderContentExpanderItemUpBorderThickness">0,0,0,1</Thickness>
+    <Thickness x:Key="SettingsExpanderContentExpanderContentDownBorderThickness">0,1,0,0</Thickness>
+    <Thickness x:Key="SettingsExpanderContentExpanderContentUpBorderThickness">0,0,0,1</Thickness>
 
     <x:Double x:Key="SettingsExpanderWrapThreshold">434</x:Double>
     <x:Double x:Key="SettingsExpanderWrapNoIconThreshold">244</x:Double>
@@ -29,12 +29,12 @@
 
     <controls:SettingsExpanderItemStyleSelector
         x:Key="SettingsExpanderItemStyleSelector"
-        BorderStyle="{StaticResource SettingsExpanderItemBorderStyle}"
+        BorderStyle="{StaticResource SettingsExpanderContentBorderStyle}"
         ClickableStyle="{StaticResource ClickableSettingsExpanderItemStyle}"
         DefaultStyle="{StaticResource DefaultSettingsExpanderItemStyle}"
-        GridStyle="{StaticResource SettingsExpanderItemGridStyle}"
-        SettingsExpanderStyle="{StaticResource SettingsExpanderItemSettingsExpanderStyle}"
-        StackPanelStyle="{StaticResource SettingsExpanderItemStackPanelStyle}" />
+        GridStyle="{StaticResource SettingsExpanderContentGridStyle}"
+        SettingsExpanderStyle="{StaticResource SettingsExpanderContentSettingsExpanderStyle}"
+        StackPanelStyle="{StaticResource SettingsExpanderContentStackPanelStyle}" />
 
     <Style x:Key="DefaultSettingsExpanderStyle" TargetType="controls:SettingsExpander">
         <Setter Property="Background" Value="{ThemeResource SettingsCardBackground}" />
@@ -691,7 +691,7 @@
         </Setter>
     </Style>
 
-    <Style x:Key="SettingsExpanderItemSettingsExpanderStyle" TargetType="controls:SettingsExpander">
+    <Style x:Key="SettingsExpanderContentSettingsExpanderStyle" TargetType="controls:SettingsExpander">
         <Setter Property="MinHeight" Value="{StaticResource ExpanderMinHeight}" />
         <Setter Property="Background" Value="{ThemeResource SystemControlTransparentBrush}" />
         <Setter Property="BorderThickness" Value="{ThemeResource SettingsExpanderItemBorderThickness}" />
@@ -714,7 +714,7 @@
                         CornerRadius="{TemplateBinding CornerRadius}"
                         ExpandDirection="{TemplateBinding ExpandDirection}"
                         IsExpanded="{Binding IsExpanded, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
-                        Style="{StaticResource SettingsExpanderItemSettingsExpanderExpanderStyle}">
+                        Style="{StaticResource SettingsExpanderContentSettingsExpanderExpanderStyle}">
                         <muxc:Expander.Header>
                             <controls:SettingsCard
                                 Padding="{TemplateBinding Padding}"
@@ -744,7 +744,7 @@
     </Style>
 
     <Style
-        x:Key="SettingsExpanderItemSettingsExpanderExpanderStyle"
+        x:Key="SettingsExpanderContentSettingsExpanderExpanderStyle"
         BasedOn="{StaticResource SettingsExpanderExpanderStyle}"
         TargetType="muxc:Expander">
         <Setter Property="Template">
@@ -788,7 +788,7 @@
                                 Background="{TemplateBinding Background}"
                                 BackgroundSizing="{TemplateBinding BackgroundSizing}"
                                 BorderBrush="{ThemeResource SettingsCardBorderBrush}"
-                                BorderThickness="{StaticResource SettingsExpanderItemExpanderContentDownBorderThickness}"
+                                BorderThickness="{StaticResource SettingsExpanderContentExpanderContentDownBorderThickness}"
                                 CornerRadius="{Binding CornerRadius, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource BottomCornerRadiusFilterConverter}}"
                                 Visibility="Collapsed">
                                 <ContentPresenter
@@ -881,7 +881,7 @@
                                 <VisualState x:Name="Up">
                                     <VisualState.Setters>
                                         <Setter Target="ExpanderHeader.Style" Value="{StaticResource SettingsExpanderHeaderUpStyle}" />
-                                        <Setter Target="ExpanderContent.BorderThickness" Value="{StaticResource SettingsExpanderContentExpanderItemUpBorderThickness}" />
+                                        <Setter Target="ExpanderContent.BorderThickness" Value="{StaticResource SettingsExpanderContentExpanderContentUpBorderThickness}" />
                                         <Setter Target="ExpanderContent.CornerRadius" Value="{Binding CornerRadius, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource TopCornerRadiusFilterConverter}}" />
                                         <Setter Target="ExpanderHeader.(Grid.Row)" Value="1" />
                                         <Setter Target="ExpanderContentClip.(Grid.Row)" Value="0" />
@@ -902,7 +902,7 @@
         <Setter Property="Stroke" Value="{ThemeResource SettingsCardBorderBrush}" />
     </Style>
 
-    <Style x:Key="SettingsExpanderItemGridStyle" TargetType="Grid">
+    <Style x:Key="SettingsExpanderContentGridStyle" TargetType="Grid">
         <Setter Property="CornerRadius" Value="0" />
         <Setter Property="BorderThickness" Value="{ThemeResource SettingsExpanderItemBorderThickness}" />
         <Setter Property="Background" Value="{ThemeResource SystemControlTransparentBrush}" />
@@ -911,7 +911,7 @@
         <Setter Property="Padding" Value="{StaticResource SettingsExpanderItemPadding}" />
     </Style>
 
-    <Style x:Key="SettingsExpanderItemBorderStyle" TargetType="Border">
+    <Style x:Key="SettingsExpanderContentBorderStyle" TargetType="Border">
         <Setter Property="CornerRadius" Value="0" />
         <Setter Property="BorderThickness" Value="{ThemeResource SettingsExpanderItemBorderThickness}" />
         <Setter Property="Background" Value="{ThemeResource SystemControlTransparentBrush}" />
@@ -920,7 +920,7 @@
         <Setter Property="Padding" Value="{StaticResource SettingsExpanderItemPadding}" />
     </Style>
 
-    <Style x:Key="SettingsExpanderItemStackPanelStyle" TargetType="StackPanel">
+    <Style x:Key="SettingsExpanderContentStackPanelStyle" TargetType="StackPanel">
         <Setter Property="CornerRadius" Value="0" />
         <Setter Property="BorderThickness" Value="{ThemeResource SettingsExpanderItemBorderThickness}" />
         <Setter Property="Background" Value="{ThemeResource SystemControlTransparentBrush}" />
