@@ -206,7 +206,7 @@
                             <TextBlock
                                 Grid.Row="0"
                                 Grid.Column="0"
-                                Foreground="{ThemeResource SettingsCardForeground}"
+                                Foreground="{ThemeResource TextFillColorPrimaryBrush}"
                                 Text="Device Family" />
                             <TextBlock
                                 Grid.Row="0"
@@ -219,7 +219,7 @@
                             <TextBlock
                                 Grid.Row="1"
                                 Grid.Column="0"
-                                Foreground="{ThemeResource SettingsCardForeground}"
+                                Foreground="{ThemeResource TextFillColorPrimaryBrush}"
                                 Text="Framework" />
                             <TextBlock
                                 Grid.Row="1"
@@ -232,7 +232,7 @@
                             <TextBlock
                                 Grid.Row="2"
                                 Grid.Column="0"
-                                Foreground="{ThemeResource SettingsCardForeground}"
+                                Foreground="{ThemeResource TextFillColorPrimaryBrush}"
                                 Text="CS/WinRT" />
                             <TextBlock
                                 Grid.Row="2"
@@ -245,7 +245,7 @@
                             <TextBlock
                                 Grid.Row="3"
                                 Grid.Column="0"
-                                Foreground="{ThemeResource SettingsCardForeground}"
+                                Foreground="{ThemeResource TextFillColorPrimaryBrush}"
                                 Text="Windows SDK" />
                             <TextBlock
                                 Grid.Row="3"
@@ -258,7 +258,7 @@
                             <TextBlock
                                 Grid.Row="4"
                                 Grid.Column="0"
-                                Foreground="{ThemeResource SettingsCardForeground}"
+                                Foreground="{ThemeResource TextFillColorPrimaryBrush}"
                                 Text="OS Platform" />
                             <TextBlock
                                 Grid.Row="4"
@@ -271,7 +271,7 @@
                             <TextBlock
                                 Grid.Row="5"
                                 Grid.Column="0"
-                                Foreground="{ThemeResource SettingsCardForeground}"
+                                Foreground="{ThemeResource TextFillColorPrimaryBrush}"
                                 Text="OS Architecture" />
                             <TextBlock
                                 Grid.Row="5"

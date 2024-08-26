@@ -30,114 +30,71 @@
         StackPanelStyle="{StaticResource SettingsExpanderContentStackPanelStyle}" />
 
     <Style x:Key="DefaultSettingsExpanderStyle" TargetType="controls:SettingsExpander">
-        <Style.Setters>
-            <Setter Property="Background" Value="{ThemeResource SettingsCardBackground}" />
-            <Setter Property="Foreground" Value="{ThemeResource SettingsCardForeground}" />
-            <Setter Property="BorderBrush" Value="{ThemeResource SettingsCardBorderBrush}" />
-            <Setter Property="BorderThickness" Value="{ThemeResource SettingsCardBorderThickness}" />
-            <Setter Property="CornerRadius" Value="{ThemeResource ControlCornerRadius}" />
-            <Setter Property="MinHeight" Value="{ThemeResource SettingsCardMinHeight}" />
-            <Setter Property="MinWidth" Value="{ThemeResource SettingsCardMinWidth}" />
-            <Setter Property="IsTabStop" Value="False" />
-            <Setter Property="HorizontalAlignment" Value="Stretch" />
-            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-            <Setter Property="VerticalAlignment" Value="Center" />
-            <Setter Property="BackgroundSizing" Value="InnerBorderEdge" />
-            <Setter Property="Padding" Value="{ThemeResource SettingsExpanderHeaderPadding}" />
-            <Setter Property="FontFamily" Value="{ThemeResource ContentControlThemeFontFamily}" />
-            <Setter Property="FontWeight" Value="Normal" />
-            <Setter Property="FontSize" Value="{ThemeResource ControlContentThemeFontSize}" />
-            <Setter Property="UseSystemFocusVisuals" Value="{StaticResource UseSystemFocusVisuals}" />
-            <Setter Property="ItemContainerStyleSelector" Value="{StaticResource SettingsExpanderItemStyleSelector}" />
-            <Setter Property="FocusVisualMargin" Value="-3" />
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="controls:SettingsExpander">
-                        <muxc:Expander
-                            MaxWidth="{TemplateBinding MaxWidth}"
-                            HorizontalAlignment="{TemplateBinding HorizontalAlignment}"
-                            HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
-                            AutomationProperties.HelpText="{TemplateBinding AutomationProperties.HelpText}"
-                            AutomationProperties.Name="{TemplateBinding AutomationProperties.Name}"
-                            Background="{TemplateBinding Background}"
-                            BorderBrush="{TemplateBinding BorderBrush}"
-                            BorderThickness="{TemplateBinding BorderThickness}"
-                            CornerRadius="{TemplateBinding CornerRadius}"
-                            IsExpanded="{Binding IsExpanded, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}">
-                            <muxc:Expander.Header>
-                                <controls:SettingsCard
-                                    Padding="{TemplateBinding Padding}"
-                                    VerticalAlignment="Center"
-                                    Background="{ThemeResource SystemControlTransparentBrush}"
-                                    BorderThickness="0"
-                                    Content="{TemplateBinding ActionContent}"
-                                    Description="{TemplateBinding Description}"
-                                    Header="{TemplateBinding Header}"
-                                    HeaderIcon="{TemplateBinding HeaderIcon}"
-                                    IsClickEnabled="False"
-                                    WrapNoIconThreshold="{StaticResource SettingsExpanderWrapNoIconThreshold}"
-                                    WrapThreshold="{StaticResource SettingsExpanderWrapThreshold}" />
-                            </muxc:Expander.Header>
-                            <muxc:Expander.Content>
-                                <ItemsPresenter
-                                    Footer="{TemplateBinding ItemsFooter}"
-                                    Header="{TemplateBinding ItemsHeader}"
-                                    TabFocusNavigation="Local" />
-                            </muxc:Expander.Content>
-                        </muxc:Expander>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style.Setters>
+        <Setter Property="Background" Value="{ThemeResource SettingsCardBackground}" />
+        <Setter Property="Foreground" Value="{ThemeResource SettingsCardForeground}" />
+        <Setter Property="BorderBrush" Value="{ThemeResource SettingsCardBorderBrush}" />
+        <Setter Property="BorderThickness" Value="{ThemeResource SettingsCardBorderThickness}" />
+        <Setter Property="CornerRadius" Value="{ThemeResource ControlCornerRadius}" />
+        <Setter Property="MinHeight" Value="{ThemeResource SettingsCardMinHeight}" />
+        <Setter Property="MinWidth" Value="{ThemeResource SettingsCardMinWidth}" />
+        <Setter Property="IsTabStop" Value="False" />
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="BackgroundSizing" Value="InnerBorderEdge" />
+        <Setter Property="Padding" Value="{ThemeResource SettingsExpanderHeaderPadding}" />
+        <Setter Property="FontFamily" Value="{ThemeResource ContentControlThemeFontFamily}" />
+        <Setter Property="FontWeight" Value="Normal" />
+        <Setter Property="FontSize" Value="{ThemeResource ControlContentThemeFontSize}" />
+        <Setter Property="UseSystemFocusVisuals" Value="{StaticResource UseSystemFocusVisuals}" />
+        <Setter Property="ItemContainerStyleSelector" Value="{StaticResource SettingsExpanderItemStyleSelector}" />
+        <Setter Property="FocusVisualMargin" Value="-3" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="controls:SettingsExpander">
+                    <muxc:Expander
+                        MaxWidth="{TemplateBinding MaxWidth}"
+                        HorizontalAlignment="{TemplateBinding HorizontalAlignment}"
+                        HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                        AutomationProperties.HelpText="{TemplateBinding AutomationProperties.HelpText}"
+                        AutomationProperties.Name="{TemplateBinding AutomationProperties.Name}"
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        CornerRadius="{TemplateBinding CornerRadius}"
+                        IsExpanded="{Binding IsExpanded, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}">
+                        <muxc:Expander.Header>
+                            <controls:SettingsCard
+                                Padding="{TemplateBinding Padding}"
+                                VerticalAlignment="Center"
+                                Background="{ThemeResource SystemControlTransparentBrush}"
+                                BorderThickness="0"
+                                Content="{TemplateBinding ActionContent}"
+                                Description="{TemplateBinding Description}"
+                                Header="{TemplateBinding Header}"
+                                HeaderIcon="{TemplateBinding HeaderIcon}"
+                                IsClickEnabled="False"
+                                WrapNoIconThreshold="{StaticResource SettingsExpanderWrapNoIconThreshold}"
+                                WrapThreshold="{StaticResource SettingsExpanderWrapThreshold}" />
+                        </muxc:Expander.Header>
+                        <muxc:Expander.Content>
+                            <ItemsPresenter
+                                Footer="{TemplateBinding ItemsFooter}"
+                                Header="{TemplateBinding ItemsHeader}"
+                                TabFocusNavigation="Local" />
+                        </muxc:Expander.Content>
+                    </muxc:Expander>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
     </Style>
 
     <Style x:Key="SettingsExpanderExpanderItemStyle" TargetType="controls:SettingsExpander">
-        <Style.Setters>
-            <Setter Property="MinHeight" Value="{StaticResource ExpanderMinHeight}" />
-            <Setter Property="Background" Value="{ThemeResource SystemControlTransparentBrush}" />
-            <Setter Property="BorderThickness" Value="{ThemeResource SettingsExpanderItemBorderThickness}" />
-            <Setter Property="Padding" Value="{ThemeResource SettingsExpanderItemHeaderPadding}" />
-            <Setter Property="CornerRadius" Value="0" />
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="controls:SettingsExpander">
-                        <muxc:Expander
-                            MaxWidth="{TemplateBinding MaxWidth}"
-                            HorizontalAlignment="{TemplateBinding HorizontalAlignment}"
-                            HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
-                            AutomationProperties.HelpText="{TemplateBinding AutomationProperties.HelpText}"
-                            AutomationProperties.Name="{TemplateBinding AutomationProperties.Name}"
-                            Background="{TemplateBinding Background}"
-                            BorderBrush="{TemplateBinding BorderBrush}"
-                            BorderThickness="{TemplateBinding BorderThickness}"
-                            CornerRadius="{TemplateBinding CornerRadius}"
-                            IsExpanded="{Binding IsExpanded, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}">
-                            <muxc:Expander.Header>
-                                <controls:SettingsCard
-                                    Padding="{TemplateBinding Padding}"
-                                    VerticalAlignment="Center"
-                                    Background="{ThemeResource SystemControlTransparentBrush}"
-                                    BorderThickness="0"
-                                    Content="{TemplateBinding ActionContent}"
-                                    Description="{TemplateBinding Description}"
-                                    Header="{TemplateBinding Header}"
-                                    HeaderIcon="{TemplateBinding HeaderIcon}"
-                                    IsClickEnabled="False"
-                                    Style="{StaticResource DefaultSettingsExpanderItemStyle}"
-                                    WrapNoIconThreshold="{StaticResource SettingsExpanderWrapNoIconThreshold}"
-                                    WrapThreshold="{StaticResource SettingsExpanderWrapThreshold}" />
-                            </muxc:Expander.Header>
-                            <muxc:Expander.Content>
-                                <ItemsPresenter
-                                    Footer="{TemplateBinding ItemsFooter}"
-                                    Header="{TemplateBinding ItemsHeader}"
-                                    TabFocusNavigation="Local" />
-                            </muxc:Expander.Content>
-                        </muxc:Expander>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style.Setters>
+        <Setter Property="MinHeight" Value="{StaticResource ExpanderMinHeight}" />
+        <Setter Property="Background" Value="{ThemeResource SystemControlTransparentBrush}" />
+        <Setter Property="BorderThickness" Value="{ThemeResource SettingsExpanderItemBorderThickness}" />
+        <Setter Property="Padding" Value="{ThemeResource SettingsExpanderItemHeaderPadding}" />
+        <Setter Property="CornerRadius" Value="0" />
     </Style>
 
     <Style x:Key="SettingsExpanderSeparatorStyle" TargetType="Rectangle">
