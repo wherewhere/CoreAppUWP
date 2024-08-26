@@ -97,6 +97,7 @@
         <Setter Property="HorizontalAlignment" Value="Stretch" />
         <Setter Property="HorizontalContentAlignment" Value="Right" />
         <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
         <Setter Property="BackgroundSizing" Value="InnerBorderEdge" />
         <Setter Property="Padding" Value="{ThemeResource SettingsCardPadding}" />
         <Setter Property="FontFamily" Value="{ThemeResource ContentControlThemeFontFamily}" />
@@ -194,8 +195,9 @@
                             x:Name="PART_ContentPresenter"
                             Grid.Column="2"
                             HorizontalAlignment="Right"
-                            VerticalAlignment="Center"
+                            VerticalAlignment="Stretch"
                             HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                            VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
                             Content="{TemplateBinding Content}">
                             <ContentPresenter.Resources>
                                 <Style BasedOn="{StaticResource RightAlignedCompactToggleSwitchStyle}" TargetType="ToggleSwitch" />
