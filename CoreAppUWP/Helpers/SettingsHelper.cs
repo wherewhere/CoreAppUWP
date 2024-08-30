@@ -4,8 +4,8 @@ using System;
 using System.IO;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Text.Json.Serialization.Metadata;
 using Windows.Storage;
-using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 
 namespace CoreAppUWP.Helpers
@@ -64,11 +64,10 @@ namespace CoreAppUWP.Helpers
         {
             if (string.IsNullOrEmpty(value)) { return default; }
             Type type = typeof(T);
-            return type == typeof(bool) && JsonSerializer.Deserialize(value, SourceGenerationContext.Default.Boolean) is T @bool
-                ? @bool
-                : type == typeof(ElementTheme) && JsonSerializer.Deserialize(value, SourceGenerationContext.Default.ElementTheme) is T ElementTheme
-                    ? ElementTheme
-                    : default;
+            return type == typeof(bool) ? Deserialize(value, SourceGenerationContext.Default.Boolean)
+                : type == typeof(ElementTheme) ? Deserialize(value, SourceGenerationContext.Default.ElementTheme)
+                : default;
+            static T Deserialize<TValue>(string json, JsonTypeInfo<TValue> jsonTypeInfo) => JsonSerializer.Deserialize(json, jsonTypeInfo) is T value ? value : default;
         }
     }
 
