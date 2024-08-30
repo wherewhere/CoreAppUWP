@@ -5,6 +5,7 @@ using System;
 using System.IO;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Text.Json.Serialization.Metadata;
 using System.Threading.Tasks;
 using Windows.Storage;
 using IObjectSerializer = CommunityToolkit.Common.Helpers.IObjectSerializer;
@@ -77,17 +78,15 @@ namespace CoreAppUWP.Helpers
         {
             if (string.IsNullOrEmpty(value)) { return default; }
             Type type = typeof(T);
-            return type == typeof(bool) && JsonSerializer.Deserialize(value, SourceGenerationContext.Default.Boolean) is T @bool
-                ? @bool
-                : type == typeof(ElementTheme) && JsonSerializer.Deserialize(value, SourceGenerationContext.Default.ElementTheme) is T ElementTheme
-                    ? ElementTheme
-                    : type == typeof(BackdropType) && JsonSerializer.Deserialize(value, SourceGenerationContext.Default.BackdropType) is T BackdropType
-                        ? BackdropType
+            return type == typeof(bool) ? Deserialize(value, SourceGenerationContext.Default.Boolean)
+                : type == typeof(ElementTheme) ? Deserialize(value, SourceGenerationContext.Default.ElementTheme)
+                : type == typeof(BackdropType) ? Deserialize(value, SourceGenerationContext.Default.BackdropType)
 #if DEBUG
-                        : JsonSerializer.Deserialize<T>(value);
+                : JsonSerializer.Deserialize<T>(value);
 #else
-                        : default;
+                : default;
 #endif
+            static T Deserialize<TValue>(string json, JsonTypeInfo<TValue> jsonTypeInfo) => JsonSerializer.Deserialize(json, jsonTypeInfo) is T value ? value : default;
         }
     }
 
