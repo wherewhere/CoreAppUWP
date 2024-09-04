@@ -31,10 +31,10 @@ namespace CoreAppUWP.Helpers
             CoreApplicationView newView = CoreApplication.CreateNewView();
             int newViewId = await newView.Dispatcher.AwaitableRunAsync(() =>
             {
-                Window newWindow = Window.Current;
-                newWindow.TrackWindow();
-                launched(newWindow);
-                Window.Current.Activate();
+                Window window = Window.Current;
+                TrackWindow(window);
+                launched(window);
+                window.Activate();
                 return ApplicationView.GetForCurrentView().Id;
             });
             return await ApplicationViewSwitcher.TryShowAsStandaloneAsync(newViewId);

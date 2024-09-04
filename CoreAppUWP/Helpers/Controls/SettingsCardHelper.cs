@@ -39,25 +39,12 @@ namespace CoreAppUWP.Helpers
             control.SetValue(HeaderIconProperty, value);
         }
 
-        private static void OnHeaderIconChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        private static async void OnHeaderIconChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             if (d is not SettingsCard element) { return; }
-            if (element.IsLoaded)
-            {
-                OnElementLoaded(element, null);
-            }
-            else
-            {
-                element.Loaded -= OnElementLoaded;
-                element.Loaded += OnElementLoaded;
-            }
-        }
-
-        private static void OnElementLoaded(object sender, RoutedEventArgs e)
-        {
-            if (sender is not SettingsCard element) { return; }
-            object content = GetHeaderIcon(element);
-            element.HeaderIcon = content == null ? null : new SymbolIcon();
+            await element.ResumeOnLoadedAsync();
+            object content = e.NewValue;
+            element.HeaderIcon = content == null ? null : new FontIcon();
             if (element.FindDescendant("PART_HeaderIconPresenter") is ContentPresenter presenter)
             {
                 presenter.Content = content;

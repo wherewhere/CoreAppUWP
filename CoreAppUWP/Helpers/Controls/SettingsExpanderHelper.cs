@@ -39,26 +39,13 @@ namespace CoreAppUWP.Helpers
             control.SetValue(HeaderIconProperty, value);
         }
 
-        private static void OnHeaderIconChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        private static async void OnHeaderIconChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             if (d is not FrameworkElement element) { return; }
-            if (element.IsLoaded)
-            {
-                OnElementLoaded(element, null);
-            }
-            else
-            {
-                element.Loaded -= OnElementLoaded;
-                element.Loaded += OnElementLoaded;
-            }
-        }
-
-        private static void OnElementLoaded(object sender, RoutedEventArgs e)
-        {
-            if (sender is not SettingsExpander element) { return; }
+            await element.ResumeOnLoadedAsync();
             if (element.FindDescendant<Expander>() is Expander expander && expander.Header is SettingsCard settings)
             {
-                SettingsCardHelper.SetHeaderIcon(settings, GetHeaderIcon(element));
+                SettingsCardHelper.SetHeaderIcon(settings, e.NewValue);
             }
         }
 
