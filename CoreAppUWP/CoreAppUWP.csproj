@@ -38,10 +38,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Remove="AppPackages\**" />
-    <EmbeddedResource Remove="AppPackages\**" />
+    <Compile Remove="Generated Files\**" />
     <None Remove="AppPackages\**" />
-    <Page Remove="AppPackages\**" />
+    <None Remove="Generated Files\**" />
   </ItemGroup>
 
   <ItemGroup>
