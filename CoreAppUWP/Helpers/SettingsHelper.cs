@@ -67,11 +67,7 @@ namespace CoreAppUWP.Helpers
             bool => JsonSerializer.Serialize(value, SourceGenerationContext.Default.Boolean),
             ElementTheme => JsonSerializer.Serialize(value, SourceGenerationContext.Default.ElementTheme),
             BackdropType => JsonSerializer.Serialize(value, SourceGenerationContext.Default.BackdropType),
-#if DEBUG
-            _ => JsonSerializer.Serialize(value)
-#else
             _ => value?.ToString(),
-#endif
         };
 
         public T Deserialize<T>(string value)
@@ -81,11 +77,7 @@ namespace CoreAppUWP.Helpers
             return type == typeof(bool) ? Deserialize(value, SourceGenerationContext.Default.Boolean)
                 : type == typeof(ElementTheme) ? Deserialize(value, SourceGenerationContext.Default.ElementTheme)
                 : type == typeof(BackdropType) ? Deserialize(value, SourceGenerationContext.Default.BackdropType)
-#if DEBUG
-                : JsonSerializer.Deserialize<T>(value);
-#else
                 : default;
-#endif
             static T Deserialize<TValue>(string json, JsonTypeInfo<TValue> jsonTypeInfo) => JsonSerializer.Deserialize(json, jsonTypeInfo) is T value ? value : default;
         }
     }

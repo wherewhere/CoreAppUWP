@@ -1,7 +1,6 @@
 ﻿using CommunityToolkit.WinUI;
 using CoreAppUWP.Common;
 using CoreAppUWP.Controls;
-using Microsoft.UI;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
@@ -11,6 +10,7 @@ using System.Threading.Tasks;
 using Windows.ApplicationModel.Core;
 using Windows.UI;
 using Windows.UI.ViewManagement;
+using Colors = Microsoft.UI.Colors;
 
 namespace CoreAppUWP.Helpers
 {

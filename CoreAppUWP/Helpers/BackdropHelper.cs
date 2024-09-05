@@ -390,7 +390,7 @@ namespace CoreAppUWP.Helpers
             if (m_dispatcherQueueController == 0)
             {
                 DispatcherQueueOptions options;
-                options.DWSize = Marshal.SizeOf(typeof(DispatcherQueueOptions));
+                options.DWSize = Marshal.SizeOf<DispatcherQueueOptions>();
                 options.ThreadType = 2;     // DQTYPE_THREAD_CURRENT
                 options.ApartmentType = 2;  // DQTAT_COM_STA
 

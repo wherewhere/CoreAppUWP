@@ -4,7 +4,7 @@ using Microsoft.UI.Xaml.Controls;
 
 namespace CoreAppUWP.Controls
 {
-    public class SettingsExpanderItemStyleSelector : CommunityToolkit.WinUI.Controls.SettingsExpanderItemStyleSelector
+    public partial class SettingsExpanderItemStyleSelector : CommunityToolkit.WinUI.Controls.SettingsExpanderItemStyleSelector
     {
         public Style GridStyle { get; set; }
         public Style BorderStyle { get; set; }

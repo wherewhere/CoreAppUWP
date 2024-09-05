@@ -3,7 +3,7 @@
 namespace CoreAppUWP.Controls
 {
     /// <param name="owner">SettingsGroup</param>
-    public class SettingsGroupAutomationPeer(SettingsGroup owner) : ItemsControlAutomationPeer(owner)
+    public partial class SettingsGroupAutomationPeer(SettingsGroup owner) : ItemsControlAutomationPeer(owner)
     {
         /// <summary>
         /// Gets the control type for the element that is associated with the UI Automation peer.
