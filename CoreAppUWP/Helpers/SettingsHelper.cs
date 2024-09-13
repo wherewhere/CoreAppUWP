@@ -1,6 +1,7 @@
 ﻿using MetroLog;
 using MetroLog.Targets;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -60,14 +61,14 @@ namespace CoreAppUWP.Helpers
             _ => value?.ToString(),
         };
 
-        public static T Deserialize<T>(string value)
+        public static T Deserialize<T>([StringSyntax(StringSyntaxAttribute.Json)] string value)
         {
             if (string.IsNullOrEmpty(value)) { return default; }
             Type type = typeof(T);
             return type == typeof(bool) ? Deserialize(value, SourceGenerationContext.Default.Boolean)
                 : type == typeof(ElementTheme) ? Deserialize(value, SourceGenerationContext.Default.ElementTheme)
                 : default;
-            static T Deserialize<TValue>(string json, JsonTypeInfo<TValue> jsonTypeInfo) => JsonSerializer.Deserialize(json, jsonTypeInfo) is T value ? value : default;
+            static T Deserialize<TValue>([StringSyntax(StringSyntaxAttribute.Json)] string json, JsonTypeInfo<TValue> jsonTypeInfo) => JsonSerializer.Deserialize(json, jsonTypeInfo) is T value ? value : default;
         }
     }
 

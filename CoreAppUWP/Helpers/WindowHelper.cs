@@ -24,21 +24,23 @@ namespace CoreAppUWP.Helpers
     /// </summary>
     public static class WindowHelper
     {
+#pragma warning disable CA1416
         [SupportedOSPlatformGuard("Windows10.0.18362.0")]
         public static bool IsAppWindowSupported { get; } = ApiInformation.IsTypePresent("Windows.UI.WindowManagement.AppWindow");
 
         [SupportedOSPlatformGuard("Windows10.0.18362.0")]
         public static bool IsXamlRootSupported { get; } = ApiInformation.IsPropertyPresent("Windows.UI.Xaml.UIElement", "XamlRoot");
+#pragma warning restore CA1416
 
         public static async Task<bool> CreateWindowAsync(Action<Window> launched)
         {
             CoreApplicationView newView = CoreApplication.CreateNewView();
             int newViewId = await newView.Dispatcher.AwaitableRunAsync(() =>
             {
-                Window newWindow = Window.Current;
-                launched(newWindow);
-                newWindow.TrackWindow();
-                Window.Current.Activate();
+                Window window = Window.Current;
+                TrackWindow(window);
+                launched(window);
+                window.Activate();
                 return ApplicationView.GetForCurrentView().Id;
             });
             return await ApplicationViewSwitcher.TryShowAsStandaloneAsync(newViewId);

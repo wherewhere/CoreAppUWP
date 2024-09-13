@@ -69,10 +69,11 @@
     <PackageReference Include="Microsoft.UI.Xaml" Version="2.8.6" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\CoreAppUWP\CoreAppUWP.csproj" />
+    <ProjectReference Include="..\CoreAppUWP\CoreAppUWP.csproj">
+      <UseLowTrustEntryPoint>true</UseLowTrustEntryPoint>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Content Include="Assets\**" />
   </ItemGroup>
-  <Import Project="UpdateEntryPoint.targets" Condition="Exists('UpdateEntryPoint.targets')" />
 </Project>
