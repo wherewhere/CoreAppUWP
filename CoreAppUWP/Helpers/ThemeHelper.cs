@@ -6,7 +6,6 @@ using System.Linq;
 using System.Runtime.Versioning;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.Core;
-using Windows.Foundation.Metadata;
 using Windows.UI;
 using Windows.UI.Core;
 using Windows.UI.ViewManagement;
@@ -21,8 +20,6 @@ namespace CoreAppUWP.Helpers
     public static class ThemeHelper
     {
         private static Window CurrentApplicationWindow;
-
-        public static bool IsStatusBarSupported { get; } = ApiInformation.IsTypePresent("Windows.UI.ViewManagement.StatusBar");
 
         // Keep reference so it does not get optimized/garbage collected
         public static UISettings UISettings { get; } = new UISettings();
@@ -307,31 +304,21 @@ namespace CoreAppUWP.Helpers
             {
                 await window.Dispatcher.ResumeForegroundAsync();
 
-                if (IsStatusBarSupported)
-                {
-                    //StatusBar statusBar = StatusBar.GetForCurrentView();
-                    //statusBar.ForegroundColor = foregroundColor;
-                    //statusBar.BackgroundColor = backgroundColor;
-                    //statusBar.BackgroundOpacity = 0; // 透明度
-                }
-                else
-                {
-                    bool extendViewIntoTitleBar = CoreApplication.GetCurrentView().TitleBar.ExtendViewIntoTitleBar;
-                    ApplicationViewTitleBar titleBar = ApplicationView.GetForCurrentView().TitleBar;
-                    titleBar.ForegroundColor = titleBar.ButtonForegroundColor = foregroundColor;
-                    titleBar.BackgroundColor = titleBar.InactiveBackgroundColor = backgroundColor;
-                    titleBar.ButtonBackgroundColor = titleBar.ButtonInactiveBackgroundColor = extendViewIntoTitleBar ? Colors.Transparent : backgroundColor;
-                }
+                bool extendViewIntoTitleBar = CoreApplication.GetCurrentView().TitleBar.ExtendViewIntoTitleBar;
+                ApplicationViewTitleBar titleBar = ApplicationView.GetForCurrentView().TitleBar;
+                titleBar.ForegroundColor = titleBar.ButtonForegroundColor = foregroundColor;
+                titleBar.BackgroundColor = titleBar.InactiveBackgroundColor = backgroundColor;
+                titleBar.ButtonBackgroundColor = titleBar.ButtonInactiveBackgroundColor = extendViewIntoTitleBar ? Colors.Transparent : backgroundColor;
 
                 if (WindowHelper.IsAppWindowSupported && WindowHelper.ActiveAppWindows.TryGetValue(window.Dispatcher, out Dictionary<XamlRoot, AppWindow> appWindows))
                 {
                     foreach (AppWindow appWindow in appWindows.Values)
                     {
-                        bool extendViewIntoTitleBar = appWindow.TitleBar.ExtendsContentIntoTitleBar;
-                        AppWindowTitleBar titleBar = appWindow.TitleBar;
-                        titleBar.ForegroundColor = titleBar.ButtonForegroundColor = foregroundColor;
-                        titleBar.BackgroundColor = titleBar.InactiveBackgroundColor = backgroundColor;
-                        titleBar.ButtonBackgroundColor = titleBar.ButtonInactiveBackgroundColor = extendViewIntoTitleBar ? Colors.Transparent : backgroundColor;
+                        bool extendsContentIntoTitleBar = appWindow.TitleBar.ExtendsContentIntoTitleBar;
+                        AppWindowTitleBar appTitleBar = appWindow.TitleBar;
+                        appTitleBar.ForegroundColor = appTitleBar.ButtonForegroundColor = foregroundColor;
+                        appTitleBar.BackgroundColor = appTitleBar.InactiveBackgroundColor = backgroundColor;
+                        appTitleBar.ButtonBackgroundColor = appTitleBar.ButtonInactiveBackgroundColor = extendsContentIntoTitleBar ? Colors.Transparent : backgroundColor;
                     }
                 }
             });
@@ -347,21 +334,11 @@ namespace CoreAppUWP.Helpers
             Color foregroundColor = isDark || isHighContrast ? Colors.White : Colors.Black;
             Color backgroundColor = isHighContrast ? Color.FromArgb(255, 0, 0, 0) : isDark ? Color.FromArgb(255, 32, 32, 32) : Color.FromArgb(255, 243, 243, 243);
 
-            if (IsStatusBarSupported)
-            {
-                //StatusBar statusBar = StatusBar.GetForCurrentView();
-                //statusBar.ForegroundColor = foregroundColor;
-                //statusBar.BackgroundColor = backgroundColor;
-                //statusBar.BackgroundOpacity = 0; // 透明度
-            }
-            else
-            {
-                bool extendViewIntoTitleBar = CoreApplication.GetCurrentView().TitleBar.ExtendViewIntoTitleBar;
-                ApplicationViewTitleBar titleBar = ApplicationView.GetForCurrentView().TitleBar;
-                titleBar.ForegroundColor = titleBar.ButtonForegroundColor = foregroundColor;
-                titleBar.BackgroundColor = titleBar.InactiveBackgroundColor = backgroundColor;
-                titleBar.ButtonBackgroundColor = titleBar.ButtonInactiveBackgroundColor = extendViewIntoTitleBar ? Colors.Transparent : backgroundColor;
-            }
+            bool extendViewIntoTitleBar = CoreApplication.GetCurrentView().TitleBar.ExtendViewIntoTitleBar;
+            ApplicationViewTitleBar titleBar = ApplicationView.GetForCurrentView().TitleBar;
+            titleBar.ForegroundColor = titleBar.ButtonForegroundColor = foregroundColor;
+            titleBar.BackgroundColor = titleBar.InactiveBackgroundColor = backgroundColor;
+            titleBar.ButtonBackgroundColor = titleBar.ButtonInactiveBackgroundColor = extendViewIntoTitleBar ? Colors.Transparent : backgroundColor;
         }
 
         [SupportedOSPlatform("Windows10.0.18362.0")]
@@ -375,11 +352,11 @@ namespace CoreAppUWP.Helpers
             Color foregroundColor = isDark || isHighContrast ? Colors.White : Colors.Black;
             Color BackgroundColor = isHighContrast ? Color.FromArgb(255, 0, 0, 0) : isDark ? Color.FromArgb(255, 32, 32, 32) : Color.FromArgb(255, 243, 243, 243);
 
-            bool extendViewIntoTitleBar = window.TitleBar.ExtendsContentIntoTitleBar;
+            bool extendsContentIntoTitleBar = window.TitleBar.ExtendsContentIntoTitleBar;
             AppWindowTitleBar titleBar = window.TitleBar;
             titleBar.ForegroundColor = titleBar.ButtonForegroundColor = foregroundColor;
             titleBar.BackgroundColor = titleBar.InactiveBackgroundColor = BackgroundColor;
-            titleBar.ButtonBackgroundColor = titleBar.ButtonInactiveBackgroundColor = extendViewIntoTitleBar ? Colors.Transparent : BackgroundColor;
+            titleBar.ButtonBackgroundColor = titleBar.ButtonInactiveBackgroundColor = extendsContentIntoTitleBar ? Colors.Transparent : BackgroundColor;
         }
     }
 

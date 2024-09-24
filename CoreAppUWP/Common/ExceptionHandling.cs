@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Threading;
-using Windows.UI.Core;
 using Windows.UI.Xaml.Controls;
 
 namespace CoreAppUWP.Common
@@ -57,22 +56,25 @@ namespace CoreAppUWP.Common
         }
 
         /// <summary>
-        /// Registration method with an event handler for unhandled exceptions.
-        /// Call this from OnLaunched and OnActivated inside the App.xaml.cs.
+        /// Try registration method. Call this from OnLaunched and OnActivated inside the App.xaml.cs.
         /// </summary>
-        /// <returns>The <see cref="ExceptionHandlingSynchronizationContext"/> which registered.</returns>
-        /// <remarks>Register handler only when synchronization context is not already registered.</remarks>
-        public static ExceptionHandlingSynchronizationContext Register(EventHandler<UnhandledExceptionEventArgs> handler)
+        /// <param name="context">The <see cref="ExceptionHandlingSynchronizationContext"/> which registered.</param>
+        /// <returns><see langword="true"/> if the registration is successful; otherwise, <see langword="false"/>.</returns>
+        public static bool TryRegister(out ExceptionHandlingSynchronizationContext context)
         {
-            SynchronizationContext syncContext = Current ?? throw new InvalidOperationException("Ensure a synchronization context exists before calling this method.");
-
-            if (syncContext is not ExceptionHandlingSynchronizationContext customSynchronizationContext)
+            switch (Current)
             {
-                customSynchronizationContext = Register();
-                customSynchronizationContext.UnhandledException += handler;
+                case ExceptionHandlingSynchronizationContext _context:
+                    context = _context;
+                    return false;
+                case SynchronizationContext syncContext:
+                    context = new(syncContext);
+                    SetSynchronizationContext(context);
+                    return true;
+                default:
+                    context = null;
+                    return false;
             }
-
-            return customSynchronizationContext;
         }
 
         /// <summary>
@@ -161,21 +163,6 @@ namespace CoreAppUWP.Common
         /// so they don't crash your application.
         /// </summary>
         public event EventHandler<UnhandledExceptionEventArgs> UnhandledException;
-    }
-
-    /// <summary>
-    /// The synchronization context for the CoreDispatcher.
-    /// </summary>
-    /// <param name="dispatcher">The dispatcher to use for synchronization.</param>
-    public sealed class CoreDispatcherSynchronizationContext(CoreDispatcher dispatcher) : SynchronizationContext
-    {
-        /// <inheritdoc/>
-        public override void Post(SendOrPostCallback d, object state) =>
-            _ = dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => d?.Invoke(state));
-
-        /// <inheritdoc/>
-        public override void Send(SendOrPostCallback d, object state) =>
-            _ = dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => d?.Invoke(state));
     }
 
     /// <summary>

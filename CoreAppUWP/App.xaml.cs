@@ -6,6 +6,7 @@ using System.Threading;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
 using Windows.ApplicationModel.Core;
+using Windows.System;
 using Windows.System.Profile;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -94,7 +95,7 @@ namespace CoreAppUWP
 
             if (SynchronizationContext.Current == null)
             {
-                SynchronizationContext.SetSynchronizationContext(new CoreDispatcherSynchronizationContext(window.Dispatcher));
+                SynchronizationContext.SetSynchronizationContext(new DispatcherQueueSynchronizationContext(window.CoreWindow.DispatcherQueue));
             }
 
             RegisterExceptionHandlingSynchronizationContext();
@@ -203,8 +204,13 @@ namespace CoreAppUWP
         /// <summary>
         /// Should be called from OnActivated and OnLaunched.
         /// </summary>
-        private static void RegisterExceptionHandlingSynchronizationContext() =>
-            ExceptionHandlingSynchronizationContext.Register(SynchronizationContext_UnhandledException);
+        private static void RegisterExceptionHandlingSynchronizationContext()
+        {
+            if (ExceptionHandlingSynchronizationContext.TryRegister(out ExceptionHandlingSynchronizationContext context))
+            {
+                context.UnhandledException += SynchronizationContext_UnhandledException;
+            }
+        }
 
         private static void SynchronizationContext_UnhandledException(object sender, Common.UnhandledExceptionEventArgs e)
         {

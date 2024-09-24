@@ -29,7 +29,7 @@
   <Applications>
     <Application Id="App"
       Executable="$targetnametoken$.exe"
-      EntryPoint="CoreAppUWP.App">
+      EntryPoint="$targetentrypoint$">
       <uap:VisualElements
         DisplayName="CoreAppUWP"
         Description="UWP running on .net core app"
