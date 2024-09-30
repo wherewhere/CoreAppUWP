@@ -2,6 +2,7 @@
 using MetroLog.Targets;
 using Microsoft.UI.Xaml;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -70,7 +71,7 @@ namespace CoreAppUWP.Helpers
             _ => value?.ToString(),
         };
 
-        public T Deserialize<T>(string value)
+        public T Deserialize<T>([StringSyntax(StringSyntaxAttribute.Json)] string value)
         {
             if (string.IsNullOrEmpty(value)) { return default; }
             Type type = typeof(T);
@@ -78,7 +79,7 @@ namespace CoreAppUWP.Helpers
                 : type == typeof(ElementTheme) ? Deserialize(value, SourceGenerationContext.Default.ElementTheme)
                 : type == typeof(BackdropType) ? Deserialize(value, SourceGenerationContext.Default.BackdropType)
                 : default;
-            static T Deserialize<TValue>(string json, JsonTypeInfo<TValue> jsonTypeInfo) => JsonSerializer.Deserialize(json, jsonTypeInfo) is T value ? value : default;
+            static T Deserialize<TValue>([StringSyntax(StringSyntaxAttribute.Json)] string json, JsonTypeInfo<TValue> jsonTypeInfo) => JsonSerializer.Deserialize(json, jsonTypeInfo) is T value ? value : default;
         }
     }
 

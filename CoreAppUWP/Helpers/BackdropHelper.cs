@@ -152,7 +152,7 @@ namespace CoreAppUWP.Helpers
             }
             if (m_controller is DesktopAcrylicController m_acrylicController)
             {
-                Color BackgroundColor = sender.ActualTheme.IsDarkTheme() ? Color.FromArgb(255, 32, 32, 32) : Color.FromArgb(255, 243, 243, 243);
+                Color BackgroundColor = ThemeHelper.IsDarkTheme(sender.ActualTheme) ? Color.FromArgb(255, 32, 32, 32) : Color.FromArgb(255, 243, 243, 243);
                 m_acrylicController.TintColor = m_acrylicController.FallbackColor = BackgroundColor;
             }
         }

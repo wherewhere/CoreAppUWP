@@ -19,7 +19,7 @@ namespace CoreAppUWP.Helpers
     /// </summary>
     public static class ThemeHelper
     {
-        public static Window CurrentApplicationWindow { get; private set; }
+        private static Window CurrentApplicationWindow;
 
         // Keep reference so it does not get optimized/garbage collected
         public static UISettings UISettings { get; } = new UISettings();
@@ -219,48 +219,29 @@ namespace CoreAppUWP.Helpers
             InvokeUISettingChanged(await IsDarkThemeAsync());
         }
 
-        public static bool IsDarkTheme()
-        {
-            return Window.Current != null
-                ? ActualTheme == ElementTheme.Default
-                    ? Application.Current.RequestedTheme == ApplicationTheme.Dark
-                    : ActualTheme == ElementTheme.Dark
-                : ActualTheme == ElementTheme.Default
-                    ? UISettings?.GetColorValue(UIColorType.Foreground).IsColorLight() == true
-                    : ActualTheme == ElementTheme.Dark;
-        }
+        public static bool IsDarkTheme() => IsDarkTheme(ActualTheme);
 
-        public static async ValueTask<bool> IsDarkThemeAsync()
-        {
-            ElementTheme ActualTheme = await GetActualThemeAsync();
-            return Window.Current != null
-                ? ActualTheme == ElementTheme.Default
-                    ? Application.Current.RequestedTheme == ApplicationTheme.Dark
-                    : ActualTheme == ElementTheme.Dark
-                : ActualTheme == ElementTheme.Default
-                    ? UISettings?.GetColorValue(UIColorType.Foreground).IsColorLight() == true
-                    : ActualTheme == ElementTheme.Dark;
-        }
+        public static Task<bool> IsDarkThemeAsync() => GetActualThemeAsync().AsTask().ContinueWith(x => IsDarkTheme(x.Result));
 
-        public static bool IsDarkTheme(this ElementTheme ActualTheme)
+        public static bool IsDarkTheme(ElementTheme actualTheme)
         {
             return Window.Current != null
-                ? ActualTheme == ElementTheme.Default
+                ? actualTheme == ElementTheme.Default
                     ? Application.Current.RequestedTheme == ApplicationTheme.Dark
-                    : ActualTheme == ElementTheme.Dark
-                : ActualTheme == ElementTheme.Default
+                    : actualTheme == ElementTheme.Dark
+                : actualTheme == ElementTheme.Default
                     ? UISettings?.GetColorValue(UIColorType.Foreground).IsColorLight() == true
-                    : ActualTheme == ElementTheme.Dark;
+                    : actualTheme == ElementTheme.Dark;
         }
 
         public static bool IsColorLight(this Color color) => ((5 * color.G) + (2 * color.R) + color.B) > (8 * 128);
 
-        public static void UpdateExtendViewIntoTitleBar(bool IsExtendsTitleBar)
+        public static void UpdateExtendViewIntoTitleBar(bool isExtendsTitleBar)
         {
             WindowHelper.ActiveWindows.Values.ForEach(async window =>
             {
                 await window.DispatcherQueue.ResumeForegroundAsync();
-                CoreApplication.GetCurrentView().TitleBar.ExtendViewIntoTitleBar = IsExtendsTitleBar;
+                CoreApplication.GetCurrentView().TitleBar.ExtendViewIntoTitleBar = isExtendsTitleBar;
             });
 
             if (!AppWindowTitleBar.IsCustomizationSupported()) { return; }
@@ -268,26 +249,26 @@ namespace CoreAppUWP.Helpers
             WindowHelper.ActiveDesktopWindows.Values.ForEach(async window =>
             {
                 await window.DispatcherQueue.ResumeForegroundAsync();
-                window.ExtendsContentIntoTitleBar = IsExtendsTitleBar;
+                window.ExtendsContentIntoTitleBar = isExtendsTitleBar;
             });
         }
 
         public static async void UpdateSystemCaptionButtonColors()
         {
-            bool IsDark = await IsDarkThemeAsync();
-            bool IsHighContrast = AccessibilitySettings.HighContrast;
+            bool isDark = await IsDarkThemeAsync();
+            bool isHighContrast = AccessibilitySettings.HighContrast;
 
-            Color ForegroundColor = IsDark || IsHighContrast ? Colors.White : Colors.Black;
-            Color BackgroundColor = IsHighContrast ? Color.FromArgb(255, 0, 0, 0) : IsDark ? Color.FromArgb(255, 32, 32, 32) : Color.FromArgb(255, 243, 243, 243);
+            Color foregroundColor = isDark || isHighContrast ? Colors.White : Colors.Black;
+            Color backgroundColor = isHighContrast ? Color.FromArgb(255, 0, 0, 0) : isDark ? Color.FromArgb(255, 32, 32, 32) : Color.FromArgb(255, 243, 243, 243);
 
             WindowHelper.ActiveWindows.Values.ForEach(async window =>
             {
                 await window.DispatcherQueue.ResumeForegroundAsync();
-                bool ExtendViewIntoTitleBar = CoreApplication.GetCurrentView().TitleBar.ExtendViewIntoTitleBar;
-                ApplicationViewTitleBar TitleBar = ApplicationView.GetForCurrentView().TitleBar;
-                TitleBar.ForegroundColor = TitleBar.ButtonForegroundColor = ForegroundColor;
-                TitleBar.BackgroundColor = TitleBar.InactiveBackgroundColor = BackgroundColor;
-                TitleBar.ButtonBackgroundColor = TitleBar.ButtonInactiveBackgroundColor = ExtendViewIntoTitleBar ? Colors.Transparent : BackgroundColor;
+                bool extendViewIntoTitleBar = CoreApplication.GetCurrentView().TitleBar.ExtendViewIntoTitleBar;
+                ApplicationViewTitleBar titleBar = ApplicationView.GetForCurrentView().TitleBar;
+                titleBar.ForegroundColor = titleBar.ButtonForegroundColor = foregroundColor;
+                titleBar.BackgroundColor = titleBar.InactiveBackgroundColor = backgroundColor;
+                titleBar.ButtonBackgroundColor = titleBar.ButtonInactiveBackgroundColor = extendViewIntoTitleBar ? Colors.Transparent : backgroundColor;
             });
 
             if (!AppWindowTitleBar.IsCustomizationSupported()) { return; }
@@ -295,11 +276,11 @@ namespace CoreAppUWP.Helpers
             WindowHelper.ActiveDesktopWindows.Values.ForEach(async window =>
             {
                 await window.DispatcherQueue.ResumeForegroundAsync();
-                bool ExtendViewIntoTitleBar = window.ExtendsContentIntoTitleBar;
-                AppWindowTitleBar TitleBar = window.AppWindow.TitleBar;
-                TitleBar.ForegroundColor = TitleBar.ButtonForegroundColor = ForegroundColor;
-                TitleBar.BackgroundColor = TitleBar.InactiveBackgroundColor = BackgroundColor;
-                TitleBar.ButtonBackgroundColor = TitleBar.ButtonInactiveBackgroundColor = ExtendViewIntoTitleBar ? Colors.Transparent : BackgroundColor;
+                bool extendsContentIntoTitleBar = window.ExtendsContentIntoTitleBar;
+                AppWindowTitleBar titleBar = window.AppWindow.TitleBar;
+                titleBar.ForegroundColor = titleBar.ButtonForegroundColor = foregroundColor;
+                titleBar.BackgroundColor = titleBar.InactiveBackgroundColor = backgroundColor;
+                titleBar.ButtonBackgroundColor = titleBar.ButtonInactiveBackgroundColor = extendsContentIntoTitleBar ? Colors.Transparent : backgroundColor;
             });
         }
 
@@ -307,17 +288,17 @@ namespace CoreAppUWP.Helpers
         {
             await window.DispatcherQueue.ResumeForegroundAsync();
 
-            bool IsDark = window?.Content is FrameworkElement rootElement ? rootElement.RequestedTheme.IsDarkTheme() : await IsDarkThemeAsync();
-            bool IsHighContrast = AccessibilitySettings.HighContrast;
+            bool isDark = window?.Content is FrameworkElement rootElement ? IsDarkTheme(rootElement.RequestedTheme) : await IsDarkThemeAsync();
+            bool isHighContrast = AccessibilitySettings.HighContrast;
 
-            Color ForegroundColor = IsDark || IsHighContrast ? Colors.White : Colors.Black;
-            Color BackgroundColor = IsHighContrast ? Color.FromArgb(255, 0, 0, 0) : IsDark ? Color.FromArgb(255, 32, 32, 32) : Color.FromArgb(255, 243, 243, 243);
+            Color foregroundColor = isDark || isHighContrast ? Colors.White : Colors.Black;
+            Color backgroundColor = isHighContrast ? Color.FromArgb(255, 0, 0, 0) : isDark ? Color.FromArgb(255, 32, 32, 32) : Color.FromArgb(255, 243, 243, 243);
 
-            bool ExtendViewIntoTitleBar = CoreApplication.GetCurrentView().TitleBar.ExtendViewIntoTitleBar;
-            ApplicationViewTitleBar TitleBar = ApplicationView.GetForCurrentView().TitleBar;
-            TitleBar.ForegroundColor = TitleBar.ButtonForegroundColor = ForegroundColor;
-            TitleBar.BackgroundColor = TitleBar.InactiveBackgroundColor = BackgroundColor;
-            TitleBar.ButtonBackgroundColor = TitleBar.ButtonInactiveBackgroundColor = ExtendViewIntoTitleBar ? Colors.Transparent : BackgroundColor;
+            bool extendViewIntoTitleBar = CoreApplication.GetCurrentView().TitleBar.ExtendViewIntoTitleBar;
+            ApplicationViewTitleBar titleBar = ApplicationView.GetForCurrentView().TitleBar;
+            titleBar.ForegroundColor = titleBar.ButtonForegroundColor = foregroundColor;
+            titleBar.BackgroundColor = titleBar.InactiveBackgroundColor = backgroundColor;
+            titleBar.ButtonBackgroundColor = titleBar.ButtonInactiveBackgroundColor = extendViewIntoTitleBar ? Colors.Transparent : backgroundColor;
         }
 
         public static async void UpdateSystemCaptionButtonColors(DesktopWindow window)
@@ -326,17 +307,17 @@ namespace CoreAppUWP.Helpers
 
             await window.DispatcherQueue.ResumeForegroundAsync();
 
-            bool IsDark = window?.Content is FrameworkElement rootElement ? rootElement.RequestedTheme.IsDarkTheme() : await IsDarkThemeAsync();
-            bool IsHighContrast = AccessibilitySettings.HighContrast;
+            bool isDark = window?.Content is FrameworkElement rootElement ? IsDarkTheme(rootElement.RequestedTheme) : await IsDarkThemeAsync();
+            bool isHighContrast = AccessibilitySettings.HighContrast;
 
-            Color ForegroundColor = IsDark || IsHighContrast ? Colors.White : Colors.Black;
-            Color BackgroundColor = IsHighContrast ? Color.FromArgb(255, 0, 0, 0) : IsDark ? Color.FromArgb(255, 32, 32, 32) : Color.FromArgb(255, 243, 243, 243);
+            Color foregroundColor = isDark || isHighContrast ? Colors.White : Colors.Black;
+            Color backgroundColor = isHighContrast ? Color.FromArgb(255, 0, 0, 0) : isDark ? Color.FromArgb(255, 32, 32, 32) : Color.FromArgb(255, 243, 243, 243);
 
-            bool ExtendViewIntoTitleBar = window.ExtendsContentIntoTitleBar;
-            AppWindowTitleBar TitleBar = window.AppWindow.TitleBar;
-            TitleBar.ForegroundColor = TitleBar.ButtonForegroundColor = ForegroundColor;
-            TitleBar.BackgroundColor = TitleBar.InactiveBackgroundColor = BackgroundColor;
-            TitleBar.ButtonBackgroundColor = TitleBar.ButtonInactiveBackgroundColor = ExtendViewIntoTitleBar ? Colors.Transparent : BackgroundColor;
+            bool extendsContentIntoTitleBar = window.ExtendsContentIntoTitleBar;
+            AppWindowTitleBar titleBar = window.AppWindow.TitleBar;
+            titleBar.ForegroundColor = titleBar.ButtonForegroundColor = foregroundColor;
+            titleBar.BackgroundColor = titleBar.InactiveBackgroundColor = backgroundColor;
+            titleBar.ButtonBackgroundColor = titleBar.ButtonInactiveBackgroundColor = extendsContentIntoTitleBar ? Colors.Transparent : backgroundColor;
         }
     }
 }

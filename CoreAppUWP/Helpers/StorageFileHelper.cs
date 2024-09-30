@@ -142,10 +142,7 @@ namespace CoreAppUWP.Helpers
             string fileName,
             CreationCollisionOption options = CreationCollisionOption.ReplaceExisting)
         {
-            if (fileLocation == null)
-            {
-                throw new ArgumentNullException(nameof(fileLocation));
-            }
+            ArgumentNullException.ThrowIfNull(fileLocation);
 
             if (string.IsNullOrWhiteSpace(fileName))
             {
@@ -285,10 +282,7 @@ namespace CoreAppUWP.Helpers
             string fileName,
             CreationCollisionOption options = CreationCollisionOption.ReplaceExisting)
         {
-            if (fileLocation == null)
-            {
-                throw new ArgumentNullException(nameof(fileLocation));
-            }
+            ArgumentNullException.ThrowIfNull(fileLocation);
 
             if (string.IsNullOrWhiteSpace(fileName))
             {
@@ -652,9 +646,9 @@ namespace CoreAppUWP.Helpers
         /// </exception>
         internal static async Task<bool> FileExistsInSubtreeAsync(StorageFolder rootFolder, string fileName)
         {
-            if (fileName.IndexOf('"') >= 0)
+            if (fileName.Contains('"'))
             {
-                throw new ArgumentException(nameof(fileName));
+                throw new ArgumentException(null, nameof(fileName));
             }
 
             QueryOptions options = new()
