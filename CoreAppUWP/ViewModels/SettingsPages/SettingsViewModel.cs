@@ -19,7 +19,7 @@ using WinRT;
 
 namespace CoreAppUWP.ViewModels.SettingsPages
 {
-    public class SettingsViewModel : INotifyPropertyChanged
+    public partial class SettingsViewModel : INotifyPropertyChanged
     {
         public static ConditionalWeakTable<DispatcherQueue, SettingsViewModel> Caches { get; } = [];
 

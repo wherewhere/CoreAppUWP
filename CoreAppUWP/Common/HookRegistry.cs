@@ -9,30 +9,68 @@ using Detours = Microsoft.Detours.PInvoke;
 
 namespace CoreAppUWP.Common
 {
-    public class HookRegistry : IDisposable
+    /// <summary>
+    /// Represents a hook for getting the value of the <c>HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\WinUI\Xaml\EnableUWPWindow</c> registry key always returning <see langword="00000001"/>.
+    /// </summary>
+    public partial class HookRegistry : IDisposable
     {
+        /// <summary>
+        /// The value that indicates whether the class has been disposed.
+        /// </summary>
         private bool disposed;
+
+        /// <summary>
+        /// The reference count for the hook.
+        /// </summary>
         private static int refCount;
+
+        /// <summary>
+        /// The dictionary that maps the <see cref="HKEY"/> to a value that indicates whether the key is a real key.
+        /// </summary>
         private static readonly Dictionary<HKEY, bool> xamlKeyMap = [];
+
+        /// <summary>
+        /// The object used to synchronize access to the <see cref="xamlKeyMap"/> dictionary.
+        /// </summary>
         private static readonly object locker = new();
 
+        /// <remarks>The original <see cref="PInvoke.RegOpenKeyEx(HKEY, PCWSTR, uint, REG_SAM_FLAGS, HKEY*)"/> function.</remarks>
+        /// <inheritdoc cref="PInvoke.RegOpenKeyEx(HKEY, PCWSTR, uint, REG_SAM_FLAGS, HKEY*)"/>
         private static unsafe delegate* unmanaged[Stdcall]<HKEY, PCWSTR, uint, REG_SAM_FLAGS, HKEY*, WIN32_ERROR> RegOpenKeyExW;
+
+        /// <remarks>The original <see cref="PInvoke.RegCloseKey(HKEY)"/> function.</remarks>
+        /// <inheritdoc cref="PInvoke.RegCloseKey(HKEY)"/>
         private static unsafe delegate* unmanaged[Stdcall]<HKEY, WIN32_ERROR> RegCloseKey;
+
+        /// <remarks>The original <see cref="PInvoke.RegQueryValueEx(HKEY, PCWSTR, uint*, REG_VALUE_TYPE*, byte*, uint*)"/> function.</remarks>
+        /// <inheritdoc cref="PInvoke.RegQueryValueEx(HKEY, PCWSTR, uint*, REG_VALUE_TYPE*, byte*, uint*)"/>
         private static unsafe delegate* unmanaged[Stdcall]<HKEY, PCWSTR, uint*, REG_VALUE_TYPE*, byte*, uint*, WIN32_ERROR> RegQueryValueExW;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="HookRegistry"/> class.
+        /// </summary>
         public HookRegistry()
         {
             refCount++;
             StartHook();
         }
 
+        /// <summary>
+        /// Finalizes this instance of the <see cref="HookRegistry"/> class.
+        /// </summary>
         ~HookRegistry()
         {
             Dispose();
         }
 
+        /// <summary>
+        /// Gets the value that indicates whether the hook is active.
+        /// </summary>
         public static bool IsHooked { get; private set; }
 
+        /// <summary>
+        /// Starts the hook for the <see cref="PInvoke.AppPolicyGetWindowingModel(HANDLE, AppPolicyWindowingModel*)"/> function.
+        /// </summary>
         private static unsafe void StartHook()
         {
             if (!IsHooked)
@@ -69,6 +107,9 @@ namespace CoreAppUWP.Common
             }
         }
 
+        /// <summary>
+        /// Ends the hook for the <see cref="PInvoke.AppPolicyGetWindowingModel(HANDLE, AppPolicyWindowingModel*)"/> function.
+        /// </summary>
         public static unsafe void EndHook()
         {
             if (--refCount == 0 && IsHooked)
@@ -96,6 +137,8 @@ namespace CoreAppUWP.Common
             }
         }
 
+        /// <remarks>The overridden <see cref="PInvoke.RegOpenKeyEx(HKEY, PCWSTR, uint, REG_SAM_FLAGS, HKEY*)"/> function.</remarks>
+        /// <inheritdoc cref="PInvoke.RegOpenKeyEx(HKEY, PCWSTR, uint, REG_SAM_FLAGS, HKEY*)"/>
         [UnmanagedCallersOnly(CallConvs = [typeof(CallConvStdcall)])]
         private static unsafe WIN32_ERROR OverrideRegOpenKeyExW(HKEY hKey, PCWSTR lpSubKey, uint ulOptions, REG_SAM_FLAGS samDesired, HKEY* phkResult)
         {
@@ -117,6 +160,8 @@ namespace CoreAppUWP.Common
             return result;
         }
 
+        /// <remarks>The overridden <see cref="PInvoke.RegCloseKey(HKEY)"/> function.</remarks>
+        /// <inheritdoc cref="PInvoke.RegCloseKey(HKEY)"/>
         [UnmanagedCallersOnly(CallConvs = [typeof(CallConvStdcall)])]
         private static unsafe WIN32_ERROR OverrideRegCloseKey(HKEY hKey)
         {
@@ -137,6 +182,8 @@ namespace CoreAppUWP.Common
             }
         }
 
+        /// <remarks>The overridden <see cref="PInvoke.RegQueryValueEx(HKEY, PCWSTR, uint*, REG_VALUE_TYPE*, byte*, uint*)"/> function.</remarks>
+        /// <inheritdoc cref="PInvoke.RegQueryValueEx(HKEY, PCWSTR, uint*, REG_VALUE_TYPE*, byte*, uint*)"/>
         [UnmanagedCallersOnly(CallConvs = [typeof(CallConvStdcall)])]
         private static unsafe WIN32_ERROR OverrideRegQueryValueExW(HKEY hKey, PCWSTR lpValueName, [Optional] uint* lpReserved, [Optional] REG_VALUE_TYPE* lpType, [Optional] byte* lpData, [Optional] uint* lpcbData)
         {
@@ -205,6 +252,7 @@ namespace CoreAppUWP.Common
             return RegQueryValueExW(hKey, lpValueName, lpReserved, lpType, lpData, lpcbData);
         }
 
+        /// <inheritdoc/>
         public void Dispose()
         {
             if (!disposed && IsHooked)
