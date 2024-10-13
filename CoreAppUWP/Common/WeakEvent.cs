@@ -34,15 +34,12 @@ namespace CoreAppUWP.Common
                     && _reference.Target == callback.Target
                     && _method == callback.GetMethodInfo();
 
-            public override bool Equals(object obj)
+            public override bool Equals(object obj) => obj switch
             {
-                return obj switch
-                {
-                    Method other => Equals(other),
-                    Action<TEventArgs> callback => Equals(callback),
-                    _ => false,
-                };
-            }
+                Method other => Equals(other),
+                Action<TEventArgs> callback => Equals(callback),
+                _ => false,
+            };
 
             public override int GetHashCode() => (_reference, _method).GetHashCode();
 

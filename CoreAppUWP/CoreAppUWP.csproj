@@ -17,7 +17,7 @@
     <TrimMode>partial</TrimMode>
     <UseWinUI>True</UseWinUI>
     <VersionPrefix>0.0.1</VersionPrefix>
-    <WindowsSdkPackageVersion>10.0.22621.42</WindowsSdkPackageVersion>
+    <WindowsSdkPackageVersion>10.0.22621.48</WindowsSdkPackageVersion>
   </PropertyGroup>
 
   <ItemGroup>

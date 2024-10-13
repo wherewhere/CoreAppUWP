@@ -31,7 +31,7 @@ body:
       required: true
     attributes:
       label: App version
-      description: Specify the version of Coolapk Lite you're using.
+      description: Specify the version of CoreAppUWP you're using.
       options:
         - "0.0.1"
   - type: dropdown

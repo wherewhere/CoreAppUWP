@@ -65,7 +65,7 @@ namespace CoreAppUWP.Common
         IThreadSwitcher IThreadSwitcher.GetAwaiter() => this;
 
         /// <inheritdoc/>
-        public void OnCompleted(Action continuation) => _ = Dispatcher.RunAsync(Priority, () => continuation());
+        public void OnCompleted(Action continuation) => _ = Dispatcher.RunAsync(Priority, continuation.Invoke);
     }
 
     /// <summary>
@@ -89,7 +89,7 @@ namespace CoreAppUWP.Common
         IThreadSwitcher IThreadSwitcher.GetAwaiter() => this;
 
         /// <inheritdoc/>
-        public void OnCompleted(Action continuation) => _ = Dispatcher.TryEnqueue(Priority, () => continuation());
+        public void OnCompleted(Action continuation) => _ = Dispatcher.TryEnqueue(Priority, continuation.Invoke);
     }
 
     /// <summary>
