@@ -73,7 +73,4 @@
       <UseLowTrustEntryPoint>true</UseLowTrustEntryPoint>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Content Include="Assets\**" />
-  </ItemGroup>
 </Project>

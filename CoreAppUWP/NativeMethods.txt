@@ -42,6 +42,7 @@ GetWindowTextLength
 LoadCursor
 LoadImage
 PeekMessage
+PostQuitMessage
 RegisterClassEx
 SendMessage
 SetWindowPos

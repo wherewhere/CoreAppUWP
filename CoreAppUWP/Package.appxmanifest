@@ -22,6 +22,7 @@
 
   <Dependencies>
     <TargetDeviceFamily Name="Windows.Universal" MinVersion="10.0.17763.0" MaxVersionTested="10.0.19041.0" />
+    <PackageDependency Name="Microsoft.UI.Xaml.2.8" MinVersion="8.2310.30001.0" Publisher="CN=Microsoft Corporation, O=Microsoft Corporation, L=Redmond, S=Washington, C=US" />
   </Dependencies>
 
   <Resources>
@@ -31,7 +32,7 @@
   <Applications>
     <Application Id="App"
       Executable="$targetnametoken$.exe"
-      EntryPoint="CoreAppUWP.App">
+      EntryPoint="$targetentrypoint$">
       <uap:VisualElements
         DisplayName="CoreAppUWP"
         Description="UWP running on .net core app"

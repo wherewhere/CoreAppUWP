@@ -37,13 +37,16 @@ namespace CoreAppUWP.Common
     /// The interface of helper type for switch thread.
     /// </summary>
     /// <typeparam name="T">The type of the result of <see cref="GetAwaiter"/>.</typeparam>
-    public interface IThreadSwitcher<out T> : IThreadSwitcher
+    public interface IThreadSwitcher<out T> : IThreadSwitcher where T : IThreadSwitcher
     {
         /// <summary>
         /// Gets an awaiter used to await <typeparamref name="T"/>.
         /// </summary>
         /// <returns>A <typeparamref name="T"/> awaiter instance.</returns>
         new T GetAwaiter();
+
+        /// <inheritdoc/>
+        IThreadSwitcher IThreadSwitcher.GetAwaiter() => GetAwaiter();
     }
 
     /// <summary>
@@ -64,10 +67,7 @@ namespace CoreAppUWP.Common
         public CoreDispatcherThreadSwitcher GetAwaiter() => this;
 
         /// <inheritdoc/>
-        IThreadSwitcher IThreadSwitcher.GetAwaiter() => this;
-
-        /// <inheritdoc/>
-        public void OnCompleted(Action continuation) => _ = Dispatcher.RunAsync(Priority, () => continuation());
+        public void OnCompleted(Action continuation) => _ = Dispatcher.RunAsync(Priority, continuation.Invoke);
     }
 
     /// <summary>
@@ -89,10 +89,7 @@ namespace CoreAppUWP.Common
         public DispatcherQueueThreadSwitcher GetAwaiter() => this;
 
         /// <inheritdoc/>
-        IThreadSwitcher IThreadSwitcher.GetAwaiter() => this;
-
-        /// <inheritdoc/>
-        public void OnCompleted(Action continuation) => _ = Dispatcher.TryEnqueue(Priority, () => continuation());
+        public void OnCompleted(Action continuation) => _ = Dispatcher.TryEnqueue(Priority, continuation.Invoke);
     }
 
     /// <summary>
@@ -113,9 +110,6 @@ namespace CoreAppUWP.Common
         public SynchronizationContextThreadSwitcher GetAwaiter() => this;
 
         /// <inheritdoc/>
-        IThreadSwitcher IThreadSwitcher.GetAwaiter() => this;
-
-        /// <inheritdoc/>
         public void OnCompleted(Action continuation) => Context.Post(_ => continuation(), null);
     }
 
@@ -134,9 +128,6 @@ namespace CoreAppUWP.Common
 
         /// <inheritdoc/>
         public ThreadPoolThreadSwitcher GetAwaiter() => this;
-
-        /// <inheritdoc/>
-        IThreadSwitcher IThreadSwitcher.GetAwaiter() => this;
 
         /// <inheritdoc/>
         public void OnCompleted(Action continuation) => _ = ThreadPool.RunAsync(_ => continuation(), Priority);

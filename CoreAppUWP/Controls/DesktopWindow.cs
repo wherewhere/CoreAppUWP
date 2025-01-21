@@ -18,16 +18,21 @@ using WinRT;
 
 namespace CoreAppUWP.Controls
 {
+    /// <summary>
+    /// Represents a system-managed container for the content of an app.
+    /// </summary>
     public partial class DesktopWindow
     {
-        private bool m_bMinimizedOrHidden = false;
-        private bool m_closed = false;
+        private bool m_bIsClosed = false;
         private DesktopWindowXamlSource m_source;
         private IDesktopWindowXamlSourceNative m_native;
 
         private readonly HWND m_hwnd;
         private readonly WNDCLASSEXW m_wndClassEx;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DesktopWindow"/> class.
+        /// </summary>
         public DesktopWindow()
         {
             m_wndClassEx = RegisterDesktopWindowClass(WNDPROC);
@@ -104,10 +109,20 @@ namespace CoreAppUWP.Controls
             }
         }
 
+        /// <summary>
+        /// Occurs when the window has closed.
+        /// </summary>
         public event TypedEventHandler<DesktopWindow, object> Closed;
 
+        /// <summary>
+        /// Shows the window and activates it.
+        /// </summary>
         public void Show() => _ = PInvoke.ShowWindow(m_hwnd, SHOW_WINDOW_CMD.SW_NORMAL);
 
+        /// <summary>
+        /// Sets the icon for the window, using the specified icon path.
+        /// </summary>
+        /// <param name="iconPath">The path of the icon.</param>
         public unsafe void SetIcon(string iconPath)
         {
             fixed (char* ptr = iconPath)
@@ -127,55 +142,28 @@ namespace CoreAppUWP.Controls
                     _ = PInvoke.FillRect(hdc, rect, new DefaultSafeHandle(PInvoke.GetStockObject(GET_STOCK_OBJECT_FLAGS.WHITE_BRUSH)));
                     _ = PInvoke.EndPaint(hWnd, ps);
                     return new LRESULT();
-                case PInvoke.WM_CLOSE when m_closed:
+                case PInvoke.WM_CLOSE when m_bIsClosed:
                     goto default;
                 case PInvoke.WM_CLOSE:
-                    m_closed = true;
+                    m_bIsClosed = true;
                     Closed?.Invoke(this, null);
                     goto default;
                 case PInvoke.WM_SIZE:
-                    return OnSizeChanged(wParam);
+                    ResizeWindowToDesktopWindowXamlSourceWindowDimensions();
+                    return new LRESULT();
                 case PInvoke.WM_CREATE:
+                    return new LRESULT();
                 case PInvoke.WM_DESTROY:
+                    PInvoke.PostQuitMessage(0);
                     return new LRESULT();
                 default:
                     return PInvoke.DefWindowProc(hWnd, message, wParam, lParam);
             }
         }
 
-        private LRESULT OnSizeChanged(WPARAM wParam)
-        {
-            ResizeWindowToDesktopWindowXamlSourceWindowDimensions();
-            //RaiseWindowSizeChangedEvent();
-
-            switch (wParam.Value)
-            {
-                case PInvoke.SIZE_RESTORED:
-                case PInvoke.SIZE_MAXIMIZED:
-                    {
-                        if (m_bMinimizedOrHidden)
-                        {
-                            m_bMinimizedOrHidden = false;
-                            //RaiseWindowVisibilityChangedEvent(true /* visible */);
-                        }
-                    }
-                    break;
-                case PInvoke.SIZE_MINIMIZED:
-                    {
-                        if (!m_bMinimizedOrHidden)
-                        {
-                            m_bMinimizedOrHidden = true;
-                            //RaiseWindowVisibilityChangedEvent(false /* visible */);
-                        }
-                    }
-                    break;
-            }
-
-            return new LRESULT();
-        }
-
         private void ResizeWindowToDesktopWindowXamlSourceWindowDimensions()
         {
+            if (m_bIsClosed) return;
             _ = PInvoke.GetClientRect(m_hwnd, out RECT rect);
             _ = PInvoke.SetWindowPos(
                 m_native.WindowHandle,
