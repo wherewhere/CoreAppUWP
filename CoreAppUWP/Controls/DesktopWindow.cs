@@ -2,6 +2,7 @@
 using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using System.Runtime.InteropServices.Marshalling;
 using System.Runtime.Versioning;
 using System.Threading;
 using System.Threading.Tasks;
@@ -166,7 +167,7 @@ namespace CoreAppUWP.Controls
             if (m_bIsClosed) return;
             _ = PInvoke.GetClientRect(m_hwnd, out RECT rect);
             _ = PInvoke.SetWindowPos(
-                m_native.WindowHandle,
+                m_native.WindowHandle(),
                 new HWND(),
                 0, 0,
                 rect.Width, rect.Height,
@@ -280,6 +281,47 @@ namespace CoreAppUWP.Controls
             }.Start();
 
             return taskCompletionSource.Task;
+        }
+    }
+}
+
+namespace Windows.Win32.System.WinRT.Xaml
+{
+    [GeneratedComInterface]
+    [Guid("3CBCF1BF-2F76-4E9C-96AB-E84B37972554")]
+    internal partial interface IDesktopWindowXamlSourceNative
+    {
+        /// <summary>
+        /// Attaches the current **IDesktopWindowXamlSourceNative** instance to a parent UI element in your desktop app that is associated with a window handle.
+        /// </summary>
+        /// <param name="parentWnd">
+        /// <para>Type: **HWND** The window handle of the parent UI element in which you want to host a WinRT XAML control.</para>
+        /// <para><see href="https://learn.microsoft.com/windows/win32/api/windows.ui.xaml.hosting.desktopwindowxamlsource/nf-windows-ui-xaml-hosting-desktopwindowxamlsource-idesktopwindowxamlsourcenative-attachtowindow#parameters">Read more on docs.microsoft.com</see>.</para>
+        /// </param>
+        /// <returns>If this method succeeds, it returns S_OK. Otherwise, it returns an **HRESULT** error code.</returns>
+        /// <remarks>
+        /// <para>For a code example that demonstrates how to use this method, see [XamlBridge.cpp](https://github.com/microsoft/Xaml-Islands-Samples/blob/master/Samples/Win32/SampleCppApp/XamlBridge.cpp) in the SampleCppApp sample in the XAML Island samples repo. > [!IMPORTANT] > Make sure that your code calls the **AttachToWindow** method only once per [DesktopWindowXamlSource](/uwp/api/windows.ui.xaml.hosting.desktopwindowxamlsource) object. Calling this method more than once for a **DesktopWindowXamlSource** object could result in a memory leak.</para>
+        /// <para><see href="https://learn.microsoft.com/windows/win32/api/windows.ui.xaml.hosting.desktopwindowxamlsource/nf-windows-ui-xaml-hosting-desktopwindowxamlsource-idesktopwindowxamlsourcenative-attachtowindow#">Read more on docs.microsoft.com</see>.</para>
+        /// </remarks>
+        [PreserveSig]
+        [return: MarshalAs(UnmanagedType.Error)]
+        int AttachToWindow(nint parentWnd);
+
+        /// <summary>
+        /// Gets the window handle of the parent UI element that is associated with the current IDesktopWindowXamlSourceNative instance.
+        /// </summary>
+        /// <returns>If this method succeeds, it returns S_OK. Otherwise, it returns an **HRESULT** error code.</returns>
+        [PreserveSig]
+        [return: MarshalAs(UnmanagedType.Error)]
+        int get_WindowHandle(out nint hWnd);
+    }
+
+    file static class Extensions
+    {
+        public static HWND WindowHandle(this IDesktopWindowXamlSourceNative source)
+        {
+            _ = source.get_WindowHandle(out nint hWnd);
+            return new HWND(hWnd);
         }
     }
 }

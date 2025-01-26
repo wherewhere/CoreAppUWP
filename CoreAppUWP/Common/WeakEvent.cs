@@ -52,7 +52,7 @@ namespace CoreAppUWP.Common
 
         public WeakEvent() => _list = [];
 
-        public WeakEvent(IEnumerable<Action<TEventArgs>> collection) => _list = new List<Method>(collection.Select<Action<TEventArgs>, Method>(x => x));
+        public WeakEvent(IEnumerable<Action<TEventArgs>> collection) => _list = [.. collection.Select<Action<TEventArgs>, Method>(x => x)];
 
         public WeakEvent(int capacity) => _list = new List<Method>(capacity);
 
