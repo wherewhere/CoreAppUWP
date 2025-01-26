@@ -147,7 +147,7 @@ namespace CoreAppUWP.Common
             {
                 if (result == WIN32_ERROR.ERROR_FILE_NOT_FOUND)
                 {
-                    HKEY key = new(HANDLE.INVALID_HANDLE_VALUE);
+                    HKEY key = new((nint)HANDLE.INVALID_HANDLE_VALUE);
                     xamlKeyMap[key] = false;
                     *phkResult = key;
                     result = WIN32_ERROR.ERROR_SUCCESS;

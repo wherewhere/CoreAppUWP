@@ -7,6 +7,8 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Hosting;
 using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
+using System.Runtime.InteropServices.Marshalling;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.Core;
 using Windows.UI.Core;
@@ -91,7 +93,7 @@ namespace CoreAppUWP.Helpers
         {
             if (!ActiveAppWindows.TryGetValue(window, out AppWindow appWindow))
             {
-                HWND handle = window.As<ICoreWindowInterop>().WindowHandle;
+                HWND handle = window.As<ICoreWindowInterop>().WindowHandle();
                 WindowId id = Win32Interop.GetWindowIdFromWindow(handle);
                 appWindow = AppWindow.GetFromWindowId(id);
                 window.Closed += (sender, args) =>
@@ -107,5 +109,38 @@ namespace CoreAppUWP.Helpers
         public static Dictionary<CoreDispatcher, Window> ActiveWindows { get; } = [];
         public static Dictionary<CoreWindow, AppWindow> ActiveAppWindows { get; } = [];
         public static Dictionary<XamlRoot, DesktopWindow> ActiveDesktopWindows { get; } = [];
+    }
+}
+
+namespace Windows.Win32.System.WinRT
+{
+    [GeneratedComInterface]
+    [Guid("45D64A29-A63E-4CB6-B498-5781D298CB4F")]
+    internal partial interface ICoreWindowInterop
+    {
+        /// <summary>
+        /// Obtains the handle (HWND) to the CoreWindow for an app.
+        /// </summary>
+        /// <remarks>
+        /// <para><see href="https://learn.microsoft.com/windows/win32/api/corewindow/nf-corewindow-icorewindowinterop-get_windowhandle">Learn more about this API from docs.microsoft.com</see>.</para>
+        /// </remarks>
+        void get_WindowHandle(out nint hwnd);
+
+        /// <summary>
+        /// Sets whether or not the message to the CoreWindow has been handled. (ICoreWindowInterop.put_MessageHandled)
+        /// </summary>
+        /// <remarks>
+        /// <para><see href="https://learn.microsoft.com/windows/win32/api/corewindow/nf-corewindow-icorewindowinterop-put_messagehandled">Learn more about this API from docs.microsoft.com</see>.</para>
+        /// </remarks>
+        void put_MessageHandled([MarshalAs(UnmanagedType.Bool)] bool value);
+    }
+
+    file static class Extensions
+    {
+        public static HWND WindowHandle(this ICoreWindowInterop interop)
+        {
+            interop.get_WindowHandle(out nint hwnd);
+            return new HWND(hwnd);
+        }
     }
 }
