@@ -1,7 +1,6 @@
 ﻿<ResourceDictionary xmlns="using:Windows.UI.Xaml">
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="ms-appx:///Styles/Button.xaml" />
-        <ResourceDictionary Source="ms-appx:///Controls/SettingsCard/SettingsCard.ThemeResources.xaml" />
-        <ResourceDictionary Source="ms-appx:///Controls/SettingsExpander/SettingsExpander.ThemeResources.xaml" />
+        <ResourceDictionary Source="ms-appx:///Styles/SettingsCard.xaml" />
     </ResourceDictionary.MergedDictionaries>
 </ResourceDictionary>
