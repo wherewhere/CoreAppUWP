@@ -6,7 +6,6 @@
     xmlns:clwm="using:CommunityToolkit.Labs.WinUI.MarkdownTextBlock"
     xmlns:common="using:CoreAppUWP.Common"
     xmlns:controls="using:CoreAppUWP.Controls"
-    xmlns:converters="using:CommunityToolkit.WinUI.Converters"
     xmlns:cwuc="using:CommunityToolkit.WinUI.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:helpers="using:CoreAppUWP.Helpers"
@@ -17,9 +16,6 @@
     DataContext="{x:Bind Provider, Mode=OneWay}"
     NavigationCacheMode="Enabled"
     mc:Ignorable="d">
-    <Page.Resources>
-        <converters:BoolNegationConverter x:Key="BoolNegationConverter" />
-    </Page.Resources>
     <Grid
         x:Name="RootGrid"
         Padding="20,20,0,0"
@@ -388,19 +384,11 @@
                                 <clwm:MarkdownTextBlock
                                     x:Name="AboutMarkdown"
                                     HorizontalAlignment="Left"
-                                    x:Load="{x:Bind IsCoreWindow}"
                                     Text="{x:Bind Provider.AboutTextBlockText, Mode=OneWay}">
                                     <clwm:MarkdownTextBlock.Config>
                                         <clwm:MarkdownConfig />
                                     </clwm:MarkdownTextBlock.Config>
                                 </clwm:MarkdownTextBlock>
-                                <TextBlock
-                                    x:Name="AboutTextBlock"
-                                    HorizontalAlignment="Left"
-                                    x:Load="{x:Bind IsCoreWindow, Converter={StaticResource BoolNegationConverter}}"
-                                    IsTextSelectionEnabled="True"
-                                    Text="{x:Bind Provider.AboutTextBlockText, Mode=OneWay}"
-                                    TextWrapping="Wrap" />
                             </Grid>
                         </cwuc:SettingsExpander.Items>
                     </cwuc:SettingsExpander>
