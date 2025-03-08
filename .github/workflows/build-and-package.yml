@@ -11,10 +11,10 @@ on:
   workflow_dispatch:
 
 env:
-  DOTNET_VERSION: '8.0.x' # The .NET SDK version to use
+  DOTNET_VERSION: '9.0.x' # The .NET SDK version to use
 
 jobs:
-  build-and-test:
+  build-and-package:
 
     name: build-and-package
     runs-on: windows-latest
@@ -22,12 +22,22 @@ jobs:
     env:
       Solution_Name: CoreAppUWP.sln
       Project_Directory: CoreAppUWP
+      Signing_Certificate: CoreAppUWP_TemporaryKey.pfx
 
     steps:
     - name: Checkout
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
+
+    # Decode the base 64 encoded pfx and save the Signing_Certificate
+    - name: Decode the pfx
+      run: |
+        $pfx_cert_byte = [System.Convert]::FromBase64String("$env:Certificate")
+        $certificatePath = Join-Path -Path $env:Project_Directory -ChildPath $env:Signing_Certificate
+        [IO.File]::WriteAllBytes("$certificatePath", $pfx_cert_byte)
+      env:
+        Certificate: ${{ secrets.Base64_Encoded_Pfx }}
 
     # Install the .NET Core App workload
     - name: Install .NET Core App
@@ -63,7 +73,10 @@ jobs:
         /p:AppxBundle=$env:Appx_Bundle `
         /p:AppxPackageDir="$env:Appx_Package_Dir" `
         /p:GenerateAppxPackageOnBuild=true `
-        /p:AppxPackageSigningEnabled=false
+        /p:AppxPackageSigningEnabled=true `
+        /p:PackageCertificateThumbprint="$env:Thumbprint" `
+        /p:PackageCertificateKeyFile=$env:Signing_Certificate `
+        /p:PackageCertificatePassword="$env:Password"
       env:
         Appx_Bundle: Always
         Appx_Bundle_Platforms: x64|ARM64
@@ -71,6 +84,8 @@ jobs:
         Appx_Package_Dir: AppxPackages\
         Configuration: Release
         Platform: 'x64'
+        Thumbprint: 0CDF4A03E9BE9DD789894BB3C7AD3DEDECD9AB25
+        Password: ${{ secrets.Password }}
 
     # Upload the MSIX package: https://github.com/marketplace/actions/upload-a-build-artifact
     - name: Upload build artifacts
