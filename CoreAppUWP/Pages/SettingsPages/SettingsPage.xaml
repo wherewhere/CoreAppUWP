@@ -48,6 +48,7 @@
                             <HyperlinkButton
                                 Click="HyperlinkButton_Click"
                                 Content="Windows Color Settings"
+                                Style="{StaticResource TextHyperlinkButtonStyle}"
                                 Tag="ms-settings:colors"
                                 ToolTipService.ToolTip="{Binding Tag, RelativeSource={RelativeSource Mode=Self}}" />
                         </cwuc:SettingsCard.Description>
@@ -226,6 +227,7 @@
                                     <RowDefinition Height="Auto" />
                                     <RowDefinition Height="Auto" />
                                     <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
                                 </Grid.RowDefinitions>
                                 <TextBlock
                                     Grid.Row="0"
@@ -283,9 +285,22 @@
                                     Grid.Row="4"
                                     Grid.Column="0"
                                     Foreground="{ThemeResource TextFillColorPrimaryBrush}"
-                                    Text="OS Platform" />
+                                    Text="Windows UI" />
                                 <TextBlock
                                     Grid.Row="4"
+                                    Grid.Column="1"
+                                    HorizontalAlignment="Left"
+                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                    IsTextSelectionEnabled="True"
+                                    Text="{x:Bind settingspages:SettingsViewModel.WinUIVersion}"
+                                    TextWrapping="Wrap" />
+                                <TextBlock
+                                    Grid.Row="5"
+                                    Grid.Column="0"
+                                    Foreground="{ThemeResource TextFillColorPrimaryBrush}"
+                                    Text="OS Platform" />
+                                <TextBlock
+                                    Grid.Row="5"
                                     Grid.Column="1"
                                     HorizontalAlignment="Left"
                                     Foreground="{ThemeResource TextFillColorSecondaryBrush}"
@@ -293,12 +308,12 @@
                                     Text="{x:Bind interopservices:RuntimeInformation.OSDescription}"
                                     TextWrapping="Wrap" />
                                 <TextBlock
-                                    Grid.Row="5"
+                                    Grid.Row="6"
                                     Grid.Column="0"
                                     Foreground="{ThemeResource TextFillColorPrimaryBrush}"
                                     Text="OS Architecture" />
                                 <TextBlock
-                                    Grid.Row="5"
+                                    Grid.Row="6"
                                     Grid.Column="1"
                                     HorizontalAlignment="Left"
                                     Foreground="{ThemeResource TextFillColorSecondaryBrush}"
@@ -321,6 +336,9 @@
                                 VerticalScrollBarVisibility="Disabled"
                                 VerticalScrollMode="Disabled">
                                 <StackPanel Orientation="Horizontal" Spacing="4">
+                                    <StackPanel.Resources>
+                                        <Style BasedOn="{StaticResource TextHyperlinkButtonStyle}" TargetType="HyperlinkButton" />
+                                    </StackPanel.Resources>
                                     <HyperlinkButton
                                         Content="Feedback"
                                         NavigateUri="https://github.com/wherewhere/CoreAppUWP/issues"

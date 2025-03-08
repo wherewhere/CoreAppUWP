@@ -1,4 +1,5 @@
-﻿using MetroLog;
+﻿using CommunityToolkit.Common.Helpers;
+using MetroLog;
 using MetroLog.Targets;
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -6,6 +7,7 @@ using System.IO;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
+using System.Threading.Tasks;
 using Windows.Storage;
 using Windows.UI.Xaml;
 
@@ -16,18 +18,20 @@ namespace CoreAppUWP.Helpers
         public const string SelectedAppTheme = nameof(SelectedAppTheme);
         public const string IsExtendsTitleBar = nameof(IsExtendsTitleBar);
 
-        public static Type Get<Type>(string key) => SystemTextJsonObjectSerializer.Deserialize<Type>(LocalObject.Values[key]?.ToString());
-        public static void Set<Type>(string key, Type value) => LocalObject.Values[key] = SystemTextJsonObjectSerializer.Serialize(value);
+        public static Type Get<Type>(string key) => LocalObject.Read<Type>(key);
+        public static void Set<Type>(string key, Type value) => LocalObject.Save(key, value);
+        public static Task<Type> GetFile<Type>(string key) => LocalObject.ReadFileAsync<Type>($"Settings/{key}");
+        public static Task SetFile<Type>(string key, Type value) => LocalObject.CreateFileAsync($"Settings/{key}", value);
 
         public static void SetDefaultSettings()
         {
-            if (!LocalObject.Values.ContainsKey(SelectedAppTheme))
+            if (!LocalObject.KeyExists(SelectedAppTheme))
             {
-                LocalObject.Values[SelectedAppTheme] = SystemTextJsonObjectSerializer.Serialize(ElementTheme.Default);
+                LocalObject.Save(SelectedAppTheme, ElementTheme.Default);
             }
-            if (!LocalObject.Values.ContainsKey(IsExtendsTitleBar))
+            if (!LocalObject.KeyExists(IsExtendsTitleBar))
             {
-                LocalObject.Values[IsExtendsTitleBar] = SystemTextJsonObjectSerializer.Serialize(true);
+                LocalObject.Save(IsExtendsTitleBar, true);
             }
         }
     }
@@ -35,7 +39,7 @@ namespace CoreAppUWP.Helpers
     public static partial class SettingsHelper
     {
         public static ILogManager LogManager { get; private set; }
-        public static ApplicationDataContainer LocalObject { get; } = ApplicationData.Current.LocalSettings;
+        public static ApplicationDataStorageHelper LocalObject { get; } = ApplicationDataStorageHelper.GetCurrent(new SystemTextJsonObjectSerializer());
 
         static SettingsHelper() => SetDefaultSettings();
 
@@ -52,16 +56,16 @@ namespace CoreAppUWP.Helpers
         }
     }
 
-    public static class SystemTextJsonObjectSerializer
+    public class SystemTextJsonObjectSerializer : IObjectSerializer
     {
-        public static string Serialize<T>(T value) => value switch
+        public string Serialize<T>(T value) => value switch
         {
             bool => JsonSerializer.Serialize(value, SourceGenerationContext.Default.Boolean),
             ElementTheme => JsonSerializer.Serialize(value, SourceGenerationContext.Default.ElementTheme),
             _ => value?.ToString(),
         };
 
-        public static T Deserialize<T>([StringSyntax(StringSyntaxAttribute.Json)] string value)
+        public T Deserialize<T>([StringSyntax(StringSyntaxAttribute.Json)] string value)
         {
             if (string.IsNullOrEmpty(value)) { return default; }
             Type type = typeof(T);

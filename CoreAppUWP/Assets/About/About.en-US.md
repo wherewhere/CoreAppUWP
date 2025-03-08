@@ -21,3 +21,4 @@
 ##### Citations and References
 - [MetroLog](https://github.com/novotnyllc/MetroLog "MetroLog")
 - [Windows UI](https://github.com/microsoft/microsoft-ui-xaml "Windows UI")
+- [Windows Community Toolkit](https://github.com/CommunityToolkit/Windows "Windows Community Toolkit")

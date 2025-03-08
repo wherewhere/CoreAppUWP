@@ -1,5 +1,6 @@
 ﻿using CoreAppUWP.Common;
 using CoreAppUWP.Helpers;
+using Microsoft.UI.Xaml.Controls;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -23,6 +24,8 @@ namespace CoreAppUWP.ViewModels.SettingsPages
         public static string SDKVersion { get; } = Assembly.GetAssembly(typeof(PackageSignatureKind)).GetName().Version.ToString();
 
         public static string WinRTVersion { get; } = Assembly.GetAssembly(typeof(TrustLevel)).GetName().Version.ToString(3);
+
+        public static string WinUIVersion { get; } = Assembly.GetAssembly(typeof(ControlsResourcesVersion)).GetName().Version.ToString(3);
 
         public static string DeviceFamily { get; } = AnalyticsInfo.VersionInfo.DeviceFamily.Replace('.', ' ');
 

@@ -64,7 +64,7 @@ namespace CoreAppUWP.Pages.SettingsPages
             switch ((sender as FrameworkElement).Tag?.ToString())
             {
                 case "Reset":
-                    SettingsHelper.LocalObject.Values.Clear();
+                    SettingsHelper.LocalObject.Clear();
                     SettingsHelper.SetDefaultSettings();
                     if (Reset.Flyout is Flyout flyout_reset)
                     { flyout_reset.Hide(); }

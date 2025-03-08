@@ -2,6 +2,12 @@
 
     <Style x:Key="HyperlinkButtonStyle" TargetType="HyperlinkButton" />
 
+    <Style x:Key="TextHyperlinkButtonStyle" BasedOn="{StaticResource TextButtonStyle}" TargetType="HyperlinkButton">
+        <Setter Property="FontSize" Value="{ThemeResource SettingsCardDescriptionFontSize}" />
+        <Setter Property="Padding" Value="0,0,0,-1" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+    </Style>
+    
     <Style x:Key="TextButtonStyle" TargetType="ButtonBase">
         <Setter Property="Margin" Value="0" />
         <Setter Property="MinWidth" Value="0" />
