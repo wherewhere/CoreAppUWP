@@ -38,21 +38,18 @@ namespace CoreAppUWP.Helpers
 
     public static partial class SettingsHelper
     {
-        public static ILogManager LogManager { get; private set; }
+        public static ILogManager LogManager { get; } = CreateLogManager();
         public static ApplicationDataStorageHelper LocalObject { get; } = ApplicationDataStorageHelper.GetCurrent(new SystemTextJsonObjectSerializer());
 
         static SettingsHelper() => SetDefaultSettings();
 
-        public static void CreateLogManager()
+        public static ILogManager CreateLogManager()
         {
-            if (LogManager == null)
-            {
-                string path = Path.Combine(ApplicationData.Current.LocalFolder.Path, "MetroLogs");
-                if (!Directory.Exists(path)) { Directory.CreateDirectory(path); }
-                LoggingConfiguration loggingConfiguration = new();
-                loggingConfiguration.AddTarget(LogLevel.Info, LogLevel.Fatal, new StreamingFileTarget(path, 7));
-                LogManager = LogManagerFactory.CreateLogManager(loggingConfiguration);
-            }
+            string path = Path.Combine(ApplicationData.Current.LocalFolder.Path, "MetroLogs");
+            if (!Directory.Exists(path)) { Directory.CreateDirectory(path); }
+            LoggingConfiguration loggingConfiguration = new();
+            loggingConfiguration.AddTarget(LogLevel.Info, LogLevel.Fatal, new StreamingFileTarget(path, 7));
+            return LogManagerFactory.CreateLogManager(loggingConfiguration);
         }
     }
 

@@ -27,35 +27,17 @@ namespace CoreAppUWP.Pages.SettingsPages
     /// </summary>
     public sealed partial class SettingsPage : Page
     {
-        #region Provider
+        private readonly SettingsViewModel Provider;
 
-        /// <summary>
-        /// Identifies the <see cref="Provider"/> dependency property.
-        /// </summary>
-        public static readonly DependencyProperty ProviderProperty =
-            DependencyProperty.Register(
-                nameof(Provider),
-                typeof(SettingsViewModel),
-                typeof(SettingsPage),
-                null);
-
-        /// <summary>
-        /// Get the <see cref="SettingsViewModel"/> of current <see cref="Page"/>.
-        /// </summary>
-        public SettingsViewModel Provider
+        public SettingsPage()
         {
-            get => (SettingsViewModel)GetValue(ProviderProperty);
-            private set => SetValue(ProviderProperty, value);
+            InitializeComponent();
+            Provider = SettingsViewModel.Caches.TryGetValue(Dispatcher, out SettingsViewModel provider) ? provider : new SettingsViewModel(Dispatcher);
         }
-
-        #endregion
-
-        public SettingsPage() => InitializeComponent();
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
-            Provider ??= SettingsViewModel.Caches.TryGetValue(Dispatcher, out SettingsViewModel provider) ? provider : new SettingsViewModel(Dispatcher);
             _ = Refresh();
         }
 

@@ -14,7 +14,7 @@
     xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
     xmlns:settingspages="using:CoreAppUWP.ViewModels.SettingsPages"
     d:DataContext="{d:DesignInstance Type=settingspages:SettingsViewModel}"
-    DataContext="{x:Bind Provider, Mode=OneWay}"
+    DataContext="{x:Bind Provider}"
     NavigationCacheMode="Enabled"
     mc:Ignorable="d">
     <Grid
@@ -325,7 +325,7 @@
                     </cwuc:SettingsExpander>
                 </controls:SettingsGroup>
                 <controls:SettingsGroup Header="About">
-                    <cwuc:SettingsExpander Header="{x:Bind settingspages:SettingsViewModel.VersionTextBlockText, Mode=OneWay}" ItemContainerStyleSelector="{StaticResource SettingsExpanderItemStyleSelector}">
+                    <cwuc:SettingsExpander Header="{x:Bind settingspages:SettingsViewModel.VersionTextBlockText}" ItemContainerStyleSelector="{StaticResource SettingsExpanderItemStyleSelector}">
                         <helpers:SettingsExpanderHelper.HeaderIcon>
                             <controls:AppLogo FontFamily="{StaticResource ContentControlThemeFontFamily}" />
                         </helpers:SettingsExpanderHelper.HeaderIcon>

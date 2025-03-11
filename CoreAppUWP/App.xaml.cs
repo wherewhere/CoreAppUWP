@@ -100,12 +100,6 @@ namespace CoreAppUWP
 
             RegisterExceptionHandlingSynchronizationContext();
 
-            if (!isLoaded)
-            {
-                SettingsHelper.CreateLogManager();
-                isLoaded = true;
-            }
-
             WindowHelper.TrackWindow(window);
 
             // 不要在窗口已包含内容时重复应用程序初始化，
@@ -217,7 +211,5 @@ namespace CoreAppUWP
             SettingsHelper.LogManager?.GetLogger("Unhandled Exception - SynchronizationContext").Error(e.Exception.ExceptionToMessage(), e.Exception);
             e.Handled = true;
         }
-
-        private bool isLoaded;
     }
 }
