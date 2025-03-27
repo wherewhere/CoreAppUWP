@@ -89,13 +89,14 @@ namespace CoreAppUWP
 
         #endregion
 
-        private void EnsureWindow(IActivatedEventArgs e)
+        private static void EnsureWindow(IActivatedEventArgs e)
         {
             if (Window.Current is not Window window) { return; }
 
             if (SynchronizationContext.Current == null)
             {
-                SynchronizationContext.SetSynchronizationContext(new DispatcherQueueSynchronizationContext(window.CoreWindow.DispatcherQueue));
+                DispatcherQueueSynchronizationContext context = new(Window.Current.CoreWindow.DispatcherQueue);
+                SynchronizationContext.SetSynchronizationContext(context);
             }
 
             RegisterExceptionHandlingSynchronizationContext();

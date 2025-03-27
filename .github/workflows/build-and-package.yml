@@ -51,14 +51,15 @@ jobs:
       with:
         msbuild-architecture: x64
 
-    - name: Setup NuGet.exe
-      uses: NuGet/setup-nuget@v2
-
     # Restore the application to populate the obj folder with RuntimeIdentifiers
     - name: Restore the application
-      run: msbuild $env:Solution_Name /t:Restore /p:Configuration=$env:Configuration
+      run: msbuild $env:Solution_Name `
+        /t:Restore `
+        /p:Configuration=$env:Configuration `
+        /p:Platform=$env:Platform
       env:
         Configuration: Release
+        Platform: 'x64'
 
     - name: Nuget restore
       run: nuget restore $env:Solution_Name

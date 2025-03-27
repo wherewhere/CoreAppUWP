@@ -27,15 +27,15 @@ namespace CoreAppUWP.Helpers
 
         #region UISettingChanged
 
-        private static readonly WeakEvent<UISettingChangedType> actions = [];
+        private static readonly WeakEvent<ApplicationTheme> actions = [];
 
-        public static event Action<UISettingChangedType> UISettingChanged
+        public static event Action<ApplicationTheme> UISettingChanged
         {
             add => actions.Add(value);
             remove => actions.Remove(value);
         }
 
-        private static void InvokeUISettingChanged(UISettingChangedType value) => actions.Invoke(value);
+        private static void InvokeUISettingChanged(ApplicationTheme value) => actions.Invoke(value);
 
         #endregion
 
@@ -160,7 +160,7 @@ namespace CoreAppUWP.Helpers
 
             SettingsHelper.Set(SettingsHelper.SelectedAppTheme, value);
             UpdateSystemCaptionButtonColors();
-            InvokeUISettingChanged(await IsDarkThemeAsync() ? UISettingChangedType.DarkMode : UISettingChangedType.LightMode);
+            InvokeUISettingChanged(await IsDarkThemeAsync() ? ApplicationTheme.Dark : ApplicationTheme.Light);
         }
 
         public static async Task SetRootThemeAsync(ElementTheme value)
@@ -194,7 +194,7 @@ namespace CoreAppUWP.Helpers
 
             SettingsHelper.Set(SettingsHelper.SelectedAppTheme, value);
             UpdateSystemCaptionButtonColors();
-            InvokeUISettingChanged(await IsDarkThemeAsync() ? UISettingChangedType.DarkMode : UISettingChangedType.LightMode);
+            InvokeUISettingChanged(await IsDarkThemeAsync() ? ApplicationTheme.Dark : ApplicationTheme.Light);
         }
 
         [SupportedOSPlatform("Windows10.0.18362.0")]
@@ -254,7 +254,7 @@ namespace CoreAppUWP.Helpers
         private static async void UISettings_ColorValuesChanged(UISettings sender, object args)
         {
             UpdateSystemCaptionButtonColors();
-            InvokeUISettingChanged(await IsDarkThemeAsync() ? UISettingChangedType.DarkMode : UISettingChangedType.LightMode);
+            InvokeUISettingChanged(await IsDarkThemeAsync() ? ApplicationTheme.Dark : ApplicationTheme.Light);
         }
 
         public static bool IsDarkTheme() => IsDarkTheme(ActualTheme);
@@ -358,12 +358,5 @@ namespace CoreAppUWP.Helpers
             titleBar.BackgroundColor = titleBar.InactiveBackgroundColor = BackgroundColor;
             titleBar.ButtonBackgroundColor = titleBar.ButtonInactiveBackgroundColor = extendsContentIntoTitleBar ? Colors.Transparent : BackgroundColor;
         }
-    }
-
-    public enum UISettingChangedType
-    {
-        LightMode,
-        DarkMode,
-        NoPicChanged
     }
 }

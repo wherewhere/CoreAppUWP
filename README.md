@@ -8,7 +8,6 @@ UWP running on .NET Core App
 ## Dictionary
 - [CoreAppUWP](#coreappuwp)
   - [Dictionary](#dictionary)
-  - [Unlock WAS](#unlock-was)
   - [Contributors](#contributors)
   - [Credits](#credits)
 
@@ -20,4 +19,4 @@ UWP running on .NET Core App
 - [@gus33000](https://github.com/gus33000 "Gustave Monce") created [CS/WinRT for UWP](https://github.com/gus33000/CsUWP "CsUWP")
 - [@dongle-the-gadget](https://github.com/dongle-the-gadget "Dongle") created [Windows.SDK.NET.Ref for UWP](https://github.com/dongle-the-gadget/CsWinRTProjectionForWindows "CsWinRTProjectionForWindows")
 - [@ahmed605](https://github.com/ahmed605 "Ahmed Walid") created unofficial C#/WinRT based [XAML build tool for UWP](https://www.nuget.org/packages/WindowsXaml.ModernDotNet.BuildTools "WindowsXaml.ModernDotNet.BuildTools")
-- [@driver1998](https://github.com/driver1998 "≥ı…˙÷ÆƒÒ") created official C#/WinRT based [XAML compiler for UWP](https://github.com/driver1998/ModernNetUAP.XamlCompiler "ModernNetUAP.XamlCompiler")
+- [@driver1998](https://github.com/driver1998 "ÂàùÁîü‰πãÈ∏ü") created official C#/WinRT based [XAML compiler for UWP](https://github.com/driver1998/ModernNetUAP.XamlCompiler "ModernNetUAP.XamlCompiler")

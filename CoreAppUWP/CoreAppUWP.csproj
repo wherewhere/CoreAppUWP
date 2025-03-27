@@ -17,10 +17,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="CommunityToolkit.Labs.Uwp.Controls.MarkdownTextBlock" Version="0.1.250305-build.2058" />
+    <PackageReference Include="CommunityToolkit.Labs.Uwp.Controls.MarkdownTextBlock" Version="0.1.250314-build.2076" />
     <PackageReference Include="CommunityToolkit.Uwp.Controls.Primitives" Version="8.2.250129-preview2" />
     <PackageReference Include="CommunityToolkit.Uwp.Controls.SettingsControls" Version="8.2.250129-preview2" />
-    <PackageReference Include="Detours.Win32Metadata" Version="4.0.1.16" />
+    <PackageReference Include="Detours.Win32Metadata" Version="4.0.1.18" />
     <PackageReference Include="MetroLog.Net6" Version="2.1.0" />
     <PackageReference Include="Microsoft.UI.Xaml" Version="2.8.7" />
     <PackageReference Include="Microsoft.Windows.CsWin32" Version="0.3.183" PrivateAssets="all">
