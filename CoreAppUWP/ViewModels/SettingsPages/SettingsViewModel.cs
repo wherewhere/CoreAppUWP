@@ -1,4 +1,5 @@
-﻿using CoreAppUWP.Common;
+﻿using CommunityToolkit.WinUI.Helpers;
+using CoreAppUWP.Common;
 using CoreAppUWP.Helpers;
 using Microsoft.UI.Xaml.Controls;
 using System;

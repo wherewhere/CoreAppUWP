@@ -9,9 +9,6 @@ namespace CoreAppUWP.Pages
     /// </summary>
     public sealed partial class HomePage : Page
     {
-        public HomePage()
-        {
-            this.InitializeComponent();
-        }
+        public HomePage() => InitializeComponent();
     }
 }

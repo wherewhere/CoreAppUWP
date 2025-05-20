@@ -55,12 +55,16 @@ namespace CoreAppUWP.Pages.SettingsPages
                 case "ExitPIP":
                     if (this.IsAppWindow())
                     { _ = this.GetWindowForElement().Presenter.RequestPresentation(AppWindowPresentationKind.Default); }
+                    else if (DesktopWindow.Current is DesktopWindow desktopWindow)
+                    { desktopWindow.AppWindow.SetPresenter(Microsoft.UI.Windowing.AppWindowPresenterKind.Default); }
                     else if (ApplicationView.GetForCurrentView().IsViewModeSupported(ApplicationViewMode.Default))
                     { _ = ApplicationView.GetForCurrentView().TryEnterViewModeAsync(ApplicationViewMode.Default); }
                     break;
                 case "EnterPIP":
                     if (this.IsAppWindow())
                     { _ = this.GetWindowForElement().Presenter.RequestPresentation(AppWindowPresentationKind.CompactOverlay); }
+                    else if (DesktopWindow.Current is DesktopWindow desktopWindow)
+                    { desktopWindow.AppWindow.SetPresenter(Microsoft.UI.Windowing.AppWindowPresenterKind.CompactOverlay); }
                     else if (ApplicationView.GetForCurrentView().IsViewModeSupported(ApplicationViewMode.CompactOverlay))
                     { _ = ApplicationView.GetForCurrentView().TryEnterViewModeAsync(ApplicationViewMode.CompactOverlay); }
                     break;
@@ -92,18 +96,20 @@ namespace CoreAppUWP.Pages.SettingsPages
                     DesktopWindow window = await WindowHelper.CreateWindowAsync(OnLaunched).ConfigureAwait(false);
                     static void OnLaunched(DesktopWindowXamlSource source)
                     {
-                        Frame _frame = new();
-                        source.Content = _frame;
-                        _ = _frame.Navigate(typeof(MainPage), null, new DrillInNavigationTransitionInfo());
-                        ThemeHelper.Initialize(_frame);
+                        Frame frame = new();
+                        source.Content = frame;
+                        _ = frame.Navigate(typeof(MainPage), null, new DrillInNavigationTransitionInfo());
+                        ThemeHelper.Initialize(frame);
                     }
                     window.Title = Package.Current.DisplayName;
-                    window.SetIcon("favicon.ico");
-                    window.Show();
+                    window.AppWindow.SetIcon("favicon.ico");
+                    window.Activate();
                     break;
                 case "ExitFullWindow":
                     if (this.IsAppWindow())
                     { _ = this.GetWindowForElement().Presenter.RequestPresentation(AppWindowPresentationKind.Default); }
+                    else if (DesktopWindow.Current is DesktopWindow desktopWindow)
+                    { desktopWindow.AppWindow.SetPresenter(Microsoft.UI.Windowing.AppWindowPresenterKind.Default); }
                     else
                     { ApplicationView.GetForCurrentView().ExitFullScreenMode(); }
                     break;
@@ -111,9 +117,12 @@ namespace CoreAppUWP.Pages.SettingsPages
                     SettingsPane.Show();
                     break;
                 case "EnterFullWindow":
-                    _ = this.IsAppWindow()
-                        ? this.GetWindowForElement().Presenter.RequestPresentation(AppWindowPresentationKind.FullScreen)
-                        : ApplicationView.GetForCurrentView().TryEnterFullScreenMode();
+                    if (this.IsAppWindow())
+                    { _ = this.GetWindowForElement().Presenter.RequestPresentation(AppWindowPresentationKind.FullScreen); }
+                    else if (DesktopWindow.Current is DesktopWindow desktopWindow)
+                    { desktopWindow.AppWindow.SetPresenter(Microsoft.UI.Windowing.AppWindowPresenterKind.FullScreen); }
+                    else
+                    { _ = ApplicationView.GetForCurrentView().TryEnterFullScreenMode(); }
                     break;
                 default:
                     break;

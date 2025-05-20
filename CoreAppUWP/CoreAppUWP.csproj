@@ -16,16 +16,22 @@
     <VersionPrefix>0.0.1</VersionPrefix>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <MicrosoftWindowsSDKBuildToolsMSIXPackageVersion>1.7.20250508.1</MicrosoftWindowsSDKBuildToolsMSIXPackageVersion>
+  </PropertyGroup>
+
   <ItemGroup>
-    <PackageReference Include="CommunityToolkit.Labs.Uwp.Controls.MarkdownTextBlock" Version="0.1.250314-build.2076" />
-    <PackageReference Include="CommunityToolkit.Uwp.Controls.Primitives" Version="8.2.250129-preview2" />
-    <PackageReference Include="CommunityToolkit.Uwp.Controls.SettingsControls" Version="8.2.250129-preview2" />
+    <PackageReference Include="CommunityToolkit.Labs.Uwp.Controls.MarkdownTextBlock" Version="0.1.250513-build.2126" />
+    <PackageReference Include="CommunityToolkit.Uwp.Controls.Primitives" Version="8.2.250402" />
+    <PackageReference Include="CommunityToolkit.Uwp.Controls.SettingsControls" Version="8.2.250402" />
     <PackageReference Include="Detours.Win32Metadata" Version="4.0.1.18" />
     <PackageReference Include="MetroLog.Net6" Version="2.1.0" />
     <PackageReference Include="Microsoft.UI.Xaml" Version="2.8.7" />
     <PackageReference Include="Microsoft.Windows.CsWin32" Version="0.3.183" PrivateAssets="all">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="Microsoft.WindowsAppSDK.Base" Version="1.8.250509001-experimental" />
+    <PackageReference Include="Microsoft.WindowsAppSDK.InteractiveExperiences" Version="1.8.250509002-experimental" />
   </ItemGroup>
 
   <ItemGroup>

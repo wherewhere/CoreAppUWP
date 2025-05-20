@@ -231,6 +231,7 @@ namespace CoreAppUWP.Helpers
             {
                 rootElement.RequestedTheme = await GetActualThemeAsync();
             }
+            UpdateSystemCaptionButtonColors(window);
         }
 
         public static async void Initialize(FrameworkElement rootElement)
@@ -290,6 +291,14 @@ namespace CoreAppUWP.Helpers
                     }
                 }
             });
+
+            //if (!Microsoft.UI.Windowing.AppWindowTitleBar.IsCustomizationSupported()) { return; }
+
+            WindowHelper.ActiveDesktopWindows.Values.ForEach(async window =>
+            {
+                await window.Dispatcher.ResumeForegroundAsync();
+                window.ExtendsContentIntoTitleBar = isExtendsTitleBar;
+            });
         }
 
         public static async void UpdateSystemCaptionButtonColors()
@@ -321,6 +330,18 @@ namespace CoreAppUWP.Helpers
                         appTitleBar.ButtonBackgroundColor = appTitleBar.ButtonInactiveBackgroundColor = extendsContentIntoTitleBar ? Colors.Transparent : backgroundColor;
                     }
                 }
+            });
+
+            //if (!Microsoft.UI.Windowing.AppWindowTitleBar.IsCustomizationSupported()) { return; }
+
+            WindowHelper.ActiveDesktopWindows.Values.ForEach(async window =>
+            {
+                await window.Dispatcher.ResumeForegroundAsync();
+                bool extendsContentIntoTitleBar = window.ExtendsContentIntoTitleBar;
+                Microsoft.UI.Windowing.AppWindowTitleBar titleBar = window.AppWindow.TitleBar;
+                titleBar.ForegroundColor = titleBar.ButtonForegroundColor = foregroundColor;
+                titleBar.BackgroundColor = titleBar.InactiveBackgroundColor = backgroundColor;
+                titleBar.ButtonBackgroundColor = titleBar.ButtonInactiveBackgroundColor = extendsContentIntoTitleBar ? Colors.Transparent : backgroundColor;
             });
         }
 
@@ -357,6 +378,25 @@ namespace CoreAppUWP.Helpers
             titleBar.ForegroundColor = titleBar.ButtonForegroundColor = foregroundColor;
             titleBar.BackgroundColor = titleBar.InactiveBackgroundColor = BackgroundColor;
             titleBar.ButtonBackgroundColor = titleBar.ButtonInactiveBackgroundColor = extendsContentIntoTitleBar ? Colors.Transparent : BackgroundColor;
+        }
+
+        public static async void UpdateSystemCaptionButtonColors(DesktopWindow window)
+        {
+            //if (!Microsoft.UI.Windowing.AppWindowTitleBar.IsCustomizationSupported()) { return; }
+
+            await window.Dispatcher.ResumeForegroundAsync();
+
+            bool isDark = window?.Content is FrameworkElement rootElement ? IsDarkTheme(rootElement.RequestedTheme) : await IsDarkThemeAsync();
+            bool isHighContrast = AccessibilitySettings.HighContrast;
+
+            Color foregroundColor = isDark || isHighContrast ? Colors.White : Colors.Black;
+            Color backgroundColor = isHighContrast ? Color.FromArgb(255, 0, 0, 0) : isDark ? Color.FromArgb(255, 32, 32, 32) : Color.FromArgb(255, 243, 243, 243);
+
+            bool extendsContentIntoTitleBar = window.ExtendsContentIntoTitleBar;
+            Microsoft.UI.Windowing.AppWindowTitleBar titleBar = window.AppWindow.TitleBar;
+            titleBar.ForegroundColor = titleBar.ButtonForegroundColor = foregroundColor;
+            titleBar.BackgroundColor = titleBar.InactiveBackgroundColor = backgroundColor;
+            titleBar.ButtonBackgroundColor = titleBar.ButtonInactiveBackgroundColor = extendsContentIntoTitleBar ? Colors.Transparent : backgroundColor;
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using CoreAppUWP.Helpers;
+﻿using CoreAppUWP.Controls;
+using CoreAppUWP.Helpers;
 using CoreAppUWP.Pages.SettingsPages;
 using Microsoft.UI.Xaml.Controls;
 using System;
@@ -6,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Windows.ApplicationModel.Core;
 using Windows.Foundation.Metadata;
+using Windows.Graphics;
 using Windows.UI.Core;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -54,8 +56,13 @@ namespace CoreAppUWP.Pages
             base.OnNavigatedFrom(e);
             if (!this.IsAppWindow())
             {
-                try { Window.Current.SetTitleBar(null); }
-                catch (Exception ex) { SettingsHelper.LogManager.GetLogger(nameof(MainPage)).Error(ex.ExceptionToMessage()); }
+                if (DesktopWindow.Current is DesktopWindow window)
+                {
+                    DragRegion.SizeChanged -= CustomTitleBar_SizeChanged;
+                    window.AppWindow.Changed -= AppWindow_Changed;
+                }
+                else
+                { Window.Current.SetTitleBar(null); }
                 SystemNavigationManager.GetForCurrentView().BackRequested -= System_BackRequested;
                 CoreApplication.GetCurrentView().TitleBar.LayoutMetricsChanged -= TitleBar_LayoutMetricsChanged;
             }
@@ -65,13 +72,20 @@ namespace CoreAppUWP.Pages
         {
             if (!this.IsAppWindow())
             {
-                try
+                if (DesktopWindow.Current is DesktopWindow window)
+                {
+                    DragRegion.SizeChanged += CustomTitleBar_SizeChanged;
+                    window.AppWindow.Changed += AppWindow_Changed;
+                    if (SettingsHelper.Get<bool>(SettingsHelper.IsExtendsTitleBar))
+                    { window.ExtendsContentIntoTitleBar = true; }
+                    ThemeHelper.UpdateSystemCaptionButtonColors(window);
+                }
+                else
                 {
                     Window.Current.SetTitleBar(DragRegion);
                     if (ApiInformation.IsMethodPresent("Windows.UI.Composition.Compositor", "TryCreateBlurredWallpaperBackdropBrush"))
                     { BackdropMaterial.SetApplyToRootOrPageBackground(this, true); }
                 }
-                catch (Exception ex) { SettingsHelper.LogManager.GetLogger(nameof(MainPage)).Error(ex.ExceptionToMessage()); }
                 SystemNavigationManager.GetForCurrentView().BackRequested += System_BackRequested;
                 CoreApplication.GetCurrentView().TitleBar.LayoutMetricsChanged += TitleBar_LayoutMetricsChanged;
             }
@@ -80,6 +94,14 @@ namespace CoreAppUWP.Pages
         private void TitleBar_LayoutMetricsChanged(CoreApplicationViewTitleBar sender, object args)
         {
             UpdateAppTitle(sender);
+        }
+
+        private void AppWindow_Changed(Microsoft.UI.Windowing.AppWindow sender, Microsoft.UI.Windowing.AppWindowChangedEventArgs args)
+        {
+            if (args.DidPresenterChange)
+            {
+                UpdateAppTitle(sender);
+            }
         }
 
         private void NavigationView_Loaded(object sender, RoutedEventArgs e)
@@ -209,11 +231,27 @@ namespace CoreAppUWP.Pages
             RightPaddingColumn.Width = new GridLength(coreTitleBar.SystemOverlayRightInset);
         }
 
+        private void UpdateAppTitle(Microsoft.UI.Windowing.AppWindow appWindow)
+        {
+            nint hwnd = (nint)appWindow.Id.Value;
+            RightPaddingColumn.Width = new GridLength(Math.Max(0, appWindow.TitleBar.RightInset.GetDisplayPixel(hwnd)));
+        }
+
         private void System_BackRequested(object sender, BackRequestedEventArgs e)
         {
             if (!e.Handled)
             {
                 e.Handled = TryGoBack();
+            }
+        }
+
+        private void CustomTitleBar_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            if (DesktopWindow.Current is DesktopWindow window)
+            {
+                nint hwnd = (nint)window.AppWindow.Id.Value;
+                RectInt32 Rect = new((AppTitleBar.ActualWidth - DragRegion.ActualWidth).GetActualPixel(hwnd), 0, DragRegion.ActualWidth.GetActualPixel(hwnd), DragRegion.ActualHeight.GetActualPixel(hwnd));
+                window.AppWindow?.TitleBar.SetDragRectangles([Rect]);
             }
         }
     }

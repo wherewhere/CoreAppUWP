@@ -2,13 +2,26 @@
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Windows.ApplicationModel;
 using Windows.UI.Core;
+using Windows.Win32;
+using Windows.Win32.Foundation;
 
 namespace CoreAppUWP.Helpers
 {
     public static class UIHelper
     {
+        public static unsafe int GetActualPixel(this double pixel, nint window)
+        {
+            uint currentDpi = PInvoke.GetDpiForWindow(new HWND(window));
+            return Convert.ToInt32(pixel * (currentDpi / 96.0));
+        }
+
+        public static unsafe double GetDisplayPixel(this int pixel, nint window)
+        {
+            uint currentDpi = PInvoke.GetDpiForWindow(new HWND(window));
+            return pixel / (currentDpi / 96.0);
+        }
+
         public static string ExceptionToMessage(this Exception ex)
         {
             StringBuilder builder = new StringBuilder().AppendLine();
@@ -81,23 +94,5 @@ namespace CoreAppUWP.Helpers
 
             return taskCompletionSource.Task;
         }
-
-        /// <summary>
-        /// Returns a string representation of a version with the format 'Major.Minor.Build.Revision'.
-        /// </summary>
-        /// <param name="packageVersion">The <see cref="PackageVersion"/> to convert to a string</param>
-        /// <param name="significance">The number of version numbers to return, default is 4 for the full version number.</param>
-        /// <returns>Version string of the format 'Major.Minor.Build.Revision'</returns>
-        /// <example>
-        /// Package.Current.Id.Version.ToFormattedString(2); // Returns "7.0" for instance.
-        /// </example>
-        public static string ToFormattedString(this PackageVersion packageVersion, int significance = 4) => significance switch
-        {
-            4 => $"{packageVersion.Major}.{packageVersion.Minor}.{packageVersion.Build}.{packageVersion.Revision}",
-            3 => $"{packageVersion.Major}.{packageVersion.Minor}.{packageVersion.Build}",
-            2 => $"{packageVersion.Major}.{packageVersion.Minor}",
-            1 => $"{packageVersion.Major}",
-            _ => throw new ArgumentOutOfRangeException(nameof(significance), "Value must be a value 1 through 4."),
-        };
     }
 }
