@@ -27,15 +27,15 @@ namespace CoreAppUWP.Helpers
 
         #region UISettingChanged
 
-        private static readonly WeakEvent<bool> actions = [];
+        private static readonly WeakEvent<ApplicationTheme> actions = [];
 
-        public static event Action<bool> UISettingChanged
+        public static event Action<ApplicationTheme> UISettingChanged
         {
             add => actions.Add(value);
             remove => actions.Remove(value);
         }
 
-        private static void InvokeUISettingChanged(bool value) => actions.Invoke(value);
+        private static void InvokeUISettingChanged(ApplicationTheme value) => actions.Invoke(value);
 
         #endregion
 
@@ -151,7 +151,7 @@ namespace CoreAppUWP.Helpers
 
             SettingsHelper.Set(SettingsHelper.SelectedAppTheme, value);
             UpdateSystemCaptionButtonColors();
-            InvokeUISettingChanged(await IsDarkThemeAsync());
+            InvokeUISettingChanged(await IsDarkThemeAsync() ? ApplicationTheme.Dark : ApplicationTheme.Light);
         }
 
         public static async ValueTask SetRootThemeAsync(ElementTheme value)
@@ -176,7 +176,7 @@ namespace CoreAppUWP.Helpers
 
             SettingsHelper.Set(SettingsHelper.SelectedAppTheme, value);
             UpdateSystemCaptionButtonColors();
-            InvokeUISettingChanged(await IsDarkThemeAsync());
+            InvokeUISettingChanged(await IsDarkThemeAsync() ? ApplicationTheme.Dark : ApplicationTheme.Light);
         }
 
         #endregion
@@ -216,7 +216,7 @@ namespace CoreAppUWP.Helpers
         private static async void UISettings_ColorValuesChanged(UISettings sender, object args)
         {
             UpdateSystemCaptionButtonColors();
-            InvokeUISettingChanged(await IsDarkThemeAsync());
+            InvokeUISettingChanged(await IsDarkThemeAsync() ? ApplicationTheme.Dark : ApplicationTheme.Light);
         }
 
         public static bool IsDarkTheme() => IsDarkTheme(ActualTheme);

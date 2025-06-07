@@ -13,7 +13,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:settingspages="using:CoreAppUWP.ViewModels.SettingsPages"
     d:DataContext="{d:DesignInstance Type=settingspages:SettingsViewModel}"
-    DataContext="{x:Bind Provider, Mode=OneWay}"
+    DataContext="{x:Bind Provider}"
     NavigationCacheMode="Enabled"
     mc:Ignorable="d">
     <Grid
@@ -48,7 +48,7 @@
                                 Click="HyperlinkButton_Click"
                                 Content="Windows Color Settings"
                                 Tag="ms-settings:colors"
-                                ToolTipService.ToolTip="{Binding Tag, RelativeSource={RelativeSource Mode=Self}}" />
+                                ToolTipService.ToolTip="ms-settings:colors" />
                         </cwuc:SettingsCard.Description>
                         <ComboBox SelectedIndex="{x:Bind Provider.SelectedTheme, Mode=TwoWay}">
                             <ComboBoxItem Content="Dark" />
@@ -351,7 +351,7 @@
                     </cwuc:SettingsCard>
                 </controls:SettingsGroup>
                 <controls:SettingsGroup Header="About">
-                    <cwuc:SettingsExpander Header="{x:Bind settingspages:SettingsViewModel.VersionTextBlockText, Mode=OneWay}" ItemContainerStyleSelector="{StaticResource SettingsExpanderItemStyleSelector}">
+                    <cwuc:SettingsExpander Header="{x:Bind settingspages:SettingsViewModel.VersionTextBlockText}" ItemContainerStyleSelector="{StaticResource SettingsExpanderItemStyleSelector}">
                         <helpers:SettingsExpanderHelper.HeaderIcon>
                             <controls:AppLogo FontFamily="{StaticResource ContentControlThemeFontFamily}" />
                         </helpers:SettingsExpanderHelper.HeaderIcon>
@@ -366,7 +366,7 @@
                                         Click="HyperlinkButton_Click"
                                         Content="Feedback"
                                         Tag="https://github.com/wherewhere/CoreAppUWP/issues"
-                                        ToolTipService.ToolTip="{Binding Tag, RelativeSource={RelativeSource Mode=Self}}" />
+                                        ToolTipService.ToolTip="https://github.com/wherewhere/CoreAppUWP/issues" />
                                     <HyperlinkButton
                                         Click="HyperlinkButton_Click"
                                         Content="Log Folder"
@@ -375,7 +375,7 @@
                                         Click="HyperlinkButton_Click"
                                         Content="Release Notes"
                                         Tag="https://github.com/wherewhere/CoreAppUWP/releases/latest"
-                                        ToolTipService.ToolTip="{Binding Tag, RelativeSource={RelativeSource Mode=Self}}" />
+                                        ToolTipService.ToolTip="https://github.com/wherewhere/CoreAppUWP/releases/latest" />
                                 </StackPanel>
                             </ScrollViewer>
                         </cwuc:SettingsExpander.Description>
