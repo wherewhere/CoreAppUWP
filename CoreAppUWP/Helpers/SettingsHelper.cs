@@ -32,7 +32,7 @@ namespace CoreAppUWP.Helpers
             }
             if (!LocalObject.KeyExists(SelectedBackdrop))
             {
-                LocalObject.Save(SelectedBackdrop, BackdropType.Mica);
+                LocalObject.Save(SelectedBackdrop, BackdropType.DefaultColor);
             }
             if (!LocalObject.KeyExists(IsExtendsTitleBar))
             {
@@ -52,11 +52,18 @@ namespace CoreAppUWP.Helpers
         {
             if (LogManager == null)
             {
-                string path = Path.Combine(ApplicationData.Current.LocalFolder.Path, "MetroLogs");
-                if (!Directory.Exists(path)) { Directory.CreateDirectory(path); }
-                LoggingConfiguration loggingConfiguration = new();
-                loggingConfiguration.AddTarget(LogLevel.Info, LogLevel.Fatal, new StreamingFileTarget(path, 7));
-                LogManager = LogManagerFactory.CreateLogManager(loggingConfiguration);
+                if (WindowHelper.IsPackagedApp)
+                {
+                    string path = Path.Combine(ApplicationData.Current.LocalFolder.Path, "MetroLogs");
+                    if (!Directory.Exists(path)) { Directory.CreateDirectory(path); }
+                    LoggingConfiguration loggingConfiguration = new();
+                    loggingConfiguration.AddTarget(LogLevel.Info, LogLevel.Fatal, new StreamingFileTarget(path, 7));
+                    LogManager = LogManagerFactory.CreateLogManager(loggingConfiguration);
+                }
+                else
+                {
+                    LogManager = LogManagerFactory.CreateLogManager();
+                }
             }
         }
     }

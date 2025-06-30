@@ -10,7 +10,13 @@ namespace CoreAppUWP.Helpers
 {
     public static class TilesHelper
     {
-        public static void UpdateTile() => CreateTile().GetXmlDocument().UpdateTitle();
+        public static void UpdateTile()
+        {
+            if (WindowHelper.IsPackagedApp)
+            {
+                CreateTile().GetXmlDocument().UpdateTitle();
+            }
+        }
 
         private static void UpdateTitle(this XmlDocument xmlDocument)
         {

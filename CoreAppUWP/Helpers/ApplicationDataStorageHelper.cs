@@ -20,25 +20,35 @@ namespace CoreAppUWP.Helpers
     public partial class ApplicationDataStorageHelper : IFileStorageHelper, ISettingsStorageHelper<string>
     {
         /// <summary>
+        /// Indicates whether the application is a packaged app.
+        /// </summary>
+        private static bool IsPackagedApp { get; } = Program.IsPackagedApp;
+
+        /// <summary>
+        /// Static dictionary to hold settings when not using ApplicationData.
+        /// </summary>
+        private readonly static Dictionary<string, object> _settings = [];
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="ApplicationDataStorageHelper"/> class.
         /// </summary>
         /// <param name="appData">The data store to interact with.</param>
         /// <param name="objectSerializer">Serializer for converting stored values. Defaults to <see cref="Toolkit.Helpers.SystemSerializer"/>.</param>
         public ApplicationDataStorageHelper(ApplicationData appData, IObjectSerializer objectSerializer = null)
         {
-            AppData = appData ?? throw new ArgumentNullException(nameof(appData));
+            AppData = appData;
             Serializer = objectSerializer ?? new SystemSerializer();
         }
 
         /// <summary>
         /// Gets the settings container.
         /// </summary>
-        public ApplicationDataContainer Settings => AppData.LocalSettings;
+        public ApplicationDataContainer Settings => AppData?.LocalSettings;
 
         /// <summary>
         ///  Gets the storage folder.
         /// </summary>
-        public StorageFolder Folder => AppData.LocalFolder;
+        public StorageFolder Folder => AppData?.LocalFolder;
 
         /// <summary>
         /// Gets the storage host.
@@ -57,7 +67,7 @@ namespace CoreAppUWP.Helpers
         /// <returns>A new instance of ApplicationDataStorageHelper.</returns>
         public static ApplicationDataStorageHelper GetCurrent(IObjectSerializer objectSerializer = null)
         {
-            ApplicationData appData = ApplicationData.Current;
+            ApplicationData appData = IsPackagedApp ? ApplicationData.Current : null;
             return new ApplicationDataStorageHelper(appData, objectSerializer);
         }
 
@@ -69,7 +79,7 @@ namespace CoreAppUWP.Helpers
         /// <returns>A new instance of ApplicationDataStorageHelper.</returns>
         public static async Task<ApplicationDataStorageHelper> GetForUserAsync(User user, IObjectSerializer objectSerializer = null)
         {
-            ApplicationData appData = await ApplicationData.GetForUserAsync(user);
+            ApplicationData appData = IsPackagedApp ? await ApplicationData.GetForUserAsync(user) : null;
             return new ApplicationDataStorageHelper(appData, objectSerializer);
         }
 
@@ -80,7 +90,7 @@ namespace CoreAppUWP.Helpers
         /// <returns>True if a value exists.</returns>
         public bool KeyExists(string key)
         {
-            return Settings.Values.ContainsKey(key);
+            return Settings == null ? _settings.ContainsKey(key) : Settings.Values.ContainsKey(key);
         }
 
         /// <summary>
@@ -92,7 +102,7 @@ namespace CoreAppUWP.Helpers
         /// <returns>The TValue object.</returns>
         public T Read<T>(string key, T @default = default)
         {
-            return Settings.Values.TryGetValue(key, out object valueObj) && valueObj is string valueString
+            return (Settings == null ? _settings.TryGetValue(key, out object valueObj) : Settings.Values.TryGetValue(key, out valueObj)) && valueObj is string valueString
                 ? Serializer.Deserialize<T>(valueString)
                 : @default;
         }
@@ -100,7 +110,7 @@ namespace CoreAppUWP.Helpers
         /// <inheritdoc />
         public bool TryRead<T>(string key, out T value)
         {
-            if (Settings.Values.TryGetValue(key, out object valueObj) && valueObj is string valueString)
+            if ((Settings == null ? _settings.TryGetValue(key, out object valueObj) : Settings.Values.TryGetValue(key, out valueObj)) && valueObj is string valueString)
             {
                 value = Serializer.Deserialize<T>(valueString);
                 return true;
@@ -113,19 +123,33 @@ namespace CoreAppUWP.Helpers
         /// <inheritdoc />
         public void Save<T>(string key, T value)
         {
-            Settings.Values[key] = Serializer.Serialize(value);
+            if (Settings == null)
+            {
+                _settings[key] = Serializer.Serialize(value);
+            }
+            else
+            {
+                Settings.Values[key] = Serializer.Serialize(value);
+            }
         }
 
         /// <inheritdoc />
         public bool TryDelete(string key)
         {
-            return Settings.Values.Remove(key);
+            return Settings == null ? _settings.Remove(key) : Settings.Values.Remove(key);
         }
 
         /// <inheritdoc />
         public void Clear()
         {
-            Settings.Values.Clear();
+            if (Settings == null)
+            {
+                _settings.Clear();
+            }
+            else
+            {
+                Settings.Values.Clear();
+            }
         }
 
         /// <summary>
@@ -273,7 +297,7 @@ namespace CoreAppUWP.Helpers
             return (value != null) ? Serializer.Deserialize<T>(value) : @default;
         }
 
-        private async Task<IEnumerable<(DirectoryItemType, string)>> ReadFolderAsync(StorageFolder folder, string folderPath)
+        private static async Task<IEnumerable<(DirectoryItemType, string)>> ReadFolderAsync(StorageFolder folder, string folderPath)
         {
             StorageFolder targetFolder = await folder.GetFolderAsync(NormalizePath(folderPath));
             IReadOnlyList<IStorageItem> items = await targetFolder.GetItemsAsync();
@@ -292,12 +316,12 @@ namespace CoreAppUWP.Helpers
             return await StorageFileHelper.WriteTextToFileAsync(folder, Serializer.Serialize(value)?.ToString(), NormalizePath(filePath), CreationCollisionOption.ReplaceExisting);
         }
 
-        private async Task CreateFolderAsync(StorageFolder folder, string folderPath)
+        private static async Task CreateFolderAsync(StorageFolder folder, string folderPath)
         {
             await folder.CreateFolderAsync(NormalizePath(folderPath), CreationCollisionOption.OpenIfExists);
         }
 
-        private async Task<bool> TryDeleteItemAsync(StorageFolder folder, string itemPath)
+        private static async Task<bool> TryDeleteItemAsync(StorageFolder folder, string itemPath)
         {
             try
             {
@@ -311,7 +335,7 @@ namespace CoreAppUWP.Helpers
             }
         }
 
-        private async Task<bool> TryRenameItemAsync(StorageFolder folder, string itemPath, string newName)
+        private static async Task<bool> TryRenameItemAsync(StorageFolder folder, string itemPath, string newName)
         {
             try
             {
@@ -325,7 +349,7 @@ namespace CoreAppUWP.Helpers
             }
         }
 
-        private string NormalizePath(string path)
+        private static string NormalizePath(string path)
         {
             return Path.Combine(Path.GetDirectoryName(path), Path.GetFileName(path));
         }

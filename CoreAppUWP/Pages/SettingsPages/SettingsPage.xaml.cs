@@ -10,6 +10,7 @@ using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Navigation;
 using System;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Core;
@@ -62,8 +63,10 @@ namespace CoreAppUWP.Pages.SettingsPages
                         if (ApplicationView.GetForCurrentView().IsViewModeSupported(ApplicationViewMode.Default))
                         { _ = ApplicationView.GetForCurrentView().TryEnterViewModeAsync(ApplicationViewMode.Default); }
                     }
-                    else if (this.GetWindowForElement() is DesktopWindow desktopWindow)
-                    { desktopWindow.AppWindow.SetPresenter(AppWindowPresenterKind.Default); }
+                    else if (this.GetDesktopWindowForElement() is DesktopWindow _desktopWindow)
+                    { _desktopWindow.AppWindow.SetPresenter(AppWindowPresenterKind.Default); }
+                    else if (!WindowHelper.IsCoreWindow && this.GetWindowForElement() is Window _window)
+                    { _window.AppWindow.SetPresenter(AppWindowPresenterKind.Default); }
                     break;
                 case "EnterPIP":
                     if (IsCoreWindow)
@@ -71,10 +74,12 @@ namespace CoreAppUWP.Pages.SettingsPages
                         if (ApplicationView.GetForCurrentView().IsViewModeSupported(ApplicationViewMode.CompactOverlay))
                         { _ = ApplicationView.GetForCurrentView().TryEnterViewModeAsync(ApplicationViewMode.CompactOverlay); }
                     }
-                    else if (this.GetWindowForElement() is DesktopWindow desktopWindow)
-                    { desktopWindow.AppWindow.SetPresenter(AppWindowPresenterKind.CompactOverlay); }
+                    else if (this.GetDesktopWindowForElement() is DesktopWindow _desktopWindow)
+                    { _desktopWindow.AppWindow.SetPresenter(AppWindowPresenterKind.CompactOverlay); }
+                    else if (!WindowHelper.IsCoreWindow && this.GetWindowForElement() is Window _window)
+                    { _window.AppWindow.SetPresenter(AppWindowPresenterKind.CompactOverlay); }
                     break;
-                case "NewWindow":
+                case "NewWindow" when WindowHelper.IsCoreWindow:
                     bool isProcessKept = Provider.IsProcessKept;
                     _ = await WindowHelper.CreateWindowAsync(window =>
                     {
@@ -89,11 +94,25 @@ namespace CoreAppUWP.Pages.SettingsPages
                         BackdropHelper.SetBackdrop(window, SettingsHelper.Get<BackdropType>(SettingsHelper.SelectedBackdrop));
                     });
                     break;
+                case "NewWindow":
+                    isProcessKept = Provider.IsProcessKept;
+                    Window window = WindowHelper.CreateWindow();
+                    if (SettingsHelper.Get<bool>(SettingsHelper.IsExtendsTitleBar))
+                    { window.AppWindow.TitleBar.ExtendsContentIntoTitleBar = true; }
+                    Frame _frame = new();
+                    window.Content = _frame;
+                    ThemeHelper.Initialize(window);
+                    NavigationTransitionInfo transitionInfo = null;
+                    if (!isProcessKept) { try { transitionInfo = new DrillInNavigationTransitionInfo(); } catch { } }
+                    _ = _frame.Navigate(typeof(MainPage), null, transitionInfo);
+                    BackdropHelper.SetBackdrop(window, SettingsHelper.Get<BackdropType>(SettingsHelper.SelectedBackdrop));
+                    window.Activate();
+                    break;
                 case "NewAppWindow":
                     isProcessKept = Provider.IsProcessKept;
-                    DesktopWindow window = await (IsCoreWindow
-                        ? WindowHelper.CreateWindowAsync(OnLaunched)
-                        : DispatcherQueue.CreateWindowAsync(OnLaunched)).ConfigureAwait(false);
+                    DesktopWindow desktopWindow = IsCoreWindow || !WindowHelper.IsCoreWindow
+                        ? await WindowHelper.CreateWindowAsync(OnLaunched).ConfigureAwait(false)
+                        : await DispatcherQueue.CreateWindowAsync(OnLaunched);
                     void OnLaunched(DesktopWindowXamlSource source)
                     {
                         Frame _frame = new();
@@ -104,13 +123,13 @@ namespace CoreAppUWP.Pages.SettingsPages
                     }
                     if (AppWindowTitleBar.IsCustomizationSupported()
                         && SettingsHelper.Get<bool>(SettingsHelper.IsExtendsTitleBar))
-                    { window.ExtendsContentIntoTitleBar = true; }
-                    ThemeHelper.Initialize(window);
-                    BackdropHelper.SetBackdrop(window, SettingsHelper.Get<BackdropType>(SettingsHelper.SelectedBackdrop));
-                    AppWindow appWindow = window.AppWindow;
-                    appWindow.Title = Package.Current.DisplayName;
+                    { desktopWindow.ExtendsContentIntoTitleBar = true; }
+                    ThemeHelper.Initialize(desktopWindow);
+                    BackdropHelper.SetBackdrop(desktopWindow, SettingsHelper.Get<BackdropType>(SettingsHelper.SelectedBackdrop));
+                    AppWindow appWindow = desktopWindow.AppWindow;
+                    appWindow.Title = WindowHelper.IsPackagedApp ? Package.Current.DisplayName : Assembly.GetEntryAssembly().GetName().Name;
                     appWindow.SetIcon("favicon.ico");
-                    window.Activate();
+                    desktopWindow.Activate();
                     break;
                 case "SearchFlyout" when SettingsPaneRegister.IsSearchPaneSupported:
                     SearchPane.GetForCurrentView().Show();
@@ -118,8 +137,10 @@ namespace CoreAppUWP.Pages.SettingsPages
                 case "ExitFullWindow":
                     if (IsCoreWindow)
                     { ApplicationView.GetForCurrentView().ExitFullScreenMode(); }
-                    else if (this.GetWindowForElement() is DesktopWindow desktopWindow)
-                    { desktopWindow.AppWindow.SetPresenter(AppWindowPresenterKind.Default); }
+                    else if (this.GetDesktopWindowForElement() is DesktopWindow _desktopWindow)
+                    { _desktopWindow.AppWindow.SetPresenter(AppWindowPresenterKind.Default); }
+                    else if (!WindowHelper.IsCoreWindow && this.GetWindowForElement() is Window _window)
+                    { _window.AppWindow.SetPresenter(AppWindowPresenterKind.Default); }
                     break;
                 case "SettingsFlyout" when SettingsPaneRegister.IsSettingsPaneSupported:
                     SettingsPane.Show();
@@ -127,8 +148,10 @@ namespace CoreAppUWP.Pages.SettingsPages
                 case "EnterFullWindow":
                     if (IsCoreWindow)
                     { ApplicationView.GetForCurrentView().TryEnterFullScreenMode(); }
-                    else if (this.GetWindowForElement() is DesktopWindow desktopWindow)
-                    { desktopWindow.AppWindow.SetPresenter(AppWindowPresenterKind.FullScreen); }
+                    else if (this.GetDesktopWindowForElement() is DesktopWindow _desktopWindow)
+                    { _desktopWindow.AppWindow.SetPresenter(AppWindowPresenterKind.FullScreen); }
+                    else if (!WindowHelper.IsCoreWindow && this.GetWindowForElement() is Window _window)
+                    { _window.AppWindow.SetPresenter(AppWindowPresenterKind.FullScreen); }
                     break;
                 case "KeepProcess" when IsCoreWindow:
                     Provider.KeepProcess();
@@ -141,7 +164,7 @@ namespace CoreAppUWP.Pages.SettingsPages
         private async void HyperlinkButton_Click(object sender, RoutedEventArgs e)
         {
             string tag = (sender as FrameworkElement).Tag?.ToString();
-            if (!IsCoreWindow && WindowHelper.ActiveWindows.Values.FirstOrDefault()?.DispatcherQueue is DispatcherQueue dispatcherQueue)
+            if (!IsCoreWindow && WindowHelper.ActiveWindows.FirstOrDefault()?.DispatcherQueue is DispatcherQueue dispatcherQueue)
             {
                 await dispatcherQueue.ResumeForegroundAsync();
             }

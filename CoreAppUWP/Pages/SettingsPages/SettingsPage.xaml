@@ -118,8 +118,8 @@
                         <cwuc:SettingsExpander.Items>
                             <cwuc:SettingsCard
                                 Click="Button_Click"
-                                Description="Create a new CoreWindow."
-                                Header="CoreWindow"
+                                Description="{x:Bind settingspages:SettingsViewModel.NewWindowDescriptionText}"
+                                Header="{x:Bind settingspages:SettingsViewModel.NewWindowHeaderText}"
                                 IsClickEnabled="True"
                                 Tag="NewWindow">
                                 <cwuc:SettingsCard.ActionIcon>
@@ -370,6 +370,7 @@
                                     <HyperlinkButton
                                         Click="HyperlinkButton_Click"
                                         Content="Log Folder"
+                                        IsEnabled="{x:Bind helpers:WindowHelper.IsPackagedApp}"
                                         Tag="LogFolder" />
                                     <HyperlinkButton
                                         Click="HyperlinkButton_Click"

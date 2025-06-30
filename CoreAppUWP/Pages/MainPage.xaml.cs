@@ -58,7 +58,7 @@ namespace CoreAppUWP.Pages
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
-            if (this.GetWindowForElement() is DesktopWindow window)
+            if (this.GetDesktopWindowForElement() is DesktopWindow window)
             {
                 window.AppWindow.Changed += AppWindow_Changed;
                 BackdropHelper.AddBackdropTypeChanged(window, OnBackdropTypeChanged);
@@ -73,7 +73,7 @@ namespace CoreAppUWP.Pages
             if (IsAppWindow)
             {
                 Loaded -= Page_Loaded;
-                if (this.GetWindowForElement() is DesktopWindow window)
+                if (this.GetDesktopWindowForElement() is DesktopWindow window)
                 {
                     BackdropHelper.RemoveBackdropTypeChanged(window, OnBackdropTypeChanged);
                 }
@@ -246,7 +246,7 @@ namespace CoreAppUWP.Pages
         {
             if (IsAppWindow)
             {
-                if (this.GetWindowForElement() is DesktopWindow window)
+                if (this.GetDesktopWindowForElement() is DesktopWindow window)
                 {
                     nint hwnd = (nint)window.AppWindow.Id.Value;
                     RectInt32 Rect = new((AppTitleBar.ActualWidth - DragRegion.ActualWidth).GetActualPixel(hwnd), 0, DragRegion.ActualWidth.GetActualPixel(hwnd), DragRegion.ActualHeight.GetActualPixel(hwnd));

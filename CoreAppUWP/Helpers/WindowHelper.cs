@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
+using System.Threading;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.Core;
 using Windows.UI.Core;
@@ -28,6 +29,10 @@ namespace CoreAppUWP.Helpers
     /// </summary>
     public static class WindowHelper
     {
+        public static bool IsCoreWindow { get; } = Program.IsCoreWindow;
+
+        public static bool IsPackagedApp { get; } = Program.IsPackagedApp;
+
         public static async Task<bool> CreateWindowAsync(Action<Window> launched)
         {
             CoreApplicationView newView = CoreApplication.CreateNewView();
@@ -42,32 +47,50 @@ namespace CoreAppUWP.Helpers
             return await ApplicationViewSwitcher.TryShowAsStandaloneAsync(newViewId);
         }
 
+        public static Window CreateWindow()
+        {
+            Window window = new();
+            TrackWindow(window);
+            return window;
+        }
+
         public static async Task<DesktopWindow> CreateWindowAsync(Action<DesktopWindowXamlSource> launched)
         {
-            DesktopWindow newWindow = await DesktopWindow.CreateAsync(launched).ConfigureAwait(false);
-            TrackWindow(newWindow);
-            return newWindow;
+            DesktopWindow window = await DesktopWindow.CreateAsync(launched).ConfigureAwait(false);
+            TrackWindow(window);
+            return window;
         }
 
         public static async Task<DesktopWindow> CreateWindowAsync(this DispatcherQueue dispatcherQueue, Action<DesktopWindowXamlSource> launched)
         {
-            DesktopWindow newWindow = await DesktopWindow.CreateAsync(dispatcherQueue, launched).ConfigureAwait(false);
-            TrackWindow(newWindow);
-            return newWindow;
+            DesktopWindow window = await DesktopWindow.CreateAsync(dispatcherQueue, launched);
+            TrackWindow(window);
+            return window;
         }
 
         public static void TrackWindow(this Window window)
         {
-            if (!ActiveWindows.ContainsKey(window.Dispatcher))
+            if (!ActiveWindows.Contains(window))
             {
-                SettingsPaneRegister.Register(window);
-                window.Closed += (sender, args) =>
+                if (IsCoreWindow)
                 {
-                    ActiveWindows.Remove(window.Dispatcher);
-                    SettingsPaneRegister.Unregister(window);
-                    window = null;
-                };
-                ActiveWindows[window.Dispatcher] = window;
+                    SettingsPaneRegister.Register(window);
+                    window.Closed += (sender, args) =>
+                    {
+                        ActiveWindows.Remove(window);
+                        SettingsPaneRegister.Unregister(window);
+                        window = null;
+                    };
+                }
+                else
+                {
+                    window.Closed += (sender, args) =>
+                    {
+                        ActiveWindows.Remove(window);
+                        window = null;
+                    };
+                }
+                ActiveWindows.Add(window);
                 BackdropHelper.Register(window);
             }
         }
@@ -86,7 +109,22 @@ namespace CoreAppUWP.Helpers
             }
         }
 
-        public static DesktopWindow GetWindowForElement(this UIElement element) =>
+        public static Window GetWindowForElement(this UIElement element)
+        {
+            if (element.XamlRoot != null)
+            {
+                foreach (Window window in ActiveWindows)
+                {
+                    if (element.XamlRoot == window.Content.XamlRoot)
+                    {
+                        return window;
+                    }
+                }
+            }
+            return null;
+        }
+
+        public static DesktopWindow GetDesktopWindowForElement(this UIElement element) =>
             ActiveDesktopWindows.TryGetValue(element.XamlRoot, out DesktopWindow window) ? window : null;
 
         public static AppWindow GetAppWindow(this CoreWindow window)
@@ -106,7 +144,7 @@ namespace CoreAppUWP.Helpers
             return appWindow;
         }
 
-        public static Dictionary<CoreDispatcher, Window> ActiveWindows { get; } = [];
+        public static HashSet<Window> ActiveWindows { get; } = [];
         public static Dictionary<CoreWindow, AppWindow> ActiveAppWindows { get; } = [];
         public static Dictionary<XamlRoot, DesktopWindow> ActiveDesktopWindows { get; } = [];
     }

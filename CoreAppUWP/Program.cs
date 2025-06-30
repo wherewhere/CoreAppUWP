@@ -3,26 +3,18 @@ using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.Win32;
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
-using System.Threading.Tasks;
-using Windows.ApplicationModel;
-using Windows.ApplicationModel.Core;
-using Windows.Data.Xml.Dom;
-using Windows.Management.Deployment;
-using Windows.Storage;
 using Windows.Win32;
 using Windows.Win32.Foundation;
+using Windows.Win32.Storage.Packaging.Appx;
 using WinRT;
 
 namespace CoreAppUWP
 {
     public static partial class Program
     {
-        private static unsafe bool IsPackagedApp
+        public static unsafe bool IsPackagedApp
         {
             get
             {
@@ -33,6 +25,25 @@ namespace CoreAppUWP
                 str = new char[(int)length];
                 WIN32_ERROR result = PInvoke.GetCurrentPackageFullName(ref length, str);
                 return result != WIN32_ERROR.APPMODEL_ERROR_NO_PACKAGE;
+            }
+        }
+
+        public unsafe static bool IsCoreWindow
+        {
+            get
+            {
+                try
+                {
+                    if (PInvoke.AppPolicyGetWindowingModel(new DefaultSafeHandle(-6), out AppPolicyWindowingModel model) == WIN32_ERROR.ERROR_SUCCESS)
+                    {
+                        return model == AppPolicyWindowingModel.AppPolicyWindowingModel_Universal;
+                    }
+                    return false;
+                }
+                catch
+                {
+                    return false;
+                }
             }
         }
 
@@ -55,55 +66,66 @@ namespace CoreAppUWP
         private static void Main()
         {
             ComWrappersSupport.InitializeComWrappers();
-            if (IsPackagedApp)
+            if (!IsPackagedApp)
             {
-                HookRegistry hookRegistry = null;
-                try
-                {
-                    if (!IsSupportCoreWindow)
+                PInvoke.TryCreatePackageDependency(
+                    new DefaultSafeHandle(0),
+                    "Microsoft.WindowsAppRuntime.1.7_8wekyb3d8bbwe",
+                    new PACKAGE_VERSION(),
+                    RuntimeInformation.ProcessArchitecture switch
                     {
-                        hookRegistry = new HookRegistry();
-                    }
-                    XamlCheckProcessRequirements();
-                    Application.Start(p =>
-                    {
-                        DispatcherQueueSynchronizationContext context = new(DispatcherQueue.GetForCurrentThread());
-                        SynchronizationContext.SetSynchronizationContext(context);
-                        _ = new App();
-                    });
-                }
-                finally
+                        Architecture.X86 => PackageDependencyProcessorArchitectures.PackageDependencyProcessorArchitectures_X86,
+                        Architecture.X64 => PackageDependencyProcessorArchitectures.PackageDependencyProcessorArchitectures_X64,
+                        Architecture.Arm => PackageDependencyProcessorArchitectures.PackageDependencyProcessorArchitectures_Arm,
+                        Architecture.Arm64 => PackageDependencyProcessorArchitectures.PackageDependencyProcessorArchitectures_Arm64,
+                        _ => PackageDependencyProcessorArchitectures.PackageDependencyProcessorArchitectures_None
+                    },
+                    PackageDependencyLifetimeKind.PackageDependencyLifetimeKind_Process,
+                    null,
+                    CreatePackageDependencyOptions.CreatePackageDependencyOptions_None,
+                    out PWSTR package).ThrowOnFailure();
+                unsafe
                 {
-                    hookRegistry?.Dispose();
+                    PWSTR packageFullName = new();
+                    PInvoke.AddPackageDependency(
+                        package.ToString(),
+                        0,
+                        AddPackageDependencyOptions.AddPackageDependencyOptions_PrependIfRankCollision,
+                        out _,
+                        &packageFullName).ThrowOnFailure();
                 }
             }
-            else
+            HookRegistry hookRegistry = null;
+            try
             {
-                StartCoreApplicationAsync().Wait();
-            }
-        }
-
-        private static async Task StartCoreApplicationAsync()
-        {
-            PackageManager manager = new();
-            string basePath = AppDomain.CurrentDomain.BaseDirectory;
-            XmlDocument manifest = await XmlDocument.LoadFromFileAsync(await StorageFile.GetFileFromPathAsync(Path.Combine(basePath, "AppxManifest.xml")));
-            IXmlNode identity = manifest.GetElementsByTagName("Identity")?[0];
-            string name = identity.Attributes.FirstOrDefault(x => x.NodeName == "Name")?.InnerText;
-            IXmlNode application = manifest.GetElementsByTagName("Application")?[0];
-            string id = application.Attributes.FirstOrDefault(x => x.NodeName == "Id")?.InnerText;
-            IEnumerable<Package> packages = manager.FindPackagesForUser("").Where(x => x.Id.FamilyName.StartsWith(name));
-            if (packages.FirstOrDefault() is Package package)
-            {
-                IReadOnlyList<AppListEntry> entries = await package.GetAppListEntriesAsync();
-                if (entries?[0] is AppListEntry entry)
+                if (IsCoreWindow && !IsSupportCoreWindow)
                 {
-                    _ = await entry.LaunchAsync();
+                    hookRegistry = new HookRegistry();
                 }
+                XamlCheckProcessRequirements();
+                Application.Start(p =>
+                {
+                    DispatcherQueueSynchronizationContext context = new(DispatcherQueue.GetForCurrentThread());
+                    SynchronizationContext.SetSynchronizationContext(context);
+                    _ = new App();
+                });
+            }
+            finally
+            {
+                hookRegistry?.Dispose();
             }
         }
 
         [LibraryImport("Microsoft.UI.Xaml.dll")]
         private static partial void XamlCheckProcessRequirements();
+
+        private partial class DefaultSafeHandle(nint invalidHandleValue, bool ownsHandle) : SafeHandle(invalidHandleValue, ownsHandle)
+        {
+            public DefaultSafeHandle(nint handle) : this(handle, true) => SetHandle(handle);
+
+            public override bool IsInvalid => handle != nint.Zero;
+
+            protected override bool ReleaseHandle() => true;
+        }
     }
 }

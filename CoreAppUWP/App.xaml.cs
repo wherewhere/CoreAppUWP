@@ -43,13 +43,24 @@ namespace CoreAppUWP
 
         private void EnsureWindow(LaunchActivatedEventArgs e)
         {
+            if (Window.Current is not Window window)
+            {
+                if (!(WindowHelper.IsCoreWindow || isLoaded))
+                {
+                    window = new Window();
+                }
+                else
+                {
+                    return;
+                }
+            }
+
             if (!isLoaded)
             {
                 RegisterExceptionHandlingSynchronizationContext();
                 isLoaded = true;
             }
 
-            if (Window.Current is not Window window) { return; }
             WindowHelper.TrackWindow(window);
 
             // 不要在窗口已包含内容时重复应用程序初始化，
@@ -58,7 +69,14 @@ namespace CoreAppUWP
             {
                 if (SettingsHelper.Get<bool>(SettingsHelper.IsExtendsTitleBar))
                 {
-                    CoreApplication.GetCurrentView().TitleBar.ExtendViewIntoTitleBar = true;
+                    if (WindowHelper.IsCoreWindow)
+                    {
+                        CoreApplication.GetCurrentView().TitleBar.ExtendViewIntoTitleBar = true;
+                    }
+                    else
+                    {
+                        window.AppWindow.TitleBar.ExtendsContentIntoTitleBar = true;
+                    }
                 }
 
                 // 创建要充当导航上下文的框架，并导航到第一页
@@ -77,7 +95,7 @@ namespace CoreAppUWP
                 ThemeHelper.Initialize();
             }
 
-            if (e is LaunchActivatedEventArgs args)
+            if (WindowHelper.IsCoreWindow && e is LaunchActivatedEventArgs args)
             {
                 if (!args.UWPLaunchActivatedEventArgs.PrelaunchActivated)
                 {
