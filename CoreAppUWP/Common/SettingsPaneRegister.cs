@@ -1,4 +1,5 @@
 ﻿using CoreAppUWP.Helpers;
+using Microsoft.Extensions.Logging;
 using Microsoft.UI.Xaml;
 using System;
 using System.Collections.Generic;
@@ -23,6 +24,7 @@ namespace CoreAppUWP.Common
         {
             try
             {
+                if (window.Dispatcher == null) { return; }
                 if (IsSettingsPaneSupported)
                 {
                     SettingsPane settingsPane = SettingsPane.GetForCurrentView();
@@ -34,7 +36,7 @@ namespace CoreAppUWP.Common
             }
             catch (Exception ex)
             {
-                SettingsHelper.LogManager.GetLogger(nameof(SettingsPaneRegister)).Error(ex.ExceptionToMessage(), ex);
+                SettingsHelper.LoggerFactory.CreateLogger(typeof(SettingsPaneRegister)).LogError(ex, "Failed to register settings pane. {message} (0x{hResult:X})", ex.GetMessage(), ex.HResult);
             }
         }
 
@@ -42,6 +44,7 @@ namespace CoreAppUWP.Common
         {
             try
             {
+                if (window.Dispatcher == null) { return; }
                 if (IsSettingsPaneSupported)
                 {
                     SettingsPane.GetForCurrentView().CommandsRequested -= OnCommandsRequested;
@@ -50,7 +53,7 @@ namespace CoreAppUWP.Common
             }
             catch (Exception ex)
             {
-                SettingsHelper.LogManager.GetLogger(nameof(SettingsPaneRegister)).Error(ex.ExceptionToMessage(), ex);
+                SettingsHelper.LoggerFactory.CreateLogger(typeof(SettingsPaneRegister)).LogError(ex, "Failed to unregister settings pane. {message} (0x{hResult:X})", ex.GetMessage(), ex.HResult);
             }
         }
 
@@ -65,7 +68,7 @@ namespace CoreAppUWP.Common
                 new SettingsCommand(
                     "LogFolder",
                     "LogFolder",
-                    async handler => _ = Launcher.LaunchFolderAsync(await ApplicationData.Current.LocalFolder.CreateFolderAsync("MetroLogs", CreationCollisionOption.OpenIfExists))));
+                    async handler => _ = Launcher.LaunchFolderAsync(await ApplicationData.Current.LocalFolder.CreateFolderAsync("Logs", CreationCollisionOption.OpenIfExists))));
             args.Request.ApplicationCommands.Add(
                 new SettingsCommand(
                     "Repository",
@@ -121,7 +124,7 @@ namespace CoreAppUWP.Common
             }
             catch (Exception ex)
             {
-                SettingsHelper.LogManager.GetLogger(nameof(SettingsPaneRegister)).Error(ex.ExceptionToMessage(), ex);
+                SettingsHelper.LoggerFactory.CreateLogger(typeof(SettingsPaneRegister)).LogWarning(ex, "Failed to check search pane supports. {message} (0x{hResult:X})", ex.GetMessage(), ex.HResult);
             }
             return false;
         }

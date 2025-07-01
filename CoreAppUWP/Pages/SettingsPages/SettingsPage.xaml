@@ -129,6 +129,17 @@
                             <cwuc:SettingsCard
                                 Click="Button_Click"
                                 CornerRadius="{Binding Source={StaticResource ControlCornerRadius}, Converter={StaticResource BottomCornerRadiusFilterConverter}}"
+                                Description="Create a new Win32 Window."
+                                Header="Win32 Window"
+                                IsClickEnabled="True"
+                                Tag="NewWin32Window">
+                                <cwuc:SettingsCard.ActionIcon>
+                                    <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE8A7;" />
+                                </cwuc:SettingsCard.ActionIcon>
+                            </cwuc:SettingsCard>
+                            <cwuc:SettingsCard
+                                Click="Button_Click"
+                                CornerRadius="{Binding Source={StaticResource ControlCornerRadius}, Converter={StaticResource BottomCornerRadiusFilterConverter}}"
                                 Description="Create a new AppWindow."
                                 Header="Desktop Window"
                                 IsClickEnabled="True"
@@ -211,7 +222,7 @@
                         </cwuc:SettingsExpander.HeaderIcon>
                         <cwuc:SettingsExpander.Items>
                             <Grid
-                                Margin="0,0,0,8"
+                                Padding="58,8,44,16"
                                 ColumnSpacing="32"
                                 RowSpacing="8">
                                 <Grid.ColumnDefinitions>
@@ -336,6 +347,8 @@
                         </cwuc:SettingsExpander.Items>
                     </cwuc:SettingsExpander>
                     <cwuc:SettingsCard
+                        x:Name="KeepProcessSettings"
+                        x:Load="{x:Bind IsCoreWindow}"
                         Click="Button_Click"
                         Description="Keep the process and the application will not exit after CoreWindow is closed."
                         Header="Keep Process"

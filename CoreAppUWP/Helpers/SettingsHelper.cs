@@ -1,9 +1,8 @@
-﻿using MetroLog;
-using MetroLog.Targets;
+﻿using Karambolo.Extensions.Logging.File;
+using Microsoft.Extensions.Logging;
 using Microsoft.UI.Xaml;
 using System;
 using System.Diagnostics.CodeAnalysis;
-using System.IO;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
@@ -43,29 +42,31 @@ namespace CoreAppUWP.Helpers
 
     public static partial class SettingsHelper
     {
-        public static ILogManager LogManager { get; private set; }
+        public static ILoggerFactory LoggerFactory { get; } = CreateLoggerFactory();
         public static ApplicationDataStorageHelper LocalObject { get; } = ApplicationDataStorageHelper.GetCurrent(new SystemTextJsonObjectSerializer());
 
         static SettingsHelper() => SetDefaultSettings();
 
-        public static void CreateLogManager()
-        {
-            if (LogManager == null)
+        public static ILoggerFactory CreateLoggerFactory() =>
+            Microsoft.Extensions.Logging.LoggerFactory.Create(x =>
             {
                 if (WindowHelper.IsPackagedApp)
                 {
-                    string path = Path.Combine(ApplicationData.Current.LocalFolder.Path, "MetroLogs");
-                    if (!Directory.Exists(path)) { Directory.CreateDirectory(path); }
-                    LoggingConfiguration loggingConfiguration = new();
-                    loggingConfiguration.AddTarget(LogLevel.Info, LogLevel.Fatal, new StreamingFileTarget(path, 7));
-                    LogManager = LogManagerFactory.CreateLogManager(loggingConfiguration);
+                    _ = x.AddFile(x =>
+                    {
+                        x.RootPath = ApplicationData.Current.LocalFolder.Path;
+                        x.IncludeScopes = true;
+                        x.BasePath = "Logs";
+                        x.Files = [
+                            new LogFileOptions()
+                            {
+                                Path = "Log - <date>.log"
+                            }
+                        ];
+                    });
                 }
-                else
-                {
-                    LogManager = LogManagerFactory.CreateLogManager();
-                }
-            }
-        }
+                _ = x.AddDebug();
+            });
     }
 
     public class SystemTextJsonObjectSerializer : IObjectSerializer
@@ -75,7 +76,7 @@ namespace CoreAppUWP.Helpers
             bool => JsonSerializer.Serialize(value, SourceGenerationContext.Default.Boolean),
             ElementTheme => JsonSerializer.Serialize(value, SourceGenerationContext.Default.ElementTheme),
             BackdropType => JsonSerializer.Serialize(value, SourceGenerationContext.Default.BackdropType),
-            _ => value?.ToString(),
+            _ => JsonSerializer.Serialize(value, typeof(T), SourceGenerationContext.Default)
         };
 
         public T Deserialize<T>([StringSyntax(StringSyntaxAttribute.Json)] string value)
@@ -85,7 +86,7 @@ namespace CoreAppUWP.Helpers
             return type == typeof(bool) ? Deserialize(value, SourceGenerationContext.Default.Boolean)
                 : type == typeof(ElementTheme) ? Deserialize(value, SourceGenerationContext.Default.ElementTheme)
                 : type == typeof(BackdropType) ? Deserialize(value, SourceGenerationContext.Default.BackdropType)
-                : default;
+                : JsonSerializer.Deserialize(value, type, SourceGenerationContext.Default) is T result ? result : default;
             static T Deserialize<TValue>([StringSyntax(StringSyntaxAttribute.Json)] string json, JsonTypeInfo<TValue> jsonTypeInfo) => JsonSerializer.Deserialize(json, jsonTypeInfo) is T value ? value : default;
         }
     }

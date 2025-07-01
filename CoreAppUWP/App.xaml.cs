@@ -1,11 +1,15 @@
 using CoreAppUWP.Common;
 using CoreAppUWP.Helpers;
 using CoreAppUWP.Pages;
+using Microsoft.Extensions.Logging;
+using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Navigation;
 using System;
+using System.Reflection;
+using Windows.ApplicationModel;
 using Windows.ApplicationModel.Core;
 using Windows.System.Profile;
 
@@ -48,6 +52,9 @@ namespace CoreAppUWP
                 if (!(WindowHelper.IsCoreWindow || isLoaded))
                 {
                     window = new Window();
+                    AppWindow appWindow = window.AppWindow;
+                    appWindow.Title = WindowHelper.IsPackagedApp ? Package.Current.DisplayName : Assembly.GetEntryAssembly().GetName().Name;
+                    appWindow.SetIcon("favicon.ico");
                 }
                 else
                 {
@@ -69,14 +76,7 @@ namespace CoreAppUWP
             {
                 if (SettingsHelper.Get<bool>(SettingsHelper.IsExtendsTitleBar))
                 {
-                    if (WindowHelper.IsCoreWindow)
-                    {
-                        CoreApplication.GetCurrentView().TitleBar.ExtendViewIntoTitleBar = true;
-                    }
-                    else
-                    {
-                        window.AppWindow.TitleBar.ExtendsContentIntoTitleBar = true;
-                    }
+                    ThemeHelper.UpdateExtendViewIntoTitleBar(window, true);
                 }
 
                 // 创建要充当导航上下文的框架，并导航到第一页
@@ -129,7 +129,10 @@ namespace CoreAppUWP
 
         private static void Application_UnhandledException(object sender, Microsoft.UI.Xaml.UnhandledExceptionEventArgs e)
         {
-            SettingsHelper.LogManager?.GetLogger("Unhandled Exception - Application").Error(e.Exception.ExceptionToMessage(), e.Exception);
+            if (e.Exception is Exception ex)
+            {
+                SettingsHelper.LoggerFactory.CreateLogger("Unhandled Exception - Application").LogError(ex, "Unhandled exception. {message} (0x{hResult:X})", ex.GetMessage(), ex.HResult);
+            }
             e.Handled = true;
         }
 
@@ -137,7 +140,7 @@ namespace CoreAppUWP
         {
             if (e.ExceptionObject is Exception ex)
             {
-                SettingsHelper.LogManager?.GetLogger("Unhandled Exception - CurrentDomain").Error(ex.ExceptionToMessage(), ex);
+                SettingsHelper.LoggerFactory.CreateLogger("Unhandled Exception - CurrentDomain").LogError(ex, "Unhandled exception. {message} (0x{hResult:X})", ex.GetMessage(), ex.HResult);
             }
         }
 
@@ -153,7 +156,10 @@ namespace CoreAppUWP
 
         private static void SynchronizationContext_UnhandledException(object sender, Common.UnhandledExceptionEventArgs e)
         {
-            SettingsHelper.LogManager?.GetLogger("Unhandled Exception - SynchronizationContext").Error(e.Exception.ExceptionToMessage(), e.Exception);
+            if (e.Exception is Exception ex)
+            {
+                SettingsHelper.LoggerFactory.CreateLogger("Unhandled Exception - SynchronizationContext").LogError(ex, "Unhandled exception. {message} (0x{hResult:X})", ex.GetMessage(), ex.HResult);
+            }
             e.Handled = true;
         }
 

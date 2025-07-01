@@ -59,7 +59,7 @@ namespace CoreAppUWP.Helpers
                             && _rootElement.RequestedTheme != ElementTheme.Default
                                 ? _rootElement.RequestedTheme
                                 : SettingsHelper.Get<ElementTheme>(SettingsHelper.SelectedAppTheme),
-                        DispatcherQueuePriority.High)?.AwaitByTaskCompleteSource()
+                        DispatcherQueuePriority.High)?.AwaitByDispatcherQueue()
                         ?? SettingsHelper.Get<ElementTheme>(SettingsHelper.SelectedAppTheme)
                     : window.Content is FrameworkElement rootElement
                         && rootElement.RequestedTheme != ElementTheme.Default
@@ -108,7 +108,7 @@ namespace CoreAppUWP.Helpers
                         window.Content is FrameworkElement _rootElement
                             ? _rootElement.RequestedTheme
                             : ElementTheme.Default,
-                        DispatcherQueuePriority.High).AwaitByTaskCompleteSource()
+                        DispatcherQueuePriority.High).AwaitByDispatcherQueue()
                     : window.Content is FrameworkElement rootElement
                         ? rootElement.RequestedTheme
                         : ElementTheme.Default;
@@ -238,31 +238,40 @@ namespace CoreAppUWP.Helpers
 
         public static void UpdateExtendViewIntoTitleBar(bool isExtendsTitleBar)
         {
-            if (WindowHelper.IsCoreWindow)
+            bool isCustomizationSupported = AppWindowTitleBar.IsCustomizationSupported();
+
+            WindowHelper.ActiveWindows.ForEach(async window =>
             {
-                WindowHelper.ActiveWindows.ForEach(async window =>
+                await window.DispatcherQueue.ResumeForegroundAsync();
+                if (window.Dispatcher != null)
                 {
-                    await window.DispatcherQueue.ResumeForegroundAsync();
                     CoreApplication.GetCurrentView().TitleBar.ExtendViewIntoTitleBar = isExtendsTitleBar;
-                });
-            }
-
-            if (!AppWindowTitleBar.IsCustomizationSupported()) { return; }
-
-            if (!WindowHelper.IsCoreWindow)
-            {
-                WindowHelper.ActiveWindows.ForEach(async window =>
+                }
+                else if (isCustomizationSupported)
                 {
-                    await window.DispatcherQueue.ResumeForegroundAsync();
                     window.AppWindow.TitleBar.ExtendsContentIntoTitleBar = isExtendsTitleBar;
-                });
-            }
+                }
+            });
+
+            if (!isCustomizationSupported) { return; }
 
             WindowHelper.ActiveDesktopWindows.Values.ForEach(async window =>
             {
                 await window.DispatcherQueue.ResumeForegroundAsync();
                 window.ExtendsContentIntoTitleBar = isExtendsTitleBar;
             });
+        }
+
+        public static void UpdateExtendViewIntoTitleBar(Window window, bool isExtendsTitleBar)
+        {
+            if (window.Dispatcher != null)
+            {
+                CoreApplication.GetCurrentView().TitleBar.ExtendViewIntoTitleBar = isExtendsTitleBar;
+            }
+            else if (AppWindowTitleBar.IsCustomizationSupported())
+            {
+                window.AppWindow.TitleBar.ExtendsContentIntoTitleBar = isExtendsTitleBar;
+            }
         }
 
         public static async void UpdateSystemCaptionButtonColors()
@@ -273,33 +282,30 @@ namespace CoreAppUWP.Helpers
             Color foregroundColor = isDark || isHighContrast ? Colors.White : Colors.Black;
             Color backgroundColor = isHighContrast ? Color.FromArgb(255, 0, 0, 0) : isDark ? Color.FromArgb(255, 32, 32, 32) : Color.FromArgb(255, 243, 243, 243);
 
-            if (WindowHelper.IsCoreWindow)
+            bool isCustomizationSupported = AppWindowTitleBar.IsCustomizationSupported();
+
+            WindowHelper.ActiveWindows.ForEach(async window =>
             {
-                WindowHelper.ActiveWindows.ForEach(async window =>
+                await window.DispatcherQueue.ResumeForegroundAsync();
+                if (window.Dispatcher != null)
                 {
-                    await window.DispatcherQueue.ResumeForegroundAsync();
                     bool extendViewIntoTitleBar = CoreApplication.GetCurrentView().TitleBar.ExtendViewIntoTitleBar;
                     ApplicationViewTitleBar titleBar = ApplicationView.GetForCurrentView().TitleBar;
                     titleBar.ForegroundColor = titleBar.ButtonForegroundColor = foregroundColor;
                     titleBar.BackgroundColor = titleBar.InactiveBackgroundColor = backgroundColor;
                     titleBar.ButtonBackgroundColor = titleBar.ButtonInactiveBackgroundColor = extendViewIntoTitleBar ? Colors.Transparent : backgroundColor;
-                });
-            }
-
-            if (!AppWindowTitleBar.IsCustomizationSupported()) { return; }
-
-            if (!WindowHelper.IsCoreWindow)
-            {
-                WindowHelper.ActiveWindows.ForEach(async window =>
+                }
+                else if (isCustomizationSupported)
                 {
-                    await window.DispatcherQueue.ResumeForegroundAsync();
                     AppWindowTitleBar titleBar = window.AppWindow.TitleBar;
                     bool extendsContentIntoTitleBar = titleBar.ExtendsContentIntoTitleBar;
                     titleBar.ForegroundColor = titleBar.ButtonForegroundColor = foregroundColor;
                     titleBar.BackgroundColor = titleBar.InactiveBackgroundColor = backgroundColor;
                     titleBar.ButtonBackgroundColor = titleBar.ButtonInactiveBackgroundColor = extendsContentIntoTitleBar ? Colors.Transparent : backgroundColor;
-                });
-            }
+                }
+            });
+
+            if (!isCustomizationSupported) { return; }
 
             WindowHelper.ActiveDesktopWindows.Values.ForEach(async window =>
             {
@@ -322,7 +328,7 @@ namespace CoreAppUWP.Helpers
             Color foregroundColor = isDark || isHighContrast ? Colors.White : Colors.Black;
             Color backgroundColor = isHighContrast ? Color.FromArgb(255, 0, 0, 0) : isDark ? Color.FromArgb(255, 32, 32, 32) : Color.FromArgb(255, 243, 243, 243);
 
-            if (WindowHelper.IsCoreWindow)
+            if (window.Dispatcher != null)
             {
                 bool extendViewIntoTitleBar = CoreApplication.GetCurrentView().TitleBar.ExtendViewIntoTitleBar;
                 ApplicationViewTitleBar titleBar = ApplicationView.GetForCurrentView().TitleBar;
@@ -330,7 +336,7 @@ namespace CoreAppUWP.Helpers
                 titleBar.BackgroundColor = titleBar.InactiveBackgroundColor = backgroundColor;
                 titleBar.ButtonBackgroundColor = titleBar.ButtonInactiveBackgroundColor = extendViewIntoTitleBar ? Colors.Transparent : backgroundColor;
             }
-            else
+            else if (AppWindowTitleBar.IsCustomizationSupported())
             {
                 AppWindowTitleBar titleBar = window.AppWindow.TitleBar;
                 bool extendsContentIntoTitleBar = titleBar.ExtendsContentIntoTitleBar;

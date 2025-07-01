@@ -3,6 +3,7 @@ using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Threading;
+using System.Threading.Tasks;
 using Windows.System.Threading;
 using Windows.UI.Core;
 using ThreadPool = Windows.System.Threading.ThreadPool;
@@ -164,5 +165,47 @@ namespace CoreAppUWP.Common
         /// <param name="priority">Specifies the priority for event dispatch.</param>
         /// <returns>An object that you can <see langword="await"/>.</returns>
         public static ThreadPoolThreadSwitcher ResumeBackgroundAsync(WorkItemPriority priority = WorkItemPriority.Normal) => new(priority);
+
+        /// <summary>
+        /// Converts a <see cref="Task{TResult}"/> to synchronous execution using a <see cref="TaskCompletionSource{TResult}"/>.
+        /// </summary>
+        /// <typeparam name="TResult">The type of the result returned by the <paramref name="task"/>.</typeparam>
+        /// <param name="task">The <see cref="Task{TResult}"/> to be executed synchronously.</param>
+        /// <param name="cancellationToken">The cancellation token to observe while waiting for the <paramref name="task"/> to complete.</param>
+        /// <returns>The result of the <paramref name="task"/>.</returns>
+        public static TResult AwaitByTaskCompleteSource<TResult>(this Task<TResult> task, CancellationToken cancellationToken = default)
+        {
+            TaskCompletionSource<TResult> taskCompletionSource = new();
+            _ = Task.Run(async () =>
+            {
+                try
+                {
+                    TResult result = await task.ConfigureAwait(false);
+                    taskCompletionSource.SetResult(result);
+                }
+                catch (Exception e)
+                {
+                    taskCompletionSource.SetException(e);
+                }
+            }, cancellationToken);
+            TResult taskResult = taskCompletionSource.Task.Result;
+            return taskResult;
+        }
+
+        /// <summary>
+        /// Converts a <see cref="Task{TResult}"/> to synchronous execution on the current <see cref="DispatcherQueue"/>.
+        /// </summary>
+        /// <typeparam name="TResult">The type of the result returned by the <paramref name="task"/>.</typeparam>
+        /// <param name="task">The <see cref="Task{TResult}"/> to be executed synchronously.</param>
+        /// <param name="cancellationToken">The cancellation token to observe while waiting for the <paramref name="task"/> to complete.</param>
+        /// <returns>The result of the <paramref name="task"/>.</returns>
+        public static TResult AwaitByDispatcherQueue<TResult>(this Task<TResult> task, CancellationToken cancellationToken = default)
+        {
+            DispatcherQueue dispatcherQueue = DispatcherQueue.GetForCurrentThread();
+            if (dispatcherQueue == null) { return task.AwaitByTaskCompleteSource(cancellationToken); }
+            _ = task.ContinueWith(_ => dispatcherQueue.EnqueueEventLoopExit(), cancellationToken);
+            dispatcherQueue.RunEventLoop(DispatcherRunOptions.QuitOnlyLocalLoop, new DispatcherExitDeferral());
+            return task.Result;
+        }
     }
 }

@@ -169,8 +169,6 @@ namespace CoreAppUWP.ViewModels.SettingsPages
             }
         }
 
-        public static bool Not(bool value) => !value;
-
         public void KeepProcess()
         {
             if (!_isProcessKept)

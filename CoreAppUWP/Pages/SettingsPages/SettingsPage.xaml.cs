@@ -65,7 +65,7 @@ namespace CoreAppUWP.Pages.SettingsPages
                     }
                     else if (this.GetDesktopWindowForElement() is DesktopWindow _desktopWindow)
                     { _desktopWindow.AppWindow.SetPresenter(AppWindowPresenterKind.Default); }
-                    else if (!WindowHelper.IsCoreWindow && this.GetWindowForElement() is Window _window)
+                    else if (this.GetWindowForElement() is Window _window)
                     { _window.AppWindow.SetPresenter(AppWindowPresenterKind.Default); }
                     break;
                 case "EnterPIP":
@@ -76,7 +76,7 @@ namespace CoreAppUWP.Pages.SettingsPages
                     }
                     else if (this.GetDesktopWindowForElement() is DesktopWindow _desktopWindow)
                     { _desktopWindow.AppWindow.SetPresenter(AppWindowPresenterKind.CompactOverlay); }
-                    else if (!WindowHelper.IsCoreWindow && this.GetWindowForElement() is Window _window)
+                    else if (this.GetWindowForElement() is Window _window)
                     { _window.AppWindow.SetPresenter(AppWindowPresenterKind.CompactOverlay); }
                     break;
                 case "NewWindow" when WindowHelper.IsCoreWindow:
@@ -97,8 +97,9 @@ namespace CoreAppUWP.Pages.SettingsPages
                 case "NewWindow":
                     isProcessKept = Provider.IsProcessKept;
                     Window window = WindowHelper.CreateWindow();
+                    AppWindow appWindow = window.AppWindow;
                     if (SettingsHelper.Get<bool>(SettingsHelper.IsExtendsTitleBar))
-                    { window.AppWindow.TitleBar.ExtendsContentIntoTitleBar = true; }
+                    { appWindow.TitleBar.ExtendsContentIntoTitleBar = true; }
                     Frame _frame = new();
                     window.Content = _frame;
                     ThemeHelper.Initialize(window);
@@ -106,6 +107,8 @@ namespace CoreAppUWP.Pages.SettingsPages
                     if (!isProcessKept) { try { transitionInfo = new DrillInNavigationTransitionInfo(); } catch { } }
                     _ = _frame.Navigate(typeof(MainPage), null, transitionInfo);
                     BackdropHelper.SetBackdrop(window, SettingsHelper.Get<BackdropType>(SettingsHelper.SelectedBackdrop));
+                    appWindow.Title = WindowHelper.IsPackagedApp ? Package.Current.DisplayName : Assembly.GetEntryAssembly().GetName().Name;
+                    appWindow.SetIcon("favicon.ico");
                     window.Activate();
                     break;
                 case "NewAppWindow":
@@ -126,10 +129,29 @@ namespace CoreAppUWP.Pages.SettingsPages
                     { desktopWindow.ExtendsContentIntoTitleBar = true; }
                     ThemeHelper.Initialize(desktopWindow);
                     BackdropHelper.SetBackdrop(desktopWindow, SettingsHelper.Get<BackdropType>(SettingsHelper.SelectedBackdrop));
-                    AppWindow appWindow = desktopWindow.AppWindow;
+                    appWindow = desktopWindow.AppWindow;
                     appWindow.Title = WindowHelper.IsPackagedApp ? Package.Current.DisplayName : Assembly.GetEntryAssembly().GetName().Name;
                     appWindow.SetIcon("favicon.ico");
                     desktopWindow.Activate();
+                    break;
+                case "NewWin32Window":
+                    isProcessKept = Provider.IsProcessKept;
+                    window = IsCoreWindow || !WindowHelper.IsCoreWindow
+                        ? await WindowHelper.CreateWindowAsync().ConfigureAwait(false)
+                        : WindowHelper.CreateWindow();
+                    appWindow = window.AppWindow;
+                    if (SettingsHelper.Get<bool>(SettingsHelper.IsExtendsTitleBar))
+                    { appWindow.TitleBar.ExtendsContentIntoTitleBar = true; }
+                    _frame = new();
+                    window.Content = _frame;
+                    ThemeHelper.Initialize(window);
+                    transitionInfo = null;
+                    if (!isProcessKept) { try { transitionInfo = new DrillInNavigationTransitionInfo(); } catch { } }
+                    _ = _frame.Navigate(typeof(MainPage), null, transitionInfo);
+                    BackdropHelper.SetBackdrop(window, SettingsHelper.Get<BackdropType>(SettingsHelper.SelectedBackdrop));
+                    appWindow.Title = WindowHelper.IsPackagedApp ? Package.Current.DisplayName : Assembly.GetEntryAssembly().GetName().Name;
+                    appWindow.SetIcon("favicon.ico");
+                    window.Activate();
                     break;
                 case "SearchFlyout" when SettingsPaneRegister.IsSearchPaneSupported:
                     SearchPane.GetForCurrentView().Show();
@@ -139,7 +161,7 @@ namespace CoreAppUWP.Pages.SettingsPages
                     { ApplicationView.GetForCurrentView().ExitFullScreenMode(); }
                     else if (this.GetDesktopWindowForElement() is DesktopWindow _desktopWindow)
                     { _desktopWindow.AppWindow.SetPresenter(AppWindowPresenterKind.Default); }
-                    else if (!WindowHelper.IsCoreWindow && this.GetWindowForElement() is Window _window)
+                    else if (this.GetWindowForElement() is Window _window)
                     { _window.AppWindow.SetPresenter(AppWindowPresenterKind.Default); }
                     break;
                 case "SettingsFlyout" when SettingsPaneRegister.IsSettingsPaneSupported:
@@ -150,7 +172,7 @@ namespace CoreAppUWP.Pages.SettingsPages
                     { ApplicationView.GetForCurrentView().TryEnterFullScreenMode(); }
                     else if (this.GetDesktopWindowForElement() is DesktopWindow _desktopWindow)
                     { _desktopWindow.AppWindow.SetPresenter(AppWindowPresenterKind.FullScreen); }
-                    else if (!WindowHelper.IsCoreWindow && this.GetWindowForElement() is Window _window)
+                    else if (this.GetWindowForElement() is Window _window)
                     { _window.AppWindow.SetPresenter(AppWindowPresenterKind.FullScreen); }
                     break;
                 case "KeepProcess" when IsCoreWindow:
@@ -170,7 +192,7 @@ namespace CoreAppUWP.Pages.SettingsPages
             }
             _ = tag switch
             {
-                "LogFolder" => Launcher.LaunchFolderAsync(await ApplicationData.Current.LocalFolder.CreateFolderAsync("MetroLogs", CreationCollisionOption.OpenIfExists)),
+                "LogFolder" => Launcher.LaunchFolderAsync(await ApplicationData.Current.LocalFolder.CreateFolderAsync("Logs", CreationCollisionOption.OpenIfExists)),
                 _ => Launcher.LaunchUriAsync(new Uri(tag)),
             };
         }

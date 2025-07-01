@@ -17,6 +17,7 @@ using Windows.UI.ViewManagement;
 using Windows.Win32.Foundation;
 using Windows.Win32.System.WinRT;
 using WinRT;
+using DispatcherQueueController = Microsoft.UI.Dispatching.DispatcherQueueController;
 
 namespace CoreAppUWP.Helpers
 {
@@ -54,6 +55,40 @@ namespace CoreAppUWP.Helpers
             return window;
         }
 
+        public static Task<Window> CreateWindowAsync()
+        {
+            TaskCompletionSource<Window> taskCompletionSource = new();
+            new Thread(() =>
+            {
+                DispatcherQueueController controller;
+                HookWindowingModel hook = null;
+                if (IsCoreWindow)
+                {
+                    hook = new HookWindowingModel();
+                }
+
+                try
+                {
+                    controller = DispatcherQueueController.CreateOnCurrentThread();
+                    WindowsXamlManager.InitializeForCurrentThread();
+                }
+                finally
+                {
+                    hook?.Dispose();
+                }
+
+                Window window = new();
+                TrackWindow(window);
+                taskCompletionSource.SetResult(window);
+
+                controller.DispatcherQueue.RunEventLoop();
+            })
+            {
+                Name = nameof(Window)
+            }.Start();
+            return taskCompletionSource.Task;
+        }
+
         public static async Task<DesktopWindow> CreateWindowAsync(Action<DesktopWindowXamlSource> launched)
         {
             DesktopWindow window = await DesktopWindow.CreateAsync(launched).ConfigureAwait(false);
@@ -72,24 +107,13 @@ namespace CoreAppUWP.Helpers
         {
             if (!ActiveWindows.Contains(window))
             {
-                if (IsCoreWindow)
+                SettingsPaneRegister.Register(window);
+                window.Closed += (sender, args) =>
                 {
-                    SettingsPaneRegister.Register(window);
-                    window.Closed += (sender, args) =>
-                    {
-                        ActiveWindows.Remove(window);
-                        SettingsPaneRegister.Unregister(window);
-                        window = null;
-                    };
-                }
-                else
-                {
-                    window.Closed += (sender, args) =>
-                    {
-                        ActiveWindows.Remove(window);
-                        window = null;
-                    };
-                }
+                    ActiveWindows.Remove(window);
+                    SettingsPaneRegister.Unregister(window);
+                    window = null;
+                };
                 ActiveWindows.Add(window);
                 BackdropHelper.Register(window);
             }
@@ -115,7 +139,7 @@ namespace CoreAppUWP.Helpers
             {
                 foreach (Window window in ActiveWindows)
                 {
-                    if (element.XamlRoot == window.Content.XamlRoot)
+                    if (window.DispatcherQueue.HasThreadAccess && element.XamlRoot == window.Content.XamlRoot)
                     {
                         return window;
                     }

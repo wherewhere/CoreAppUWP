@@ -34,7 +34,6 @@ namespace CoreAppUWP.Pages
         {
             InitializeComponent();
             TilesHelper.UpdateTile();
-            SettingsHelper.CreateLogManager();
             NavigationView.PaneDisplayMode = NavigationViewPaneDisplayMode.Left;
         }
 
@@ -58,7 +57,13 @@ namespace CoreAppUWP.Pages
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
-            if (this.GetDesktopWindowForElement() is DesktopWindow window)
+            if (this.GetDesktopWindowForElement() is DesktopWindow desktopWindow)
+            {
+                desktopWindow.AppWindow.Changed += AppWindow_Changed;
+                BackdropHelper.AddBackdropTypeChanged(desktopWindow, OnBackdropTypeChanged);
+                OnBackdropTypeChanged(BackdropHelper.GetBackdrop(desktopWindow));
+            }
+            else if (this.GetWindowForElement() is Window window)
             {
                 window.AppWindow.Changed += AppWindow_Changed;
                 BackdropHelper.AddBackdropTypeChanged(window, OnBackdropTypeChanged);
@@ -73,7 +78,11 @@ namespace CoreAppUWP.Pages
             if (IsAppWindow)
             {
                 Loaded -= Page_Loaded;
-                if (this.GetDesktopWindowForElement() is DesktopWindow window)
+                if (this.GetDesktopWindowForElement() is DesktopWindow desktopWindow)
+                {
+                    BackdropHelper.RemoveBackdropTypeChanged(desktopWindow, OnBackdropTypeChanged);
+                }
+                else if (this.GetWindowForElement() is Window window)
                 {
                     BackdropHelper.RemoveBackdropTypeChanged(window, OnBackdropTypeChanged);
                 }
