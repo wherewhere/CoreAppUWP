@@ -3,6 +3,7 @@ using CoreAppUWP.Controls;
 using CoreAppUWP.Helpers;
 using CoreAppUWP.ViewModels.SettingsPages;
 using System;
+using System.Reflection;
 using System.Threading.Tasks;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Core;
@@ -101,7 +102,7 @@ namespace CoreAppUWP.Pages.SettingsPages
                         _ = frame.Navigate(typeof(MainPage), null, new DrillInNavigationTransitionInfo());
                         ThemeHelper.Initialize(frame);
                     }
-                    window.Title = Package.Current.DisplayName;
+                    window.Title = WindowHelper.IsPackagedApp ? Package.Current.DisplayName : Assembly.GetEntryAssembly().GetName().Name;
                     window.AppWindow.SetIcon("favicon.ico");
                     window.Activate();
                     break;

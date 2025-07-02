@@ -1,4 +1,5 @@
-﻿using CommunityToolkit.WinUI.Helpers;
+﻿using CommunityToolkit.WinUI;
+using CommunityToolkit.WinUI.Helpers;
 using CoreAppUWP.Common;
 using CoreAppUWP.Helpers;
 using Microsoft.UI.Xaml.Controls;
@@ -6,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
+using System.IO;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
@@ -28,9 +30,11 @@ namespace CoreAppUWP.ViewModels.SettingsPages
 
         public static string WinUIVersion { get; } = Assembly.GetAssembly(typeof(ControlsResourcesVersion)).GetName().Version.ToString(3);
 
-        public static string DeviceFamily { get; } = AnalyticsInfo.VersionInfo.DeviceFamily.Replace('.', ' ');
+        public static string DeviceFamily { get; } = WindowHelper.IsPackagedApp ? AnalyticsInfo.VersionInfo.DeviceFamily.Replace('.', ' ') : "Unpackage";
 
-        public static string VersionTextBlockText { get; } = $"{Package.Current.DisplayName} v{Package.Current.Id.Version.ToFormattedString(3)}";
+        public static string ToolkitVersion { get; } = Assembly.GetAssembly(typeof(HsvColor)).GetName().Version.ToString(3);
+
+        public static string VersionTextBlockText { get; } = WindowHelper.IsPackagedApp ? $"{Package.Current.DisplayName} v{Package.Current.Id.Version.ToFormattedString(3)}" : Assembly.GetEntryAssembly()?.GetName() is AssemblyName name ? $"{name.Name} {name.Version.ToString(3)}" : "Unknown";
 
         public CoreDispatcher Dispatcher { get; }
 
@@ -117,12 +121,24 @@ namespace CoreAppUWP.ViewModels.SettingsPages
             {
                 await ThreadSwitcher.ResumeBackgroundAsync();
                 const string langCode = "en-US";
-                Uri dataUri = new($"ms-appx:///Assets/About/About.{langCode}.md");
-                StorageFile file = await StorageFile.GetFileFromApplicationUriAsync(dataUri);
-                if (file != null)
+                if (WindowHelper.IsPackagedApp)
                 {
-                    string markdown = await FileIO.ReadTextAsync(file);
-                    AboutTextBlockText = markdown;
+                    Uri dataUri = new($"ms-appx:///Assets/About/About.{langCode}.md");
+                    StorageFile file = await StorageFile.GetFileFromApplicationUriAsync(dataUri);
+                    if (file != null)
+                    {
+                        string markdown = await FileIO.ReadTextAsync(file);
+                        AboutTextBlockText = markdown;
+                    }
+                }
+                else
+                {
+                    string filePath = Path.Combine(AppContext.BaseDirectory, "Assets", "About", $"About.{langCode}.md");
+                    if (File.Exists(filePath))
+                    {
+                        string markdown = await File.ReadAllTextAsync(filePath);
+                        AboutTextBlockText = markdown;
+                    }
                 }
             }
         }

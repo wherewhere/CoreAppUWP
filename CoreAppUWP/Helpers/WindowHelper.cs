@@ -32,6 +32,10 @@ namespace CoreAppUWP.Helpers
         public static bool IsXamlRootSupported { get; } = ApiInformation.IsPropertyPresent("Windows.UI.Xaml.UIElement", "XamlRoot");
 #pragma warning restore CA1416
 
+        public static bool IsCoreWindow { get; } = Program.IsCoreWindow;
+
+        public static bool IsPackagedApp { get; } = Program.IsPackagedApp;
+
         public static async Task<bool> CreateWindowAsync(Action<Window> launched)
         {
             CoreApplicationView newView = CoreApplication.CreateNewView();
@@ -49,18 +53,18 @@ namespace CoreAppUWP.Helpers
         [SupportedOSPlatform("Windows10.0.18362.0")]
         public static async Task<(AppWindow, Frame)> CreateWindowAsync()
         {
-            Frame newFrame = new();
-            AppWindow newWindow = await AppWindow.TryCreateAsync();
-            ElementCompositionPreview.SetAppWindowContent(newWindow, newFrame);
-            newWindow.TrackWindow(newFrame);
-            return (newWindow, newFrame);
+            Frame frame = new();
+            AppWindow window = await AppWindow.TryCreateAsync();
+            ElementCompositionPreview.SetAppWindowContent(window, frame);
+            window.TrackWindow(frame);
+            return (window, frame);
         }
 
         public static async Task<DesktopWindow> CreateWindowAsync(Action<DesktopWindowXamlSource> launched)
         {
-            DesktopWindow newWindow = await DesktopWindow.CreateAsync(launched).ConfigureAwait(false);
-            TrackWindow(newWindow);
-            return newWindow;
+            DesktopWindow window = await DesktopWindow.CreateAsync(launched).ConfigureAwait(false);
+            TrackWindow(window);
+            return window;
         }
 
         public static void TrackWindow(this Window window)

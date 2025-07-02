@@ -1,6 +1,7 @@
 ﻿using CoreAppUWP.Common;
 using CoreAppUWP.Helpers;
 using CoreAppUWP.Pages;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Threading;
 using Windows.ApplicationModel;
@@ -140,7 +141,7 @@ namespace CoreAppUWP
                 }
                 catch (Exception ex)
                 {
-                    SettingsHelper.LogManager.GetLogger(nameof(App)).Error(ex.ExceptionToMessage(), ex);
+                    SettingsHelper.LoggerFactory.CreateLogger<App>().LogError("Failed to set CoreApplication.EnablePrelaunch(true). {message} (0x{hResult:X})", ex.GetMessage(), ex.HResult);
                     goto end;
                 }
             }
@@ -184,7 +185,10 @@ namespace CoreAppUWP
 
         private static void Application_UnhandledException(object sender, Windows.UI.Xaml.UnhandledExceptionEventArgs e)
         {
-            SettingsHelper.LogManager?.GetLogger("Unhandled Exception - Application").Error(e.Exception.ExceptionToMessage(), e.Exception);
+            if (e.Exception is Exception ex)
+            {
+                SettingsHelper.LoggerFactory.CreateLogger("Unhandled Exception - Application").LogError(ex, "Unhandled exception. {message} (0x{hResult:X})", ex.GetMessage(), ex.HResult);
+            }
             e.Handled = true;
         }
 
@@ -192,7 +196,7 @@ namespace CoreAppUWP
         {
             if (e.ExceptionObject is Exception ex)
             {
-                SettingsHelper.LogManager?.GetLogger("Unhandled Exception - CurrentDomain").Error(ex.ExceptionToMessage(), ex);
+                SettingsHelper.LoggerFactory.CreateLogger("Unhandled Exception - CurrentDomain").LogError(ex, "Unhandled exception. {message} (0x{hResult:X})", ex.GetMessage(), ex.HResult);
             }
         }
 
@@ -209,8 +213,12 @@ namespace CoreAppUWP
 
         private static void SynchronizationContext_UnhandledException(object sender, Common.UnhandledExceptionEventArgs e)
         {
-            SettingsHelper.LogManager?.GetLogger("Unhandled Exception - SynchronizationContext").Error(e.Exception.ExceptionToMessage(), e.Exception);
+            if (e.Exception is Exception ex)
+            {
+                SettingsHelper.LoggerFactory.CreateLogger("Unhandled Exception - SynchronizationContext").LogError(ex, "Unhandled exception. {message} (0x{hResult:X})", ex.GetMessage(), ex.HResult);
+            }
             e.Handled = true;
         }
+
     }
 }

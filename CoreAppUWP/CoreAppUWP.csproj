@@ -4,6 +4,7 @@
     <ApplicationIcon>favicon.ico</ApplicationIcon>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <DefaultLanguage>en-US</DefaultLanguage>
+    <DefineConstants>$(DefineConstants);DISABLE_XAML_GENERATED_MAIN</DefineConstants>
     <EnableMsixTooling>True</EnableMsixTooling>
     <OutputType>WinExe</OutputType>
     <Platforms>x86;x64;ARM64</Platforms>
@@ -21,17 +22,18 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="CommunityToolkit.Labs.Uwp.Controls.MarkdownTextBlock" Version="0.1.250513-build.2126" />
+    <PackageReference Include="CommunityToolkit.Labs.Uwp.Controls.MarkdownTextBlock" Version="0.1.250626-build.2162" />
     <PackageReference Include="CommunityToolkit.Uwp.Controls.Primitives" Version="8.2.250402" />
     <PackageReference Include="CommunityToolkit.Uwp.Controls.SettingsControls" Version="8.2.250402" />
     <PackageReference Include="Detours.Win32Metadata" Version="4.0.1.18" />
-    <PackageReference Include="MetroLog.Net6" Version="2.1.0" />
+    <PackageReference Include="Karambolo.Extensions.Logging.File" Version="3.6.3" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.6" />
     <PackageReference Include="Microsoft.UI.Xaml" Version="2.8.7" />
     <PackageReference Include="Microsoft.Windows.CsWin32" Version="0.3.183" PrivateAssets="all">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.WindowsAppSDK.Base" Version="1.8.250509001-experimental" />
-    <PackageReference Include="Microsoft.WindowsAppSDK.InteractiveExperiences" Version="1.8.250509002-experimental" />
+    <PackageReference Include="Microsoft.WindowsAppSDK.InteractiveExperiences" Version="1.8.250523001-experimental" />
   </ItemGroup>
 
   <ItemGroup>
@@ -40,6 +42,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="favicon.ico" />
+    <Content Include="favicon.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Assets\About\About.en-US.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 </Project>

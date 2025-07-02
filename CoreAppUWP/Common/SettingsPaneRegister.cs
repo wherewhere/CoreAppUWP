@@ -1,4 +1,5 @@
 ﻿using CoreAppUWP.Helpers;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -34,7 +35,7 @@ namespace CoreAppUWP.Common
             }
             catch (Exception ex)
             {
-                SettingsHelper.LogManager.GetLogger(nameof(SettingsPaneRegister)).Error(ex.ExceptionToMessage(), ex);
+                SettingsHelper.LoggerFactory.CreateLogger(typeof(SettingsPaneRegister)).LogError(ex, "Failed to register settings pane. {message} (0x{hResult:X})", ex.GetMessage(), ex.HResult);
             }
         }
 
@@ -50,7 +51,7 @@ namespace CoreAppUWP.Common
             }
             catch (Exception ex)
             {
-                SettingsHelper.LogManager.GetLogger(nameof(SettingsPaneRegister)).Error(ex.ExceptionToMessage(), ex);
+                SettingsHelper.LoggerFactory.CreateLogger(typeof(SettingsPaneRegister)).LogError(ex, "Failed to unregister settings pane. {message} (0x{hResult:X})", ex.GetMessage(), ex.HResult);
             }
         }
 
@@ -121,7 +122,7 @@ namespace CoreAppUWP.Common
             }
             catch (Exception ex)
             {
-                SettingsHelper.LogManager.GetLogger(nameof(SettingsPaneRegister)).Error(ex.ExceptionToMessage(), ex);
+                SettingsHelper.LoggerFactory.CreateLogger(typeof(SettingsPaneRegister)).LogWarning(ex, "Failed to check search pane supports. {message} (0x{hResult:X})", ex.GetMessage(), ex.HResult);
             }
             return false;
         }

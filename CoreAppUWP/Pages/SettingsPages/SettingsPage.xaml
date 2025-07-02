@@ -228,6 +228,7 @@
                                     <RowDefinition Height="Auto" />
                                     <RowDefinition Height="Auto" />
                                     <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
                                 </Grid.RowDefinitions>
                                 <TextBlock
                                     Grid.Row="0"
@@ -298,9 +299,22 @@
                                     Grid.Row="5"
                                     Grid.Column="0"
                                     Foreground="{ThemeResource TextFillColorPrimaryBrush}"
-                                    Text="OS Platform" />
+                                    Text="Community Toolkit" />
                                 <TextBlock
                                     Grid.Row="5"
+                                    Grid.Column="1"
+                                    HorizontalAlignment="Left"
+                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                    IsTextSelectionEnabled="True"
+                                    Text="{x:Bind settingspages:SettingsViewModel.ToolkitVersion}"
+                                    TextWrapping="WrapWholeWords" />
+                                <TextBlock
+                                    Grid.Row="6"
+                                    Grid.Column="0"
+                                    Foreground="{ThemeResource TextFillColorPrimaryBrush}"
+                                    Text="OS Platform" />
+                                <TextBlock
+                                    Grid.Row="6"
                                     Grid.Column="1"
                                     HorizontalAlignment="Left"
                                     Foreground="{ThemeResource TextFillColorSecondaryBrush}"
@@ -308,12 +322,12 @@
                                     Text="{x:Bind interopservices:RuntimeInformation.OSDescription}"
                                     TextWrapping="Wrap" />
                                 <TextBlock
-                                    Grid.Row="6"
+                                    Grid.Row="7"
                                     Grid.Column="0"
                                     Foreground="{ThemeResource TextFillColorPrimaryBrush}"
                                     Text="OS Architecture" />
                                 <TextBlock
-                                    Grid.Row="6"
+                                    Grid.Row="7"
                                     Grid.Column="1"
                                     HorizontalAlignment="Left"
                                     Foreground="{ThemeResource TextFillColorSecondaryBrush}"

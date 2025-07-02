@@ -9,6 +9,7 @@
       
       It is also necessary to support features in unpackaged applications, for example the custom titlebar implementation.-->
       <supportedOS Id="{4a2f28e3-53b9-4441-ba9c-d69d4a4a6e38}" />
+      <maxversiontested Id="10.0.18226.0" />
     </application>
   </compatibility>
   

@@ -1,8 +1,7 @@
 ﻿using CoreAppUWP.Common;
-using Microsoft.UI.Dispatching;
+using CoreAppUWP.Helpers;
 using Microsoft.UI.Windowing;
 using System;
-using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
 using System.Runtime.Versioning;
@@ -118,9 +117,19 @@ namespace CoreAppUWP.Controls
                     DesktopWindowXamlSource source;
                     AppWindow window = AppWindow.Create();
 
-                    using (HookWindowingModel hook = new())
+                    HookWindowingModel hook = null;
+                    if (WindowHelper.IsCoreWindow)
+                    {
+                        hook = new HookWindowingModel();
+                    }
+
+                    try
                     {
                         source = new DesktopWindowXamlSource();
+                    }
+                    finally
+                    {
+                        hook?.Dispose();
                     }
 
                     IDesktopWindowXamlSourceNative m_native = source.As<IDesktopWindowXamlSourceNative>();
@@ -139,6 +148,7 @@ namespace CoreAppUWP.Controls
                                 SET_WINDOW_POS_FLAGS.SWP_NOACTIVATE | SET_WINDOW_POS_FLAGS.SWP_NOZORDER | SET_WINDOW_POS_FLAGS.SWP_SHOWWINDOW);
                         }
                     };
+                    window.Destroying += (sender, args) => PInvoke.PostQuitMessage(0);
 
                     launched(source);
                     DesktopWindow desktopWindow = new()
@@ -166,6 +176,54 @@ namespace CoreAppUWP.Controls
             }.Start();
 
             return taskCompletionSource.Task;
+        }
+
+        /// <summary>
+        /// Create a new <see cref="DesktopWindow"/> instance.
+        /// </summary>
+        /// <param name="launched">Do something after <see cref="DesktopWindowXamlSource"/> created.</param>
+        /// <returns>The new instance of <see cref="DesktopWindow"/>.</returns>
+        public static DesktopWindow CreateMainWindow(Action<DesktopWindowXamlSource> launched)
+        {
+            AppWindow window = AppWindow.Create();
+            DesktopWindowXamlSource source = new();
+
+            IDesktopWindowXamlSourceNative m_native = source.As<IDesktopWindowXamlSourceNative>();
+            m_native.AttachToWindow((nint)window.Id.Value);
+            
+            window.Changed += (sender, args) =>
+            {
+                if (args.DidPresenterChange)
+                {
+                    SizeInt32 size = sender.ClientSize;
+                    _ = PInvoke.SetWindowPos(
+                        m_native.WindowHandle(),
+                        new HWND(),
+                        0, 0,
+                        size.Width, size.Height,
+                        SET_WINDOW_POS_FLAGS.SWP_NOACTIVATE | SET_WINDOW_POS_FLAGS.SWP_NOZORDER | SET_WINDOW_POS_FLAGS.SWP_SHOWWINDOW);
+                }
+            };
+            window.Destroying += (sender, args) => PInvoke.PostQuitMessage(0);
+
+            launched(source);
+            DesktopWindow desktopWindow = new()
+            {
+                AppWindow = window,
+                WindowXamlSource = source,
+                Dispatcher = CoreWindow.GetForCurrentThread().Dispatcher
+            };
+            return desktopWindow;
+        }
+
+        public static void RunEventLoop()
+        {
+            MSG msg = new();
+            while (msg.message != PInvoke.WM_QUIT)
+            {
+                if (PInvoke.PeekMessage(out msg, new HWND(), 0, 0, PEEK_MESSAGE_REMOVE_TYPE.PM_REMOVE))
+                { _ = PInvoke.DispatchMessage(msg); }
+            }
         }
     }
 }
