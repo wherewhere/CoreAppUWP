@@ -9,12 +9,9 @@ DetourUpdateThread
 
 AddPackageDependency
 AppPolicyGetWindowingModel
-DispatchMessage
 GetCurrentPackageFullName
 GetCurrentThread
 GetDpiForWindow
 GetModuleHandle
-PeekMessage
-PostQuitMessage
 SetWindowPos
 TryCreatePackageDependency

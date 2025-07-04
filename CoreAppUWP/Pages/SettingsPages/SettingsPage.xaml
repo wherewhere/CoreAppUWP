@@ -360,7 +360,30 @@
                                     <HyperlinkButton
                                         Click="HyperlinkButton_Click"
                                         Content="Log Folder"
-                                        Tag="LogFolder" />
+                                        IsEnabled="{x:Bind helpers:WindowHelper.IsPackagedApp}"
+                                        Tag="LogFolder">
+                                        <HyperlinkButton.ContextFlyout>
+                                            <MenuFlyout>
+                                                <MenuFlyoutItem
+                                                    Click="MenuFlyoutItem_Click"
+                                                    Tag="OpenLogFile"
+                                                    Text="Open Recent Log">
+                                                    <MenuFlyoutItem.Icon>
+                                                        <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE7C3;" />
+                                                    </MenuFlyoutItem.Icon>
+                                                </MenuFlyoutItem>
+                                                <MenuFlyoutItem
+                                                    Click="MenuFlyoutItem_Click"
+                                                    IsEnabled="{x:Bind Provider.IsCleanLogsButtonEnabled, Mode=OneWay}"
+                                                    Tag="CleanLogs"
+                                                    Text="Clean Log Files">
+                                                    <MenuFlyoutItem.Icon>
+                                                        <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE74D;" />
+                                                    </MenuFlyoutItem.Icon>
+                                                </MenuFlyoutItem>
+                                            </MenuFlyout>
+                                        </HyperlinkButton.ContextFlyout>
+                                    </HyperlinkButton>
                                     <HyperlinkButton
                                         Content="Release Notes"
                                         NavigateUri="https://github.com/wherewhere/CoreAppUWP/releases/latest"

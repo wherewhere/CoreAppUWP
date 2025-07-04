@@ -148,23 +148,21 @@ namespace CoreAppUWP.Controls
                                 SET_WINDOW_POS_FLAGS.SWP_NOACTIVATE | SET_WINDOW_POS_FLAGS.SWP_NOZORDER | SET_WINDOW_POS_FLAGS.SWP_SHOWWINDOW);
                         }
                     };
-                    window.Destroying += (sender, args) => PInvoke.PostQuitMessage(0);
+
+                    CoreWindow coreWindow = CoreWindow.GetForCurrentThread();
+                    CoreDispatcher dispatcher = coreWindow.Dispatcher;
+                    window.Destroying += (sender, args) => coreWindow.Close();
 
                     launched(source);
                     DesktopWindow desktopWindow = new()
                     {
                         AppWindow = window,
                         WindowXamlSource = source,
-                        Dispatcher = CoreWindow.GetForCurrentThread().Dispatcher
+                        Dispatcher = dispatcher
                     };
                     taskCompletionSource.SetResult(desktopWindow);
 
-                    MSG msg = new();
-                    while (msg.message != PInvoke.WM_QUIT)
-                    {
-                        if (PInvoke.PeekMessage(out msg, new HWND(), 0, 0, PEEK_MESSAGE_REMOVE_TYPE.PM_REMOVE))
-                        { _ = PInvoke.DispatchMessage(msg); }
-                    }
+                    dispatcher.ProcessEvents(CoreProcessEventsOption.ProcessUntilQuit);
                 }
                 catch (Exception e)
                 {
@@ -204,26 +202,18 @@ namespace CoreAppUWP.Controls
                         SET_WINDOW_POS_FLAGS.SWP_NOACTIVATE | SET_WINDOW_POS_FLAGS.SWP_NOZORDER | SET_WINDOW_POS_FLAGS.SWP_SHOWWINDOW);
                 }
             };
-            window.Destroying += (sender, args) => PInvoke.PostQuitMessage(0);
+
+            CoreWindow coreWindow = CoreWindow.GetForCurrentThread();
+            window.Destroying += (sender, args) => coreWindow.Close();
 
             launched(source);
             DesktopWindow desktopWindow = new()
             {
                 AppWindow = window,
                 WindowXamlSource = source,
-                Dispatcher = CoreWindow.GetForCurrentThread().Dispatcher
+                Dispatcher = coreWindow.Dispatcher
             };
             return desktopWindow;
-        }
-
-        public static void RunEventLoop()
-        {
-            MSG msg = new();
-            while (msg.message != PInvoke.WM_QUIT)
-            {
-                if (PInvoke.PeekMessage(out msg, new HWND(), 0, 0, PEEK_MESSAGE_REMOVE_TYPE.PM_REMOVE))
-                { _ = PInvoke.DispatchMessage(msg); }
-            }
         }
     }
 }

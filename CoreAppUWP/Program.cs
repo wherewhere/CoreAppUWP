@@ -7,6 +7,7 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using Windows.ApplicationModel;
 using Windows.System;
+using Windows.UI.Core;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media.Animation;
@@ -108,7 +109,7 @@ namespace CoreAppUWP
                 window.Title = isPackagedApp ? Package.Current.DisplayName : Assembly.GetEntryAssembly().GetName().Name;
                 window.AppWindow.SetIcon("favicon.ico");
                 window.Activate();
-                DesktopWindow.RunEventLoop();
+                window.Dispatcher.ProcessEvents(CoreProcessEventsOption.ProcessUntilQuit);
             }
         }
 

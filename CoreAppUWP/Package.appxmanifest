@@ -88,6 +88,16 @@
     </Application>
   </Applications>
 
+  <Extensions>
+    <Extension Category="windows.activatableClass.inProcessServer">
+      <InProcessServer>
+        <Path>CoreMessagingXP.dll</Path>
+        <ActivatableClass ActivatableClassId="Microsoft.System.DispatcherQueue" ThreadingModel="both" />
+        <ActivatableClass ActivatableClassId="Microsoft.System.DispatcherQueueController" ThreadingModel="both" />
+      </InProcessServer>
+    </Extension>
+  </Extensions>
+
   <Capabilities>
     <Capability Name="internetClient" />
   </Capabilities>

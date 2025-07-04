@@ -219,6 +219,5 @@ namespace CoreAppUWP
             }
             e.Handled = true;
         }
-
     }
 }

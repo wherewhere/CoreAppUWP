@@ -44,7 +44,8 @@ namespace CoreAppUWP.Pages.SettingsPages
 
         private async void Button_Click(object sender, RoutedEventArgs e)
         {
-            switch ((sender as FrameworkElement).Tag?.ToString())
+            if (sender is not FrameworkElement element) { return; }
+            switch (element.Tag?.ToString())
             {
                 case "Reset":
                     SettingsHelper.LocalObject.Clear();
@@ -130,12 +131,28 @@ namespace CoreAppUWP.Pages.SettingsPages
             }
         }
 
+        private void MenuFlyoutItem_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is not FrameworkElement element) { return; }
+            switch (element.Tag?.ToString())
+            {
+                case "CleanLogs":
+                    _ = Provider.CleanLogsAsync();
+                    break;
+                case "OpenLogFile":
+                    _ = Provider.OpenLogFileAsync();
+                    break;
+                default:
+                    break;
+            }
+        }
+
         private async void HyperlinkButton_Click(object sender, RoutedEventArgs e)
         {
             string tag = (sender as FrameworkElement).Tag?.ToString();
             _ = tag switch
             {
-                "LogFolder" => Launcher.LaunchFolderAsync(await ApplicationData.Current.LocalFolder.CreateFolderAsync("MetroLogs", CreationCollisionOption.OpenIfExists)),
+                "LogFolder" => Launcher.LaunchFolderAsync(await ApplicationData.Current.LocalFolder.CreateFolderAsync("Logs", CreationCollisionOption.OpenIfExists)),
                 _ => Launcher.LaunchUriAsync(new Uri(tag)),
             };
         }

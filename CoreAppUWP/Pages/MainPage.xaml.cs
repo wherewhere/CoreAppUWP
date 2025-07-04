@@ -42,6 +42,7 @@ namespace CoreAppUWP.Pages
         public MainPage()
         {
             InitializeComponent();
+            TilesHelper.UpdateTile();
             NavigationView.PaneDisplayMode = NavigationViewPaneDisplayMode.Left;
         }
 
@@ -79,6 +80,7 @@ namespace CoreAppUWP.Pages
                     if (SettingsHelper.Get<bool>(SettingsHelper.IsExtendsTitleBar))
                     { window.ExtendsContentIntoTitleBar = true; }
                     ThemeHelper.UpdateSystemCaptionButtonColors(window);
+                    CustomTitleBar_SizeChanged(DragRegion, null);
                 }
                 else
                 {
