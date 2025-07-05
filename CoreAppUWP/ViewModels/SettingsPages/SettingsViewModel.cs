@@ -2,6 +2,7 @@
 using CommunityToolkit.WinUI.Helpers;
 using CoreAppUWP.Common;
 using CoreAppUWP.Helpers;
+using Microsoft.Extensions.Logging;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.Windows.AppLifecycle;
@@ -17,6 +18,7 @@ using Windows.ApplicationModel;
 using Windows.Storage;
 using Windows.System.Profile;
 using WinRT;
+using Launcher = Windows.System.Launcher;
 
 namespace CoreAppUWP.ViewModels.SettingsPages
 {
@@ -83,6 +85,13 @@ namespace CoreAppUWP.ViewModels.SettingsPages
                     RaisePropertyChangedEvent();
                 }
             }
+        }
+
+        private static bool isCleanLogsButtonEnabled = true;
+        public bool IsCleanLogsButtonEnabled
+        {
+            get => isCleanLogsButtonEnabled;
+            set => SetProperty(ref isCleanLogsButtonEnabled, value);
         }
 
         private static bool _isProcessKept;
@@ -166,6 +175,38 @@ namespace CoreAppUWP.ViewModels.SettingsPages
                         AboutTextBlockText = markdown;
                     }
                 }
+            }
+        }
+
+        public async Task<bool> OpenLogFileAsync()
+        {
+            await ThreadSwitcher.ResumeBackgroundAsync();
+            StorageFolder folder = await ApplicationData.Current.LocalFolder.CreateFolderAsync("Logs", CreationCollisionOption.OpenIfExists);
+            IReadOnlyList<StorageFile> files = await folder.GetFilesAsync();
+            if (files is [StorageFile file, ..])
+            {
+                await Dispatcher.ResumeForegroundAsync();
+                return await Launcher.LaunchFileAsync(file);
+            }
+            return false;
+        }
+
+        public async Task CleanLogsAsync()
+        {
+            IsCleanLogsButtonEnabled = false;
+            try
+            {
+                await ThreadSwitcher.ResumeBackgroundAsync();
+                StorageFolder folder = await ApplicationData.Current.LocalFolder.CreateFolderAsync("Logs", CreationCollisionOption.OpenIfExists);
+                await folder.DeleteAsync();
+            }
+            catch (Exception ex)
+            {
+                SettingsHelper.LoggerFactory.CreateLogger<SettingsViewModel>().LogError(ex, "Failed to clean the logs. {message} (0x{hResult:X})", ex.GetMessage(), ex.HResult);
+            }
+            finally
+            {
+                IsCleanLogsButtonEnabled = true;
             }
         }
 
