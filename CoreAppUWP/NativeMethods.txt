@@ -11,7 +11,6 @@ AddPackageDependency
 AppPolicyGetWindowingModel
 GetCurrentPackageFullName
 GetCurrentThread
-GetDpiForWindow
 GetModuleHandle
 SetWindowPos
 TryCreatePackageDependency

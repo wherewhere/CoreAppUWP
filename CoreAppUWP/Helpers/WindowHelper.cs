@@ -6,6 +6,7 @@ using System.Runtime.Versioning;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.Core;
 using Windows.Foundation.Metadata;
+using Windows.Graphics.Display;
 using Windows.UI.Core;
 using Windows.UI.ViewManagement;
 using Windows.UI.WindowManagement;
@@ -120,34 +121,25 @@ namespace CoreAppUWP.Helpers
         [SupportedOSPlatformGuard("Windows10.0.18362.0")]
         public static bool IsAppWindow(this UIElement element) =>
             IsAppWindowSupported
-            && element?.XamlRoot != null
+            && element?.XamlRoot is XamlRoot xamlRoot
             && ActiveAppWindows.TryGetValue(element.Dispatcher, out Dictionary<XamlRoot, AppWindow> windows)
-            && windows.ContainsKey(element.XamlRoot);
+            && windows.ContainsKey(xamlRoot);
 
         public static AppWindow GetWindowForElement(this UIElement element) =>
             IsAppWindowSupported
-            && element?.XamlRoot != null
+            && element?.XamlRoot is XamlRoot xamlRoot
             && ActiveAppWindows.TryGetValue(element.Dispatcher, out Dictionary<XamlRoot, AppWindow> windows)
-            && windows.TryGetValue(element.XamlRoot, out AppWindow window)
+            && windows.TryGetValue(xamlRoot, out AppWindow window)
                 ? window : null;
 
         [SupportedOSPlatform("Windows10.0.18362.0")]
         public static UIElement GetXamlRootForWindow(this AppWindow window) =>
             ElementCompositionPreview.GetAppWindowContent(window);
 
-        public static UIElement GetXAMLRoot(this UIElement element) =>
-            IsXamlRootSupported && element.XamlRoot != null
-                ? element.XamlRoot.Content
-                : Window.Current is Window window
-                    ? window.Content : null;
-
-        public static void SetXAMLRoot(this UIElement element, UIElement target)
-        {
-            if (IsXamlRootSupported)
-            {
-                element.XamlRoot = target?.XamlRoot;
-            }
-        }
+        public static double GetRasterizationScale(this UIElement element) =>
+            IsXamlRootSupported && element.XamlRoot is XamlRoot xamlRoot
+                ? xamlRoot.RasterizationScale
+                : DisplayInformation.GetForCurrentView().RawPixelsPerViewPixel;
 
         public static Dictionary<CoreDispatcher, Window> ActiveWindows { get; } = [];
         public static Dictionary<CoreDispatcher, DesktopWindow> ActiveDesktopWindows { get; } = [];

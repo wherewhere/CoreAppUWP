@@ -235,8 +235,7 @@ namespace CoreAppUWP.Pages
 
         private void UpdateAppTitle(Microsoft.UI.Windowing.AppWindow appWindow)
         {
-            nint hwnd = (nint)appWindow.Id.Value;
-            RightPaddingColumn.Width = new GridLength(Math.Max(0, appWindow.TitleBar.RightInset.GetDisplayPixel(hwnd)));
+            RightPaddingColumn.Width = new GridLength(Math.Max(0, this.GetDisplayPixel(appWindow.TitleBar.RightInset)));
         }
 
         private void System_BackRequested(object sender, BackRequestedEventArgs e)
@@ -251,8 +250,7 @@ namespace CoreAppUWP.Pages
         {
             if (DesktopWindow.Current is DesktopWindow window)
             {
-                nint hwnd = (nint)window.AppWindow.Id.Value;
-                RectInt32 Rect = new((AppTitleBar.ActualWidth - DragRegion.ActualWidth).GetActualPixel(hwnd), 0, DragRegion.ActualWidth.GetActualPixel(hwnd), DragRegion.ActualHeight.GetActualPixel(hwnd));
+                RectInt32 Rect = new(this.GetActualPixel(AppTitleBar.ActualWidth - DragRegion.ActualWidth), 0, this.GetActualPixel(DragRegion.ActualWidth), this.GetActualPixel(DragRegion.ActualHeight));
                 window.AppWindow?.TitleBar.SetDragRectangles([Rect]);
             }
         }

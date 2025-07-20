@@ -18,11 +18,11 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <MicrosoftWindowsSDKBuildToolsMSIXPackageVersion>1.7.20250508.1</MicrosoftWindowsSDKBuildToolsMSIXPackageVersion>
+    <MicrosoftWindowsSDKBuildToolsMSIXPackageVersion>1.7.20250528.2</MicrosoftWindowsSDKBuildToolsMSIXPackageVersion>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="CommunityToolkit.Labs.Uwp.Controls.MarkdownTextBlock" Version="0.1.250626-build.2162" />
+    <PackageReference Include="CommunityToolkit.Labs.Uwp.Controls.MarkdownTextBlock" Version="0.1.250703-build.2173" />
     <PackageReference Include="CommunityToolkit.Uwp.Controls.Primitives" Version="8.2.250402" />
     <PackageReference Include="CommunityToolkit.Uwp.Controls.SettingsControls" Version="8.2.250402" />
     <PackageReference Include="Detours.Win32Metadata" Version="4.0.1.18" />
@@ -34,7 +34,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.WindowsAppSDK.Base" Version="1.8.250509001-experimental" />
-    <PackageReference Include="Microsoft.WindowsAppSDK.InteractiveExperiences" Version="1.8.250523001-experimental" />
+    <PackageReference Include="Microsoft.WindowsAppSDK.InteractiveExperiences" Version="1.8.250626001-experimental" />
   </ItemGroup>
 
   <ItemGroup>

@@ -20,7 +20,7 @@ namespace CoreAppUWP
 {
     public static partial class Program
     {
-        public static unsafe bool IsPackagedApp
+        public static bool IsPackagedApp
         {
             get
             {
@@ -34,7 +34,7 @@ namespace CoreAppUWP
             }
         }
 
-        public unsafe static bool IsCoreWindow
+        public static bool IsCoreWindow
         {
             get
             {
@@ -113,11 +113,11 @@ namespace CoreAppUWP
             }
         }
 
-        private partial class DefaultSafeHandle(nint invalidHandleValue, bool ownsHandle) : SafeHandle(invalidHandleValue, ownsHandle)
+        private sealed partial class DefaultSafeHandle(nint invalidHandleValue, bool ownsHandle) : SafeHandle(invalidHandleValue, ownsHandle)
         {
             public DefaultSafeHandle(nint handle) : this(handle, true) => SetHandle(handle);
 
-            public override bool IsInvalid => handle != nint.Zero;
+            public override bool IsInvalid => handle == 0;
 
             protected override bool ReleaseHandle() => true;
         }

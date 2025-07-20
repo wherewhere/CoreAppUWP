@@ -1,26 +1,16 @@
 ﻿using System;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Windows.UI.Core;
-using Windows.Win32;
-using Windows.Win32.Foundation;
+using Windows.UI.Xaml;
 
 namespace CoreAppUWP.Helpers
 {
     public static class UIHelper
     {
-        public static unsafe int GetActualPixel(this double pixel, nint window)
-        {
-            uint currentDpi = PInvoke.GetDpiForWindow(new HWND(window));
-            return Convert.ToInt32(pixel * (currentDpi / 96.0));
-        }
+        public static int GetActualPixel(this UIElement element, double pixel) => Convert.ToInt32(pixel * element.GetRasterizationScale());
 
-        public static unsafe double GetDisplayPixel(this int pixel, nint window)
-        {
-            uint currentDpi = PInvoke.GetDpiForWindow(new HWND(window));
-            return pixel / (currentDpi / 96.0);
-        }
+        public static double GetDisplayPixel(this UIElement element, int pixel) => pixel / element.GetRasterizationScale();
 
         public static object GetMessage(this Exception ex) => ex.Message is { Length: > 0 } message ? message : ex.GetType();
 
