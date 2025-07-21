@@ -239,8 +239,7 @@ namespace CoreAppUWP.Pages
 
         private void UpdateAppTitle(AppWindow appWindow)
         {
-            nint hwnd = (nint)appWindow.Id.Value;
-            RightPaddingColumn.Width = new GridLength(Math.Max(0, appWindow.TitleBar.RightInset.GetDisplayPixel(hwnd)));
+            RightPaddingColumn.Width = new GridLength(Math.Max(0, XamlRoot.GetDisplayPixel(appWindow.TitleBar.RightInset)));
         }
 
         private void System_BackRequested(object sender, BackRequestedEventArgs e)
@@ -253,18 +252,20 @@ namespace CoreAppUWP.Pages
 
         private void CustomTitleBar_SizeChanged(object sender, SizeChangedEventArgs e)
         {
+            RectInt32 Rect = new(XamlRoot.GetActualPixel(AppTitleBar.ActualWidth - DragRegion.ActualWidth), 0, XamlRoot.GetActualPixel(DragRegion.ActualWidth), XamlRoot.GetActualPixel(DragRegion.ActualHeight));
             if (IsAppWindow)
             {
-                if (this.GetDesktopWindowForElement() is DesktopWindow window)
+                if (this.GetDesktopWindowForElement() is DesktopWindow desktopWindow)
                 {
-                    nint hwnd = (nint)window.AppWindow.Id.Value;
-                    RectInt32 Rect = new((AppTitleBar.ActualWidth - DragRegion.ActualWidth).GetActualPixel(hwnd), 0, DragRegion.ActualWidth.GetActualPixel(hwnd), DragRegion.ActualHeight.GetActualPixel(hwnd));
+                    desktopWindow.AppWindow?.TitleBar.SetDragRectangles([Rect]);
+                }
+                else if (this.GetWindowForElement() is Window window)
+                {
                     window.AppWindow?.TitleBar.SetDragRectangles([Rect]);
                 }
             }
             else
             {
-                RectInt32 Rect = new((AppTitleBar.ActualWidth - DragRegion.ActualWidth).GetActualPixel(), 0, DragRegion.ActualWidth.GetActualPixel(), DragRegion.ActualHeight.GetActualPixel());
                 CoreWindow.GetForCurrentThread()?.GetAppWindow()?.TitleBar.SetDragRectangles([Rect]);
             }
         }

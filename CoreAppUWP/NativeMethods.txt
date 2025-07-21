@@ -12,7 +12,6 @@ AddPackageDependency
 AppPolicyGetWindowingModel
 GetCurrentPackageFullName
 GetCurrentThread
-GetDpiForWindow
 GetModuleHandle
 RegCloseKey
 RegOpenKeyEx

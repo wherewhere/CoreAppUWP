@@ -155,7 +155,7 @@ namespace CoreAppUWP.Helpers
         {
             if (!ActiveAppWindows.TryGetValue(window, out AppWindow appWindow))
             {
-                HWND handle = window.As<ICoreWindowInterop>().WindowHandle();
+                nint handle = window.As<ICoreWindowInterop>().WindowHandle();
                 WindowId id = Win32Interop.GetWindowIdFromWindow(handle);
                 appWindow = AppWindow.GetFromWindowId(id);
                 window.Closed += (sender, args) =>
@@ -199,10 +199,10 @@ namespace Windows.Win32.System.WinRT
 
     file static class Extensions
     {
-        public static HWND WindowHandle(this ICoreWindowInterop interop)
+        public static nint WindowHandle(this ICoreWindowInterop interop)
         {
             interop.get_WindowHandle(out nint hwnd);
-            return new HWND(hwnd);
+            return hwnd;
         }
     }
 }

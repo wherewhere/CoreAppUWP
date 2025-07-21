@@ -394,11 +394,8 @@ namespace CoreAppUWP.Helpers
                 options.ThreadType = 2;     // DQTYPE_THREAD_CURRENT
                 options.ApartmentType = 2;  // DQTAT_COM_STA
 
-                unsafe
-                {
-                    _ = CreateDispatcherQueueController(options, out nint dispatcherQueueController);
-                    m_dispatcherQueueController = dispatcherQueueController;
-                }
+                _ = CreateDispatcherQueueController(options, out nint dispatcherQueueController);
+                m_dispatcherQueueController = dispatcherQueueController;
             }
         }
     }

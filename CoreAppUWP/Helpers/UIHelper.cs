@@ -1,34 +1,16 @@
-﻿using Microsoft.UI.Dispatching;
+﻿using Microsoft.UI.Xaml;
 using System;
-using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using Windows.Graphics.Display;
 using Windows.UI.Core;
-using Windows.Win32;
-using Windows.Win32.Foundation;
 
 namespace CoreAppUWP.Helpers
 {
     public static class UIHelper
     {
-        public static int GetActualPixel(this double pixel)
-        {
-            double currentDpi = DisplayInformation.GetForCurrentView().RawPixelsPerViewPixel;
-            return Convert.ToInt32(pixel * currentDpi);
-        }
+        public static int GetActualPixel(this XamlRoot root, double pixel) => Convert.ToInt32(pixel * root.RasterizationScale);
 
-        public static unsafe int GetActualPixel(this double pixel, nint window)
-        {
-            uint currentDpi = PInvoke.GetDpiForWindow(new HWND((void*)window));
-            return Convert.ToInt32(pixel * (currentDpi / 96.0));
-        }
-
-        public static unsafe double GetDisplayPixel(this int pixel, nint window)
-        {
-            uint currentDpi = PInvoke.GetDpiForWindow(new HWND((void*)window));
-            return pixel / (currentDpi / 96.0);
-        }
+        public static double GetDisplayPixel(this XamlRoot root, int pixel) => pixel / root.RasterizationScale;
 
         public static object GetMessage(this Exception ex) => ex.Message is { Length: > 0 } message ? message : ex.GetType();
 
