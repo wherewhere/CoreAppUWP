@@ -87,7 +87,7 @@ namespace CoreAppUWP.Helpers
         {
             if (!ActiveDesktopWindows.ContainsKey(window.Dispatcher))
             {
-                window.AppWindow.Closing += (sender, args) =>
+                window.Closing += (sender, args) =>
                 {
                     ActiveDesktopWindows.Remove(window.Dispatcher);
                     window = null;

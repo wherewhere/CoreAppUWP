@@ -7,6 +7,7 @@ using System.Runtime.InteropServices.Marshalling;
 using System.Runtime.Versioning;
 using System.Threading;
 using System.Threading.Tasks;
+using Windows.Foundation;
 using Windows.Graphics;
 using Windows.UI.Core;
 using Windows.UI.Xaml;
@@ -81,6 +82,15 @@ namespace CoreAppUWP.Controls
         /// Gets the <see cref="DesktopWindowXamlSource"/> to provide XAML for this window.
         /// </summary>
         public DesktopWindowXamlSource WindowXamlSource { get; private init; }
+
+        /// <summary>
+        /// Occurs when a window is being closed through a system affordance.
+        /// </summary>
+        public event TypedEventHandler<AppWindow, AppWindowClosingEventArgs> Closing
+        {
+            add => AppWindow.Closing += value;
+            remove => AppWindow.Closing -= value;
+        }
 
         public DesktopWindow() => current = this;
 
