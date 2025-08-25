@@ -55,7 +55,11 @@ namespace CoreAppUWP.Pages
         protected override void OnNavigatedFrom(NavigationEventArgs e)
         {
             base.OnNavigatedFrom(e);
-            if (!this.IsAppWindow())
+            if (this.IsAppWindow())
+            {
+                this.GetWindowForElement().Frame.DragRegionVisuals.Clear();
+            }
+            else
             {
                 if (DesktopWindow.Current is DesktopWindow window)
                 {
@@ -71,7 +75,11 @@ namespace CoreAppUWP.Pages
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
-            if (!this.IsAppWindow())
+            if (this.IsAppWindow())
+            {
+                this.GetWindowForElement().Frame.DragRegionVisuals.Add(DragRegion);
+            }
+            else
             {
                 if (DesktopWindow.Current is DesktopWindow window)
                 {
@@ -146,7 +154,7 @@ namespace CoreAppUWP.Pages
             }
         }
 
-        private bool TryGoBack()
+        public bool TryGoBack()
         {
             if (!NavigationViewFrame.CanGoBack)
             { return false; }

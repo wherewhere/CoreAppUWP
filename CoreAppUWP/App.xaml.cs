@@ -1,7 +1,9 @@
 ﻿using CoreAppUWP.Common;
 using CoreAppUWP.Helpers;
 using CoreAppUWP.Pages;
+using CoreAppUWP.Pages.SettingsPages;
 using Microsoft.Extensions.Logging;
+using Microsoft.Gaming.XboxGameBar;
 using System;
 using System.Threading;
 using Windows.ApplicationModel;
@@ -94,15 +96,24 @@ namespace CoreAppUWP
         {
             if (Window.Current is not Window window) { return; }
 
+            XboxGameBarWidgetActivatedEventArgs widgetArgs = e as XboxGameBarWidgetActivatedEventArgs;
+            if (widgetArgs?.IsLaunchActivation == false)
+            {
+                return;
+            }
+
             if (SynchronizationContext.Current == null)
             {
-                DispatcherQueueSynchronizationContext context = new(Window.Current.CoreWindow.DispatcherQueue);
+                DispatcherQueueSynchronizationContext context = new(window.CoreWindow.DispatcherQueue);
                 SynchronizationContext.SetSynchronizationContext(context);
             }
 
             RegisterExceptionHandlingSynchronizationContext();
 
-            WindowHelper.TrackWindow(window);
+            if (widgetArgs == null)
+            {
+                WindowHelper.TrackWindow(window);
+            }
 
             // 不要在窗口已包含内容时重复应用程序初始化，
             // 只需确保窗口处于活动状态
@@ -127,6 +138,28 @@ namespace CoreAppUWP
                 window.Content = rootFrame;
 
                 ThemeHelper.Initialize();
+            }
+
+            if (widgetArgs != null)
+            {
+                XboxGameBarWidget widget = new(widgetArgs, window.CoreWindow, rootFrame);
+                widget.SettingsClicked += async (s, e) =>
+                {
+                    await rootFrame.Dispatcher.ResumeForegroundAsync();
+                    if (rootFrame.Content is not MainPage page) { return; }
+                    page.NavigationViewFrame.Navigate(typeof(SettingsPage), null, new DrillInNavigationTransitionInfo());
+                };
+                widget.BackButtonClicked += async (s, e) =>
+                {
+                    await rootFrame.Dispatcher.ResumeForegroundAsync();
+                    if (rootFrame.Content is not MainPage page) { return; }
+                    _ = page.TryGoBack();
+                };
+                widget.RequestedThemeChanged += async (s, e) =>
+                {
+                    await rootFrame.Dispatcher.ResumeForegroundAsync();
+                    rootFrame.RequestedTheme = s.RequestedTheme;
+                };
             }
 
             if (e is LaunchActivatedEventArgs args)
