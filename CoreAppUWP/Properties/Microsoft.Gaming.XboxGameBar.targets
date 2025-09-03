@@ -9,7 +9,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ReferenceCopyLocalPaths Include="$(PkgMicrosoft_Gaming_XboxGameBar)\lib\uap10.0\Microsoft.Gaming.XboxGameBar.winmd" />
+    <Content Include="$(PkgMicrosoft_Gaming_XboxGameBar)\lib\uap10.0\Microsoft.Gaming.XboxGameBar.winmd" Visible="false">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <ReferenceCopyLocalPaths Include="$(PkgMicrosoft_Gaming_XboxGameBar)\runtimes\win10-$(Native-Platform)\native\Microsoft.Gaming.XboxGameBar.dll" />
     <ReferenceCopyLocalPaths Include="$(PkgMicrosoft_Gaming_XboxGameBar)\runtimes\win10-$(Native-Platform)\native\Microsoft.Gaming.XboxGameBar.pri" />
     <ReferenceCopyLocalPaths Include="$(PkgMicrosoft_Gaming_XboxGameBar)\private\Microsoft.Gaming.XboxGameBar.Private.winmd" />
