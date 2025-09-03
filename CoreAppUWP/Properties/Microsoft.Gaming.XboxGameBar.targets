@@ -3,10 +3,6 @@
   <PropertyGroup>
     <Native-Platform>$(Platform)</Native-Platform>
   </PropertyGroup>
-  
-  <ItemGroup>
-    <PackageReference Include="Microsoft.Gaming.XboxGameBar" Version="7.3.2506120" GeneratePathProperty="true" />
-  </ItemGroup>
 
   <ItemGroup>
     <CsWinRTInputs Include="$(PkgMicrosoft_Gaming_XboxGameBar)\**\*.winmd" />
@@ -19,6 +15,6 @@
     <ReferenceCopyLocalPaths Include="$(PkgMicrosoft_Gaming_XboxGameBar)\private\Microsoft.Gaming.XboxGameBar.Private.winmd" />
   </ItemGroup>
 
-  <Import Project="$(PkgMicrosoft_Gaming_XboxGameBar)\build\Microsoft.Gaming.XboxGameBar.targets"/>
-  <Import Project="$(PkgMicrosoft_Gaming_XboxGameBar)\build\Microsoft.Gaming.XboxGameBar.props"/>
+  <Import Project="$(PkgMicrosoft_Gaming_XboxGameBar)\build\Microsoft.Gaming.XboxGameBar.targets" />
+  <Import Project="$(PkgMicrosoft_Gaming_XboxGameBar)\build\Microsoft.Gaming.XboxGameBar.props" />
 </Project>
