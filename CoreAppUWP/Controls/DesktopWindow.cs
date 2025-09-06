@@ -1,5 +1,6 @@
 ﻿using CoreAppUWP.Common;
 using CoreAppUWP.Helpers;
+using Microsoft.UI.Composition;
 using Microsoft.UI.Content;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Windowing;
@@ -10,15 +11,17 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Windows.Foundation;
+using WinRT;
 
 namespace CoreAppUWP.Controls
 {
-    public partial class DesktopWindow
+    public partial class DesktopWindow : ICompositionSupportsSystemBackdrop
     {
         /// <summary>
         /// Gets the <see cref="AppWindow"/> associated with this XAML Window.
         /// </summary>
-        public AppWindow AppWindow { get; private set; }
+        public AppWindow AppWindow { get; private init; }
 
         /// <summary>
         /// Gets or sets the visual root of an application window.
@@ -82,7 +85,23 @@ namespace CoreAppUWP.Controls
         /// <summary>
         /// Gets the <see cref="DesktopWindowXamlSource"/> to provide XAML for this window.
         /// </summary>
-        public DesktopWindowXamlSource WindowXamlSource { get; private set; }
+        public DesktopWindowXamlSource WindowXamlSource { get; private init; }
+
+        /// <inheritdoc/>
+        Windows.UI.Composition.CompositionBrush ICompositionSupportsSystemBackdrop.SystemBackdrop 
+        { 
+            get => WindowXamlSource.As<ICompositionSupportsSystemBackdrop>().SystemBackdrop;
+            set => WindowXamlSource.As<ICompositionSupportsSystemBackdrop>().SystemBackdrop = value; 
+        }
+
+        /// <summary>
+        /// Occurs when a window is being closed through a system affordance.
+        /// </summary>
+        public event TypedEventHandler<AppWindow, AppWindowClosingEventArgs> Closing
+        {
+            add => AppWindow.Closing += value;
+            remove => AppWindow.Closing -= value;
+        }
 
         /// <summary>
         /// Attempts to activate the application window by bringing it to the foreground and setting the input focus to it.

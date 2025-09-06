@@ -28,6 +28,8 @@ namespace CoreAppUWP.Helpers
         protected SystemBackdropConfiguration m_configurationSource;
 
         public BackdropType? Backdrop { get; private set; } = null;
+        protected abstract FrameworkElement Content { get; }
+        protected abstract ICompositionSupportsSystemBackdrop CompositionSupportsSystemBackdrop { get; }
 
         #region BackdropTypeChanged
 
@@ -105,7 +107,7 @@ namespace CoreAppUWP.Helpers
                 if (window != null)
                 {
                     // Note: Be sure to have "using WinRT;" to support the Window.As<...>() call.
-                    m_controller.AddSystemBackdropTarget(GetCompositionSupportsSystemBackdrop());
+                    m_controller.AddSystemBackdropTarget(CompositionSupportsSystemBackdrop);
                 }
 
                 m_controller.SetSystemBackdropConfiguration(m_configurationSource);
@@ -134,7 +136,7 @@ namespace CoreAppUWP.Helpers
                 if (window != null)
                 {
                     // Note: Be sure to have "using WinRT;" to support the Window.As<...>() call.
-                    m_controller.AddSystemBackdropTarget(GetCompositionSupportsSystemBackdrop());
+                    m_controller.AddSystemBackdropTarget(CompositionSupportsSystemBackdrop);
                 }
 
                 m_controller.SetSystemBackdropConfiguration(m_configurationSource);
@@ -159,7 +161,7 @@ namespace CoreAppUWP.Helpers
 
         private void SetConfigurationSourceTheme()
         {
-            m_configurationSource.Theme = GetContent()?.ActualTheme switch
+            m_configurationSource.Theme = Content?.ActualTheme switch
             {
                 ElementTheme.Dark => SystemBackdropTheme.Dark,
                 ElementTheme.Light => SystemBackdropTheme.Light,
@@ -168,8 +170,11 @@ namespace CoreAppUWP.Helpers
             };
         }
 
+        protected virtual void Register() => Content.ActualThemeChanged += FrameworkElement_ThemeChanged;
+
         protected virtual void Unregister()
         {
+            Content.ActualThemeChanged -= FrameworkElement_ThemeChanged;
             if (m_controller != null)
             {
                 m_controller.Dispose();
@@ -177,34 +182,29 @@ namespace CoreAppUWP.Helpers
             }
         }
 
-        public abstract IThreadSwitcher<DispatcherQueueThreadSwitcher> ResumeForegroundAsync();
-        protected abstract void Register();
-        protected abstract FrameworkElement GetContent();
-        protected abstract ICompositionSupportsSystemBackdrop GetCompositionSupportsSystemBackdrop();
+        public abstract DispatcherQueueThreadSwitcher ResumeForegroundAsync();
     }
 
     public class WindowBackdropHelper(Window window) : BackdropHelper<Window>(window)
     {
-        public override IThreadSwitcher<DispatcherQueueThreadSwitcher> ResumeForegroundAsync() => window.DispatcherQueue.ResumeForegroundAsync();
+        protected override FrameworkElement Content => window.Content as FrameworkElement;
+        protected override ICompositionSupportsSystemBackdrop CompositionSupportsSystemBackdrop => window.As<ICompositionSupportsSystemBackdrop>();
 
         protected override void Register()
         {
+            base.Register();
             window.Closed += Window_Closed;
             window.Activated += Window_Activated;
-            ((FrameworkElement)window.Content).ActualThemeChanged += FrameworkElement_ThemeChanged;
         }
 
         protected override void Unregister()
         {
-            base.Unregister();
             window.Closed -= Window_Closed;
             window.Activated -= Window_Activated;
-            ((FrameworkElement)window.Content).ActualThemeChanged -= FrameworkElement_ThemeChanged;
+            base.Unregister();
         }
 
-        protected override FrameworkElement GetContent() => window.Content as FrameworkElement;
-
-        protected override ICompositionSupportsSystemBackdrop GetCompositionSupportsSystemBackdrop() => window.As<ICompositionSupportsSystemBackdrop>();
+        public override DispatcherQueueThreadSwitcher ResumeForegroundAsync() => window.DispatcherQueue.ResumeForegroundAsync();
 
         private void Window_Activated(object sender, WindowActivatedEventArgs args) => m_configurationSource.IsInputActive = args.WindowActivationState != WindowActivationState.Deactivated;
 
@@ -217,24 +217,22 @@ namespace CoreAppUWP.Helpers
 
     public class DesktopWindowBackdropHelper(DesktopWindow window) : BackdropHelper<DesktopWindow>(window)
     {
-        public override IThreadSwitcher<DispatcherQueueThreadSwitcher> ResumeForegroundAsync() => window.DispatcherQueue.ResumeForegroundAsync();
+        protected override FrameworkElement Content => window.Content as FrameworkElement;
+        protected override DesktopWindow CompositionSupportsSystemBackdrop => window;
 
         protected override void Register()
         {
-            window.AppWindow.Closing += AppWindow_Closing;
-            ((FrameworkElement)window.Content).ActualThemeChanged += FrameworkElement_ThemeChanged;
+            base.Register();
+            window.Closing += AppWindow_Closing;
         }
 
         protected override void Unregister()
         {
+            window.Closing -= AppWindow_Closing;
             base.Unregister();
-            window.AppWindow.Closing -= AppWindow_Closing;
-            ((FrameworkElement)window.Content).ActualThemeChanged -= FrameworkElement_ThemeChanged;
         }
 
-        protected override ICompositionSupportsSystemBackdrop GetCompositionSupportsSystemBackdrop() => window.WindowXamlSource.As<ICompositionSupportsSystemBackdrop>();
-
-        protected override FrameworkElement GetContent() => window.Content as FrameworkElement;
+        public override DispatcherQueueThreadSwitcher ResumeForegroundAsync() => window.DispatcherQueue.ResumeForegroundAsync();
 
         private void AppWindow_Closing(AppWindow sender, AppWindowClosingEventArgs args)
         {
@@ -262,7 +260,7 @@ namespace CoreAppUWP.Helpers
         {
             if (!ActiveDesktopWindows.ContainsKey(window))
             {
-                window.AppWindow.Closing += (sender, args) =>
+                window.Closing += (sender, args) =>
                 {
                     ActiveDesktopWindows.Remove(window);
                     window = null;
@@ -376,7 +374,7 @@ namespace CoreAppUWP.Helpers
         }
 
         [LibraryImport("CoreMessaging.dll")]
-        private static unsafe partial int CreateDispatcherQueueController(DispatcherQueueOptions options, out nint instance);
+        private static partial int CreateDispatcherQueueController(DispatcherQueueOptions options, out nint instance);
 
         private nint m_dispatcherQueueController = 0;
         public void EnsureWindowsSystemDispatcherQueueController()

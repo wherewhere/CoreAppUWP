@@ -310,8 +310,8 @@ namespace CoreAppUWP.Helpers
             WindowHelper.ActiveDesktopWindows.Values.ForEach(async window =>
             {
                 await window.DispatcherQueue.ResumeForegroundAsync();
-                bool extendsContentIntoTitleBar = window.ExtendsContentIntoTitleBar;
                 AppWindowTitleBar titleBar = window.AppWindow.TitleBar;
+                bool extendsContentIntoTitleBar = titleBar.ExtendsContentIntoTitleBar;
                 titleBar.ForegroundColor = titleBar.ButtonForegroundColor = foregroundColor;
                 titleBar.BackgroundColor = titleBar.InactiveBackgroundColor = backgroundColor;
                 titleBar.ButtonBackgroundColor = titleBar.ButtonInactiveBackgroundColor = extendsContentIntoTitleBar ? Colors.Transparent : backgroundColor;
@@ -358,8 +358,8 @@ namespace CoreAppUWP.Helpers
             Color foregroundColor = isDark || isHighContrast ? Colors.White : Colors.Black;
             Color backgroundColor = isHighContrast ? Color.FromArgb(255, 0, 0, 0) : isDark ? Color.FromArgb(255, 32, 32, 32) : Color.FromArgb(255, 243, 243, 243);
 
-            bool extendsContentIntoTitleBar = window.ExtendsContentIntoTitleBar;
             AppWindowTitleBar titleBar = window.AppWindow.TitleBar;
+            bool extendsContentIntoTitleBar = titleBar.ExtendsContentIntoTitleBar;
             titleBar.ForegroundColor = titleBar.ButtonForegroundColor = foregroundColor;
             titleBar.BackgroundColor = titleBar.InactiveBackgroundColor = backgroundColor;
             titleBar.ButtonBackgroundColor = titleBar.ButtonInactiveBackgroundColor = extendsContentIntoTitleBar ? Colors.Transparent : backgroundColor;

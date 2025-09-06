@@ -1,5 +1,5 @@
-﻿using CoreAppUWP.Common;
-using Microsoft.Toolkit.Uwp.Notifications;
+﻿using CommunityToolkit.Notifications;
+using CoreAppUWP.Common;
 using System;
 using System.Linq;
 using System.Runtime.InteropServices;
