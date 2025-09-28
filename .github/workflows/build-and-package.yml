@@ -20,7 +20,7 @@ jobs:
     runs-on: windows-latest
 
     env:
-      Solution_Name: CoreAppUWP.sln
+      Solution_Name: CoreAppUWP.slnx
       Project_Directory: CoreAppUWP
       Signing_Certificate: CoreAppUWP_TemporaryKey.pfx
 
