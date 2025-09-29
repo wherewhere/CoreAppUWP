@@ -19,12 +19,13 @@
   </PropertyGroup>
 
   <PropertyGroup>
+    <MicrosoftWindowsSDKBuildToolsPackageVersion>10.0.26100.6584</MicrosoftWindowsSDKBuildToolsPackageVersion>
     <MicrosoftWindowsSDKBuildToolsMSIXPackageVersion>1.7.20250829.1</MicrosoftWindowsSDKBuildToolsMSIXPackageVersion>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="CommunityToolkit.Labs.Notifications" Version="0.1.250829-build.2245" />
-    <PackageReference Include="CommunityToolkit.Labs.Uwp.Controls.MarkdownTextBlock" Version="0.1.250829-build.2245" />
+    <PackageReference Include="CommunityToolkit.Labs.Notifications" Version="0.1.250926-build.2293" />
+    <PackageReference Include="CommunityToolkit.Labs.Uwp.Controls.MarkdownTextBlock" Version="0.1.250926-build.2293" />
     <PackageReference Include="CommunityToolkit.Uwp.Controls.Primitives" Version="8.2.250402" />
     <PackageReference Include="CommunityToolkit.Uwp.Controls.SettingsControls" Version="8.2.250402" />
     <PackageReference Include="Detours.Win32Metadata" Version="4.0.1.18" />
@@ -32,7 +33,7 @@
     <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.9" />
     <PackageReference Include="Microsoft.Gaming.XboxGameBar" Version="7.3.2506120" GeneratePathProperty="true" />
     <PackageReference Include="Microsoft.UI.Xaml" Version="2.8.7" />
-    <PackageReference Include="Microsoft.Windows.CsWin32" Version="0.3.183" PrivateAssets="all">
+    <PackageReference Include="Microsoft.Windows.CsWin32" Version="0.3.205" PrivateAssets="all">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.Windows.CsWinRT" Version="2.2.0" />
