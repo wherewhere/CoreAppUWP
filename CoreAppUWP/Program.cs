@@ -70,7 +70,7 @@ namespace CoreAppUWP
             {
                 PInvoke.TryCreatePackageDependency(
                     new DefaultSafeHandle(0),
-                    "Microsoft.WindowsAppRuntime.1.7_8wekyb3d8bbwe",
+                    "Microsoft.WindowsAppRuntime.1.8_8wekyb3d8bbwe",
                     new PACKAGE_VERSION(),
                     RuntimeInformation.ProcessArchitecture switch
                     {

@@ -15,6 +15,7 @@
     <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
     <UseWinUI>True</UseWinUI>
     <VersionPrefix>0.0.1</VersionPrefix>
+    <WindowsAppSdkDeploymentManagerInitialize>False</WindowsAppSdkDeploymentManagerInitialize>
     <WindowsSdkPackageVersion>10.0.26100.75</WindowsSdkPackageVersion>
   </PropertyGroup>
 
@@ -25,18 +26,16 @@
     <PackageReference Include="CommunityToolkit.WinUI.Controls.SettingsControls" Version="8.2.250402" />
     <PackageReference Include="Detours.Win32Metadata" Version="4.0.1.18" />
     <PackageReference Include="Karambolo.Extensions.Logging.File" Version="3.6.3" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.8" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.9" />
     <PackageReference Include="Microsoft.Windows.CsWin32" Version="0.3.183" PrivateAssets="all">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.7.250606001" />
+    <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.8.250907003" />
     <Manifest Include="$(ApplicationManifest)" />
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Remove="Generated Files\**" />
     <None Remove="AppPackages\**" />
-    <None Remove="Generated Files\**" />
   </ItemGroup>
 
   <ItemGroup>
