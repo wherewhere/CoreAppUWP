@@ -9,13 +9,14 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Windows.Foundation;
 using Windows.Storage;
 using Windows.System;
 
 namespace CoreAppUWP.Helpers
 {
     /// <summary>
-    /// Storage helper for files and folders living in Windows.Storage.ApplicationData storage endpoints.
+    /// Storage helper for files and folders living in <see cref="ApplicationData"/> storage endpoints.
     /// </summary>
     public partial class ApplicationDataStorageHelper : IFileStorageHelper, ISettingsStorageHelper<string>
     {
@@ -61,10 +62,10 @@ namespace CoreAppUWP.Helpers
         protected IObjectSerializer Serializer { get; }
 
         /// <summary>
-        /// Get a new instance using ApplicationData.Current and the provided serializer.
+        /// Get a new instance using <see cref="ApplicationData.Current"/> and the provided serializer.
         /// </summary>
         /// <param name="objectSerializer">Serializer for converting stored values. Defaults to <see cref="Toolkit.Helpers.SystemSerializer"/>.</param>
-        /// <returns>A new instance of ApplicationDataStorageHelper.</returns>
+        /// <returns>A new instance of <see cref="ApplicationDataStorageHelper"/>.</returns>
         public static ApplicationDataStorageHelper GetCurrent(IObjectSerializer objectSerializer = null)
         {
             ApplicationData appData = IsPackagedApp ? ApplicationData.Current : null;
@@ -72,11 +73,11 @@ namespace CoreAppUWP.Helpers
         }
 
         /// <summary>
-        /// Get a new instance using the ApplicationData for the provided user and serializer.
+        /// Get a new instance using the <see cref="ApplicationData"/> for the provided user and serializer.
         /// </summary>
         /// <param name="user">App data user owner.</param>
         /// <param name="objectSerializer">Serializer for converting stored values. Defaults to <see cref="SystemSerializer"/>.</param>
-        /// <returns>A new instance of ApplicationDataStorageHelper.</returns>
+        /// <returns>A new instance of <see cref="ApplicationDataStorageHelper"/>.</returns>
         public static async Task<ApplicationDataStorageHelper> GetForUserAsync(User user, IObjectSerializer objectSerializer = null)
         {
             ApplicationData appData = IsPackagedApp ? await ApplicationData.GetForUserAsync(user) : null;
@@ -258,7 +259,7 @@ namespace CoreAppUWP.Helpers
         /// <inheritdoc />
         public Task<T> ReadFileAsync<T>(string filePath, T @default = default)
         {
-            return ReadFileAsync<T>(Folder, filePath, @default);
+            return ReadFileAsync(Folder, filePath, @default);
         }
 
         /// <inheritdoc />
@@ -270,13 +271,13 @@ namespace CoreAppUWP.Helpers
         /// <inheritdoc />
         public Task CreateFileAsync<T>(string filePath, T value)
         {
-            return CreateFileAsync<T>(Folder, filePath, value);
+            return CreateFileAsync(Folder, filePath, value);
         }
 
         /// <inheritdoc />
         public Task CreateFolderAsync(string folderPath)
         {
-            return CreateFolderAsync(Folder, folderPath);
+            return CreateFolderAsync(Folder, folderPath).AsTask();
         }
 
         /// <inheritdoc />
@@ -311,14 +312,14 @@ namespace CoreAppUWP.Helpers
             });
         }
 
-        private async Task<StorageFile> CreateFileAsync<T>(StorageFolder folder, string filePath, T value)
+        private Task<StorageFile> CreateFileAsync<T>(StorageFolder folder, string filePath, T value)
         {
-            return await StorageFileHelper.WriteTextToFileAsync(folder, Serializer.Serialize(value)?.ToString(), NormalizePath(filePath), CreationCollisionOption.ReplaceExisting);
+            return StorageFileHelper.WriteTextToFileAsync(folder, Serializer.Serialize(value)?.ToString(), NormalizePath(filePath), CreationCollisionOption.ReplaceExisting);
         }
 
-        private static async Task CreateFolderAsync(StorageFolder folder, string folderPath)
+        private static IAsyncOperation<StorageFolder> CreateFolderAsync(StorageFolder folder, string folderPath)
         {
-            await folder.CreateFolderAsync(NormalizePath(folderPath), CreationCollisionOption.OpenIfExists);
+            return folder.CreateFolderAsync(NormalizePath(folderPath), CreationCollisionOption.OpenIfExists);
         }
 
         private static async Task<bool> TryDeleteItemAsync(StorageFolder folder, string itemPath)

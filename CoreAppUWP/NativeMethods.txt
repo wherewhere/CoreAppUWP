@@ -1,5 +1,7 @@
 ﻿WM_QUIT
 
+IDesktopWindowXamlSourceNative
+
 DetourAttach
 DetourDetach
 DetourRestoreAfterWith

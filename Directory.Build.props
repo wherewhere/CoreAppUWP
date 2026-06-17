@@ -1,7 +1,7 @@
 <Project>
   <PropertyGroup>
     <Authors>wherewhere</Authors>
-    <Copyright>Copyright © 2017 - 2025 wherewhere. All Rights Reserved.</Copyright>
+    <Copyright>Copyright © 2017 - 2026 wherewhere. All Rights Reserved.</Copyright>
     <Description>UWP running on .NET Core App</Description>
     <LangVersion>latest</LangVersion>
     <RepositoryType>git</RepositoryType>
@@ -12,7 +12,7 @@
   <PropertyGroup>
     <AppxAutoIncrementPackageRevision>False</AppxAutoIncrementPackageRevision>
     <AppxBundle>Never</AppxBundle>
-    <AppxBundlePlatforms>x64</AppxBundlePlatforms>
+    <AppxBundlePlatforms>x86|x64|ARM64</AppxBundlePlatforms>
     <AppxPackageDir>AppPackages</AppxPackageDir>
     <AppxPackageSigningEnabled>True</AppxPackageSigningEnabled>
     <AppxPackageSigningTimestampDigestAlgorithm>SHA256</AppxPackageSigningTimestampDigestAlgorithm>

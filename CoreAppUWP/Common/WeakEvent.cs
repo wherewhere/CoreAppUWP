@@ -165,16 +165,8 @@ namespace CoreAppUWP.Common
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-        public static WeakEvent<TEventArgs> operator +(WeakEvent<TEventArgs> weakEvent, Action<TEventArgs> callback)
-        {
-            weakEvent.Add(callback);
-            return weakEvent;
-        }
+        public void operator +=(Action<TEventArgs> callback) => Add(callback);
 
-        public static WeakEvent<TEventArgs> operator -(WeakEvent<TEventArgs> weakEvent, Action<TEventArgs> callback)
-        {
-            weakEvent.Remove(callback);
-            return weakEvent;
-        }
+        public void operator -=(Action<TEventArgs> callback) => Remove(callback);
     }
 }

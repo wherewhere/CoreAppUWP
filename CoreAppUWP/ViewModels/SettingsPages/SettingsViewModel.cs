@@ -155,7 +155,7 @@ namespace CoreAppUWP.ViewModels.SettingsPages
         public async Task<bool> OpenLogFileAsync()
         {
             await ThreadSwitcher.ResumeBackgroundAsync();
-            StorageFolder folder = await ApplicationData.Current.LocalFolder.CreateFolderAsync("Logs", CreationCollisionOption.OpenIfExists);
+            StorageFolder folder = await SettingsHelper.LocalObject.Folder.CreateFolderAsync("Logs", CreationCollisionOption.OpenIfExists);
             IReadOnlyList<StorageFile> files = await folder.GetFilesAsync();
             if (files is [StorageFile file, ..])
             {
@@ -171,7 +171,7 @@ namespace CoreAppUWP.ViewModels.SettingsPages
             try
             {
                 await ThreadSwitcher.ResumeBackgroundAsync();
-                StorageFolder folder = await ApplicationData.Current.LocalFolder.CreateFolderAsync("Logs", CreationCollisionOption.OpenIfExists);
+                StorageFolder folder = await SettingsHelper.LocalObject.Folder.CreateFolderAsync("Logs", CreationCollisionOption.OpenIfExists);
                 await folder.DeleteAsync();
             }
             catch (Exception ex)

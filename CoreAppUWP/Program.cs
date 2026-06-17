@@ -59,8 +59,8 @@ namespace CoreAppUWP
             bool isPackagedApp = IsPackagedApp;
             if (!isPackagedApp)
             {
-                PInvoke.TryCreatePackageDependency(
-                    new DefaultSafeHandle(0),
+                _ = PInvoke.TryCreatePackageDependency(
+                    default,
                     "Microsoft.UI.Xaml.2.8_8wekyb3d8bbwe",
                     new PACKAGE_VERSION(),
                     RuntimeInformation.ProcessArchitecture switch
@@ -75,16 +75,11 @@ namespace CoreAppUWP
                     null,
                     CreatePackageDependencyOptions.CreatePackageDependencyOptions_None,
                     out PWSTR package).ThrowOnFailure();
-                unsafe
-                {
-                    PWSTR packageFullName = new();
-                    PInvoke.AddPackageDependency(
-                        package.ToString(),
-                        0,
-                        AddPackageDependencyOptions.AddPackageDependencyOptions_PrependIfRankCollision,
-                        out _,
-                        &packageFullName).ThrowOnFailure();
-                }
+                _ = PInvoke.AddPackageDependency(
+                    package.ToString(),
+                    0,
+                    AddPackageDependencyOptions.AddPackageDependencyOptions_PrependIfRankCollision,
+                    out _, out _).ThrowOnFailure();
             }
             if (IsCoreWindow)
             {
