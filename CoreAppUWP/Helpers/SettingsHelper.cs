@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.UI.Xaml;
 using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
@@ -42,31 +43,27 @@ namespace CoreAppUWP.Helpers
 
     public static partial class SettingsHelper
     {
+        public static ApplicationDataStorageHelper LocalObject { get; } =
+            WindowHelper.IsPackagedApp
+                ? ApplicationDataStorageHelper.GetCurrent(new SystemTextJsonObjectSerializer())
+                : ApplicationDataStorageHelper.GetForUnpackaged("wherewhere", "wherewhere.CoreAppUWP", new SystemTextJsonObjectSerializer());
         public static ILoggerFactory LoggerFactory { get; } = CreateLoggerFactory();
-        public static ApplicationDataStorageHelper LocalObject { get; } = ApplicationDataStorageHelper.GetCurrent(new SystemTextJsonObjectSerializer());
 
         static SettingsHelper() => SetDefaultSettings();
 
         public static ILoggerFactory CreateLoggerFactory() =>
-            Microsoft.Extensions.Logging.LoggerFactory.Create(x =>
+            Microsoft.Extensions.Logging.LoggerFactory.Create(x => _ = x.AddFile(x =>
             {
-                if (WindowHelper.IsPackagedApp)
-                {
-                    _ = x.AddFile(x =>
+                x.RootPath = LocalObject.Folder.Path;
+                x.IncludeScopes = true;
+                x.BasePath = "Logs";
+                x.Files = [
+                    new LogFileOptions()
                     {
-                        x.RootPath = ApplicationData.Current.LocalFolder.Path;
-                        x.IncludeScopes = true;
-                        x.BasePath = "Logs";
-                        x.Files = [
-                            new LogFileOptions()
-                            {
-                                Path = "Log - <date>.log"
-                            }
-                        ];
-                    });
-                }
-                _ = x.AddDebug();
-            });
+                        Path = "Log - <date>.log"
+                    }
+                ];
+            }).AddDebug());
     }
 
     public class SystemTextJsonObjectSerializer : IObjectSerializer
@@ -87,7 +84,12 @@ namespace CoreAppUWP.Helpers
                 : type == typeof(ElementTheme) ? Deserialize(value, SourceGenerationContext.Default.ElementTheme)
                 : type == typeof(BackdropType) ? Deserialize(value, SourceGenerationContext.Default.BackdropType)
                 : JsonSerializer.Deserialize(value, type, SourceGenerationContext.Default) is T result ? result : default;
-            static T Deserialize<TValue>([StringSyntax(StringSyntaxAttribute.Json)] string json, JsonTypeInfo<TValue> jsonTypeInfo) => JsonSerializer.Deserialize(json, jsonTypeInfo) is T value ? value : default;
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            static T Deserialize<TValue>([StringSyntax(StringSyntaxAttribute.Json)] string json, JsonTypeInfo<TValue> jsonTypeInfo)
+            {
+                TValue value = JsonSerializer.Deserialize(json, jsonTypeInfo);
+                return Unsafe.As<TValue, T>(ref value);
+            }
         }
     }
 

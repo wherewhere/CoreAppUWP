@@ -68,7 +68,7 @@ namespace CoreAppUWP.Common
                 new SettingsCommand(
                     "LogFolder",
                     "LogFolder",
-                    async handler => _ = Launcher.LaunchFolderAsync(await ApplicationData.Current.LocalFolder.CreateFolderAsync("Logs", CreationCollisionOption.OpenIfExists))));
+                    async handler => _ = Launcher.LaunchFolderAsync(await SettingsHelper.LocalObject.Folder.CreateFolderAsync("Logs", CreationCollisionOption.OpenIfExists))));
             args.Request.ApplicationCommands.Add(
                 new SettingsCommand(
                     "Repository",
@@ -107,6 +107,7 @@ namespace CoreAppUWP.Common
         {
             try
             {
+                if (!WindowHelper.IsPackagedApp) { return false; }
                 XDocument doc = XDocument.Load(Path.Combine(Package.Current.InstalledLocation.Path, "AppxManifest.xml"));
                 XNamespace ns = XNamespace.Get("http://schemas.microsoft.com/appx/manifest/uap/windows10");
                 IEnumerable<XElement> extensions = doc.Root.Descendants(ns + "Extension");

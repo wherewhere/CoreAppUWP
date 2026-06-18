@@ -1,6 +1,9 @@
 ﻿HKEY_LOCAL_MACHINE
 INVALID_HANDLE_VALUE
 
+ICoreWindowInterop
+DispatcherQueueOptions
+
 DetourAttach
 DetourDetach
 DetourRestoreAfterWith

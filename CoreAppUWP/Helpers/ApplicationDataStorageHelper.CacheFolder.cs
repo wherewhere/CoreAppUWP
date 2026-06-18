@@ -3,6 +3,7 @@
 // See the LICENSE file in the project root for more information.
 
 using CommunityToolkit.Common.Helpers;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Windows.Storage;
@@ -60,7 +61,7 @@ namespace CoreAppUWP.Helpers
         /// <returns>Waiting task until completion.</returns>
         public Task CreateCacheFolderAsync(string folderPath)
         {
-            return CreateFolderAsync(CacheFolder, folderPath);
+            return CreateFolderAsync(CacheFolder, folderPath).AsTask();
         }
 
         /// <summary>

@@ -68,32 +68,27 @@ namespace CoreAppUWP
             ComWrappersSupport.InitializeComWrappers();
             if (!IsPackagedApp)
             {
-                PInvoke.TryCreatePackageDependency(
-                    new DefaultSafeHandle(0),
-                    "Microsoft.WindowsAppRuntime.1.8_8wekyb3d8bbwe",
-                    new PACKAGE_VERSION(),
-                    RuntimeInformation.ProcessArchitecture switch
-                    {
-                        Architecture.X86 => PackageDependencyProcessorArchitectures.PackageDependencyProcessorArchitectures_X86,
-                        Architecture.X64 => PackageDependencyProcessorArchitectures.PackageDependencyProcessorArchitectures_X64,
-                        Architecture.Arm => PackageDependencyProcessorArchitectures.PackageDependencyProcessorArchitectures_Arm,
-                        Architecture.Arm64 => PackageDependencyProcessorArchitectures.PackageDependencyProcessorArchitectures_Arm64,
-                        _ => PackageDependencyProcessorArchitectures.PackageDependencyProcessorArchitectures_None
-                    },
-                    PackageDependencyLifetimeKind.PackageDependencyLifetimeKind_Process,
-                    null,
-                    CreatePackageDependencyOptions.CreatePackageDependencyOptions_None,
-                    out PWSTR package).ThrowOnFailure();
-                unsafe
-                {
-                    PWSTR packageFullName = new();
-                    PInvoke.AddPackageDependency(
-                        package.ToString(),
-                        0,
-                        AddPackageDependencyOptions.AddPackageDependencyOptions_PrependIfRankCollision,
-                        out _,
-                        &packageFullName).ThrowOnFailure();
-                }
+                _ = PInvoke.TryCreatePackageDependency(
+                     default,
+                     "Microsoft.WindowsAppRuntime.2_8wekyb3d8bbwe",
+                     new PACKAGE_VERSION(),
+                     RuntimeInformation.ProcessArchitecture switch
+                     {
+                         Architecture.X86 => PackageDependencyProcessorArchitectures.PackageDependencyProcessorArchitectures_X86,
+                         Architecture.X64 => PackageDependencyProcessorArchitectures.PackageDependencyProcessorArchitectures_X64,
+                         Architecture.Arm => PackageDependencyProcessorArchitectures.PackageDependencyProcessorArchitectures_Arm,
+                         Architecture.Arm64 => PackageDependencyProcessorArchitectures.PackageDependencyProcessorArchitectures_Arm64,
+                         _ => PackageDependencyProcessorArchitectures.PackageDependencyProcessorArchitectures_None
+                     },
+                     PackageDependencyLifetimeKind.PackageDependencyLifetimeKind_Process,
+                     null,
+                     CreatePackageDependencyOptions.CreatePackageDependencyOptions_None,
+                     out PWSTR package).ThrowOnFailure();
+                _ = PInvoke.AddPackageDependency(
+                    package.ToString(),
+                    0,
+                    AddPackageDependencyOptions.AddPackageDependencyOptions_PrependIfRankCollision,
+                    out _, out _).ThrowOnFailure();
             }
             HookRegistry hookRegistry = null;
             try

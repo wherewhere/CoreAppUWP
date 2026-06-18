@@ -209,7 +209,7 @@ namespace CoreAppUWP.Pages.SettingsPages
             }
             _ = tag switch
             {
-                "LogFolder" => Launcher.LaunchFolderAsync(await ApplicationData.Current.LocalFolder.CreateFolderAsync("Logs", CreationCollisionOption.OpenIfExists)),
+                "LogFolder" => Launcher.LaunchFolderAsync(await SettingsHelper.LocalObject.Folder.CreateFolderAsync("Logs", CreationCollisionOption.OpenIfExists)),
                 _ => Launcher.LaunchUriAsync(new Uri(tag)),
             };
         }
