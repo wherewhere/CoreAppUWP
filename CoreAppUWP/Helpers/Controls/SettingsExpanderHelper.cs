@@ -1,7 +1,7 @@
 ﻿using CommunityToolkit.WinUI;
 using CommunityToolkit.WinUI.Controls;
-using Windows.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Windows.UI.Xaml;
 
 namespace CoreAppUWP.Helpers
 {

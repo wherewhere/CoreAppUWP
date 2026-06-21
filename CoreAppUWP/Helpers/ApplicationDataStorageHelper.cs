@@ -28,7 +28,7 @@ namespace CoreAppUWP.Helpers
         /// <summary>
         /// Static dictionary to hold settings when not using ApplicationData.
         /// </summary>
-        private readonly static Dictionary<string, object> _settings = [];
+        private static readonly Dictionary<string, object> _settings = [];
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ApplicationDataStorageHelper"/> class.

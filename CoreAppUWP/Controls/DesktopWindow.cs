@@ -20,9 +20,8 @@ namespace CoreAppUWP.Controls
 {
     public partial class DesktopWindow
     {
-        [ThreadStatic]
-        private static DesktopWindow current;
-        public static DesktopWindow Current => current;
+        [field: ThreadStatic]
+        public static DesktopWindow Current { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="AppWindow"/> associated with this XAML Window.
@@ -94,7 +93,7 @@ namespace CoreAppUWP.Controls
             remove => AppWindow.Closing -= value;
         }
 
-        public DesktopWindow() => current = this;
+        public DesktopWindow() => Current = this;
 
         /// <summary>
         /// Attempts to activate the application window by bringing it to the foreground and setting the input focus to it.
@@ -215,7 +214,7 @@ namespace CoreAppUWP.Controls
 
             IDesktopWindowXamlSourceNative m_native = source.As<IDesktopWindowXamlSourceNative>();
             m_native.AttachToWindow(new HWND((nint)window.Id.Value));
-            
+
             window.Changed += (sender, args) =>
             {
                 if (args.DidPresenterChange || args.DidSizeChange || args.DidVisibilityChange)

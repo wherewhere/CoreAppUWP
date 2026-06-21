@@ -236,10 +236,7 @@ namespace CoreAppUWP.Helpers
 
         public static async void Initialize(FrameworkElement rootElement)
         {
-            if (rootElement != null)
-            {
-                rootElement.RequestedTheme = await GetActualThemeAsync();
-            }
+            rootElement?.RequestedTheme = await GetActualThemeAsync();
         }
 
         [SupportedOSPlatform("Windows10.0.18362.0")]

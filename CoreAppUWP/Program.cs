@@ -40,11 +40,8 @@ namespace CoreAppUWP
             {
                 try
                 {
-                    if (PInvoke.AppPolicyGetWindowingModel(new DefaultSafeHandle(-6), out AppPolicyWindowingModel model) == WIN32_ERROR.ERROR_SUCCESS)
-                    {
-                        return model == AppPolicyWindowingModel.AppPolicyWindowingModel_Universal;
-                    }
-                    return false;
+                    return PInvoke.AppPolicyGetWindowingModel(new DefaultSafeHandle(-6), out AppPolicyWindowingModel model) == WIN32_ERROR.ERROR_SUCCESS
+                        && model == AppPolicyWindowingModel.AppPolicyWindowingModel_Universal;
                 }
                 catch
                 {
