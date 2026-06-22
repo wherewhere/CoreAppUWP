@@ -10,11 +10,10 @@ namespace CoreAppUWP.Common
     {
         private class Method(Action<TEventArgs> callback) : IEquatable<Method>, IEquatable<Action<TEventArgs>>
         {
-            private readonly bool _isStatic = callback.Target == null;
             private readonly WeakReference _reference = new(callback.Target);
             private readonly MethodInfo _method = callback.GetMethodInfo();
 
-            public bool IsDead => !(_isStatic || _reference.IsAlive);
+            public bool IsDead { get => !(field || _reference.IsAlive); } = callback.Target == null;
 
             public void Invoke(TEventArgs arg)
             {
@@ -52,7 +51,7 @@ namespace CoreAppUWP.Common
 
         public WeakEvent() => _list = [];
 
-        public WeakEvent(IEnumerable<Action<TEventArgs>> collection) => _list = new List<Method>(collection.Select<Action<TEventArgs>, Method>(x => x));
+        public WeakEvent(IEnumerable<Action<TEventArgs>> collection) => _list = [.. collection.Select<Action<TEventArgs>, Method>(x => x)];
 
         public WeakEvent(int capacity) => _list = new List<Method>(capacity);
 

@@ -7,8 +7,6 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Hosting;
 using System;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
-using System.Runtime.InteropServices.Marshalling;
 using System.Threading;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.Core;

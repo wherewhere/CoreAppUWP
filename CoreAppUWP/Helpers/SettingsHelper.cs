@@ -8,7 +8,6 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
 using System.Threading.Tasks;
-using Windows.Storage;
 using IObjectSerializer = CommunityToolkit.Common.Helpers.IObjectSerializer;
 
 namespace CoreAppUWP.Helpers

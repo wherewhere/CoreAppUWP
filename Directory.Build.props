@@ -3,7 +3,7 @@
     <Authors>wherewhere</Authors>
     <Copyright>Copyright © 2017 - 2025 wherewhere. All Rights Reserved.</Copyright>
     <Description>UWP running on .NET Core App</Description>
-    <LangVersion>preview</LangVersion>
+    <LangVersion>latest</LangVersion>
     <RepositoryType>git</RepositoryType>
     <PublishRepositoryUrl>True</PublishRepositoryUrl>
     <RepositoryUrl>https://github.com/wherewhere/CoreAppUWP</RepositoryUrl>

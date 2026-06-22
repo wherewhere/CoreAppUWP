@@ -88,10 +88,10 @@ namespace CoreAppUWP.Controls
         public DesktopWindowXamlSource WindowXamlSource { get; private init; }
 
         /// <inheritdoc/>
-        Windows.UI.Composition.CompositionBrush ICompositionSupportsSystemBackdrop.SystemBackdrop 
-        { 
+        Windows.UI.Composition.CompositionBrush ICompositionSupportsSystemBackdrop.SystemBackdrop
+        {
             get => WindowXamlSource.As<ICompositionSupportsSystemBackdrop>().SystemBackdrop;
-            set => WindowXamlSource.As<ICompositionSupportsSystemBackdrop>().SystemBackdrop = value; 
+            set => WindowXamlSource.As<ICompositionSupportsSystemBackdrop>().SystemBackdrop = value;
         }
 
         /// <summary>

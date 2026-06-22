@@ -1,7 +1,6 @@
 ﻿using Microsoft.UI.Xaml;
 using System;
 using System.Threading.Tasks;
-using Windows.Graphics.Display;
 using Windows.UI.Core;
 
 namespace CoreAppUWP.Helpers

@@ -9,7 +9,6 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Windows.UI;
-using Windows.Win32;
 using Windows.Win32.System.WinRT;
 using WinRT; // required to support Window.As<ICompositionSupportsSystemBackdrop>()
 
