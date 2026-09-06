@@ -18,7 +18,7 @@ using WinRT;
 
 namespace CoreAppUWP.Controls
 {
-    public partial class DesktopWindow
+    public sealed partial class DesktopWindow
     {
         [field: ThreadStatic]
         public static DesktopWindow Current { get; private set; }

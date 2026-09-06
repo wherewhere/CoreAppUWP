@@ -80,7 +80,7 @@ namespace CoreAppUWP
             }
             if (IsCoreWindow)
             {
-                Application.Start(p =>
+                Application.Start(static p =>
                 {
                     DispatcherQueueSynchronizationContext context = new(DispatcherQueue.GetForCurrentThread());
                     SynchronizationContext.SetSynchronizationContext(context);
