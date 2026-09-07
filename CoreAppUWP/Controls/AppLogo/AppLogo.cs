@@ -5,7 +5,7 @@ namespace CoreAppUWP.Controls
     /// <summary>
     /// The logo of this application.
     /// </summary>
-    public partial class AppLogo : Control
+    public sealed partial class AppLogo : Control
     {
         /// <summary>
         /// Creates a new instance of the <see cref="AppLogo"/> class.

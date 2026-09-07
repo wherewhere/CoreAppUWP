@@ -187,7 +187,7 @@ namespace CoreAppUWP.Helpers
         public abstract DispatcherQueueThreadSwitcher ResumeForegroundAsync();
     }
 
-    public class WindowBackdropHelper(Window window) : BackdropHelper<Window>(window)
+    public sealed class WindowBackdropHelper(Window window) : BackdropHelper<Window>(window)
     {
         protected override FrameworkElement Content => window.Content as FrameworkElement;
         protected override ICompositionSupportsSystemBackdrop CompositionSupportsSystemBackdrop => window.As<ICompositionSupportsSystemBackdrop>();
@@ -217,7 +217,7 @@ namespace CoreAppUWP.Helpers
         }
     }
 
-    public class DesktopWindowBackdropHelper(DesktopWindow window) : BackdropHelper<DesktopWindow>(window)
+    public sealed class DesktopWindowBackdropHelper(DesktopWindow window) : BackdropHelper<DesktopWindow>(window)
     {
         protected override FrameworkElement Content => window.Content as FrameworkElement;
         protected override DesktopWindow CompositionSupportsSystemBackdrop => window;
@@ -348,7 +348,7 @@ namespace CoreAppUWP.Helpers
         public static Dictionary<DesktopWindow, BackdropHelper<DesktopWindow>> ActiveDesktopWindows { get; } = [];
     }
 
-    public partial class WindowsSystemDispatcherQueueHelper
+    public sealed partial class WindowsSystemDispatcherQueueHelper
     {
         [LibraryImport("CoreMessaging.dll")]
         private static partial int CreateDispatcherQueueController(DispatcherQueueOptions options, out nint instance);

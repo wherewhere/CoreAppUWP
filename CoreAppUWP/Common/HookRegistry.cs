@@ -12,7 +12,7 @@ namespace CoreAppUWP.Common
     /// <summary>
     /// Represents a hook for getting the value of the <c>HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\WinUI\Xaml\EnableUWPWindow</c> registry key always returning <see langword="00000001"/>.
     /// </summary>
-    public partial class HookRegistry : IDisposable
+    public sealed partial class HookRegistry : IDisposable
     {
         /// <summary>
         /// The value that indicates whether the class has been disposed.

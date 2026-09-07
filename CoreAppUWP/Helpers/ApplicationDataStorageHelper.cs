@@ -20,7 +20,7 @@ namespace CoreAppUWP.Helpers
     /// <summary>
     /// Storage helper for files and folders living in <see cref="ApplicationData"/> storage endpoints.
     /// </summary>
-    public partial class ApplicationDataStorageHelper : IFileStorageHelper, ISettingsStorageHelper<string>
+    public sealed partial class ApplicationDataStorageHelper : IFileStorageHelper, ISettingsStorageHelper<string>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ApplicationDataStorageHelper"/> class.
@@ -46,12 +46,12 @@ namespace CoreAppUWP.Helpers
         /// <summary>
         /// Gets the storage host.
         /// </summary>
-        protected ApplicationData AppData { get; }
+        private ApplicationData AppData { get; }
 
         /// <summary>
         /// Gets the serializer for converting stored values.
         /// </summary>
-        protected IObjectSerializer Serializer { get; }
+        private IObjectSerializer Serializer { get; }
 
         /// <summary>
         /// Get a new instance using <see cref="ApplicationData.GetDefault"/> and the provided serializer.

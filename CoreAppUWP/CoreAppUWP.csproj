@@ -27,11 +27,11 @@
     <PackageReference Include="CommunityToolkit.WinUI.Controls.SettingsControls" Version="8.2.251219" />
     <PackageReference Include="Detours.Win32Metadata" Version="4.0.1.18" />
     <PackageReference Include="Karambolo.Extensions.Logging.File" Version="4.1.1" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.9" />
-    <PackageReference Include="Microsoft.Windows.CsWin32" Version="0.3.298" PrivateAssets="all">
+    <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.11" />
+    <PackageReference Include="Microsoft.Windows.CsWin32" Version="0.3.321" PrivateAssets="all">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.WindowsAppSDK" Version="2.2.0" />
+    <PackageReference Include="Microsoft.WindowsAppSDK" Version="2.4.0" />
     <Manifest Include="$(ApplicationManifest)" />
   </ItemGroup>
 
@@ -46,5 +46,9 @@
     <Content Update="Assets\About\About.en-US.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Update="Microsoft.SourceLink.GitHub" Version="10.0.400" />
   </ItemGroup>
 </Project>

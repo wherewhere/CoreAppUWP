@@ -16,7 +16,7 @@ using WinRT;
 
 namespace CoreAppUWP.Controls
 {
-    public partial class DesktopWindow : ICompositionSupportsSystemBackdrop
+    public sealed partial class DesktopWindow : ICompositionSupportsSystemBackdrop
     {
         /// <summary>
         /// Gets the <see cref="AppWindow"/> associated with this XAML Window.

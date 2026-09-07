@@ -65,7 +65,7 @@ namespace CoreAppUWP.Helpers
             }).AddDebug());
     }
 
-    public class SystemTextJsonObjectSerializer : IObjectSerializer
+    public sealed class SystemTextJsonObjectSerializer : IObjectSerializer
     {
         public string Serialize<T>(T value) => value switch
         {
@@ -95,5 +95,5 @@ namespace CoreAppUWP.Helpers
     [JsonSerializable(typeof(bool))]
     [JsonSerializable(typeof(ElementTheme))]
     [JsonSerializable(typeof(BackdropType))]
-    public partial class SourceGenerationContext : JsonSerializerContext;
+    public sealed partial class SourceGenerationContext : JsonSerializerContext;
 }

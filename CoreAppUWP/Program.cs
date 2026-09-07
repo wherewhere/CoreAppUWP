@@ -95,7 +95,7 @@ namespace CoreAppUWP
                     hookRegistry = new HookRegistry();
                 }
                 XamlCheckProcessRequirements();
-                Application.Start(p =>
+                Application.Start(static p =>
                 {
                     DispatcherQueueSynchronizationContext context = new(DispatcherQueue.GetForCurrentThread());
                     SynchronizationContext.SetSynchronizationContext(context);
