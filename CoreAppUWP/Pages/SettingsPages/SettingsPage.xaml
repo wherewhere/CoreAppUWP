@@ -124,6 +124,7 @@
                                 Description="Create a new AppWindow."
                                 Header="AppWindow"
                                 IsClickEnabled="True"
+                                IsEnabled="{x:Bind helpers:WindowHelper.IsAppWindowSupported}"
                                 Tag="NewAppWindow">
                                 <cwuc:SettingsCard.ActionIcon>
                                     <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE8A7;" />

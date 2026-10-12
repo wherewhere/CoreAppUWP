@@ -84,26 +84,24 @@ namespace CoreAppUWP.ViewModels.SettingsPages
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        private static async void RaisePropertyChangedEvent([CallerMemberName] string name = null)
+        private static void RaisePropertyChangedEvent([CallerMemberName] string name = null)
         {
             if (name != null)
             {
                 foreach (KeyValuePair<CoreDispatcher, SettingsViewModel> cache in Caches)
                 {
-                    await cache.Key.ResumeForegroundAsync();
-                    cache.Value.PropertyChanged?.Invoke(cache.Value, new PropertyChangedEventArgs(name));
+                    _ = cache.Key.AwaitableRunAsync(() => cache.Value.PropertyChanged?.Invoke(cache.Value, new PropertyChangedEventArgs(name)));
                 }
             }
         }
 
-        private static async void RaisePropertyChangedEvent(params string[] names)
+        private static void RaisePropertyChangedEvent(params string[] names)
         {
-            if (names != null)
+            if (names?.Length > 0)
             {
                 foreach (KeyValuePair<CoreDispatcher, SettingsViewModel> cache in Caches)
                 {
-                    await cache.Key.ResumeForegroundAsync();
-                    names.ForEach(name => cache.Value.PropertyChanged?.Invoke(cache.Value, new PropertyChangedEventArgs(name)));
+                    _ = cache.Key.AwaitableRunAsync(() => names.ForEach(name => cache.Value.PropertyChanged?.Invoke(cache.Value, new PropertyChangedEventArgs(name))));
                 }
             }
         }
@@ -111,7 +109,7 @@ namespace CoreAppUWP.ViewModels.SettingsPages
         [SuppressMessage("Performance", "CA1822:将成员标记为 static", Justification = "<挂起>")]
         private void SetProperty<TProperty>(ref TProperty property, TProperty value, [CallerMemberName] string name = null)
         {
-            if (property == null ? value != null : !property.Equals(value))
+            if (!property?.Equals(value) ?? (value != null))
             {
                 property = value;
                 RaisePropertyChangedEvent(name);

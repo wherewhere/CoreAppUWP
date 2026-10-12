@@ -1,5 +1,6 @@
 ﻿using CoreAppUWP.Common;
 using CoreAppUWP.Controls;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,7 +33,7 @@ namespace CoreAppUWP.Helpers
         public static event Action<ApplicationTheme> UISettingChanged
         {
             add => actions.Add(value);
-            remove => actions.Remove(value);
+            remove => _ = actions.Remove(value);
         }
 
         private static void InvokeUISettingChanged(ApplicationTheme value) => actions.Invoke(value);
@@ -310,11 +311,18 @@ namespace CoreAppUWP.Helpers
             {
                 await window.Dispatcher.ResumeForegroundAsync();
 
-                bool extendViewIntoTitleBar = CoreApplication.GetCurrentView().TitleBar.ExtendViewIntoTitleBar;
-                ApplicationViewTitleBar titleBar = ApplicationView.GetForCurrentView().TitleBar;
-                titleBar.ForegroundColor = titleBar.ButtonForegroundColor = foregroundColor;
-                titleBar.BackgroundColor = titleBar.InactiveBackgroundColor = backgroundColor;
-                titleBar.ButtonBackgroundColor = titleBar.ButtonInactiveBackgroundColor = extendViewIntoTitleBar ? Colors.Transparent : backgroundColor;
+                try
+                {
+                    bool extendViewIntoTitleBar = CoreApplication.GetCurrentView().TitleBar.ExtendViewIntoTitleBar;
+                    ApplicationViewTitleBar titleBar = ApplicationView.GetForCurrentView().TitleBar;
+                    titleBar.ForegroundColor = titleBar.ButtonForegroundColor = foregroundColor;
+                    titleBar.BackgroundColor = titleBar.InactiveBackgroundColor = backgroundColor;
+                    titleBar.ButtonBackgroundColor = titleBar.ButtonInactiveBackgroundColor = extendViewIntoTitleBar ? Colors.Transparent : backgroundColor;
+                }
+                catch (Exception ex)
+                {
+                    SettingsHelper.LoggerFactory.CreateLogger(typeof(ThemeHelper)).LogError("Failed to custom ApplicationViewTitleBar. {message} (0x{hResult:X})", ex.GetMessage(), ex.HResult);
+                }
 
                 if (WindowHelper.IsAppWindowSupported && WindowHelper.ActiveAppWindows.TryGetValue(window.Dispatcher, out Dictionary<XamlRoot, AppWindow> appWindows))
                 {
@@ -352,11 +360,18 @@ namespace CoreAppUWP.Helpers
             Color foregroundColor = isDark || isHighContrast ? Colors.White : Colors.Black;
             Color backgroundColor = isHighContrast ? Color.FromArgb(255, 0, 0, 0) : isDark ? Color.FromArgb(255, 32, 32, 32) : Color.FromArgb(255, 243, 243, 243);
 
-            bool extendViewIntoTitleBar = CoreApplication.GetCurrentView().TitleBar.ExtendViewIntoTitleBar;
-            ApplicationViewTitleBar titleBar = ApplicationView.GetForCurrentView().TitleBar;
-            titleBar.ForegroundColor = titleBar.ButtonForegroundColor = foregroundColor;
-            titleBar.BackgroundColor = titleBar.InactiveBackgroundColor = backgroundColor;
-            titleBar.ButtonBackgroundColor = titleBar.ButtonInactiveBackgroundColor = extendViewIntoTitleBar ? Colors.Transparent : backgroundColor;
+            try
+            {
+                bool extendViewIntoTitleBar = CoreApplication.GetCurrentView().TitleBar.ExtendViewIntoTitleBar;
+                ApplicationViewTitleBar titleBar = ApplicationView.GetForCurrentView().TitleBar;
+                titleBar.ForegroundColor = titleBar.ButtonForegroundColor = foregroundColor;
+                titleBar.BackgroundColor = titleBar.InactiveBackgroundColor = backgroundColor;
+                titleBar.ButtonBackgroundColor = titleBar.ButtonInactiveBackgroundColor = extendViewIntoTitleBar ? Colors.Transparent : backgroundColor;
+            }
+            catch (Exception ex)
+            {
+                SettingsHelper.LoggerFactory.CreateLogger(typeof(ThemeHelper)).LogError("Failed to custom ApplicationViewTitleBar. {message} (0x{hResult:X})", ex.GetMessage(), ex.HResult);
+            }
         }
 
         [SupportedOSPlatform("Windows10.0.18362.0")]

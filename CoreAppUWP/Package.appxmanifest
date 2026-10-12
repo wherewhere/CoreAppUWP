@@ -89,7 +89,7 @@
     </Application>
     <Application Id="Win32"
       Executable="$targetnametoken$.exe"
-      EntryPoint="windows.partialTrustApplication">
+      EntryPoint="Windows.PartialTrustApplication">
       <uap:VisualElements
         DisplayName="CoreAppUWP (Win32)"
         Description="UWP running on .NET Core App (Win32 Mode)"
