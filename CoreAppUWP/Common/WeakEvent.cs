@@ -59,7 +59,7 @@ namespace CoreAppUWP.Common
 
         public int Count => _list.Count;
 
-        public bool IsReadOnly => ((ICollection<Method>)_list).IsReadOnly;
+        bool ICollection<Action<TEventArgs>>.IsReadOnly => ((ICollection<Method>)_list).IsReadOnly;
 
         public Action<TEventArgs> this[int index]
         {
@@ -90,22 +90,7 @@ namespace CoreAppUWP.Common
 
         public void CopyTo(Action<TEventArgs>[] array, int arrayIndex) => Array.Copy(_list.Select(x => (Action<TEventArgs>)x).ToArray(), 0, array, arrayIndex, _list.Count);
 
-        public void Remove(Action<TEventArgs> callback)
-        {
-            for (int i = _list.Count; --i >= 0;)
-            {
-                if (_list[i].IsDead)
-                {
-                    _list.RemoveAt(i);
-                }
-                else if (_list[i].Equals(callback))
-                {
-                    _list.RemoveAt(i);
-                }
-            }
-        }
-
-        bool ICollection<Action<TEventArgs>>.Remove(Action<TEventArgs> callback)
+        public bool Remove(Action<TEventArgs> callback)
         {
             for (int i = _list.Count; --i >= 0;)
             {
@@ -166,6 +151,6 @@ namespace CoreAppUWP.Common
 
         public void operator +=(Action<TEventArgs> callback) => Add(callback);
 
-        public void operator -=(Action<TEventArgs> callback) => Remove(callback);
+        public void operator -=(Action<TEventArgs> callback) => _ = Remove(callback);
     }
 }

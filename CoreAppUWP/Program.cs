@@ -2,13 +2,22 @@
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.Win32;
+using Microsoft.Windows.ApplicationModel.DynamicDependency;
 using System;
+using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
+using Windows.ApplicationModel;
+using Windows.Management.Deployment;
 using Windows.Win32;
 using Windows.Win32.Foundation;
+using Windows.Win32.Security;
 using Windows.Win32.Storage.Packaging.Appx;
 using WinRT;
+using AddPackageDependencyOptions = Windows.Win32.Storage.Packaging.Appx.AddPackageDependencyOptions;
+using CreatePackageDependencyOptions = Windows.Win32.Storage.Packaging.Appx.CreatePackageDependencyOptions;
+using PackageDependencyProcessorArchitectures = Microsoft.Windows.ApplicationModel.DynamicDependency.PackageDependencyProcessorArchitectures;
 
 namespace CoreAppUWP
 {
@@ -65,27 +74,30 @@ namespace CoreAppUWP
             ComWrappersSupport.InitializeComWrappers();
             if (!IsPackagedApp)
             {
-                _ = PInvoke.TryCreatePackageDependency(
-                     default,
-                     "Microsoft.WindowsAppRuntime.2_8wekyb3d8bbwe",
-                     new PACKAGE_VERSION(),
-                     RuntimeInformation.ProcessArchitecture switch
-                     {
-                         Architecture.X86 => PackageDependencyProcessorArchitectures.PackageDependencyProcessorArchitectures_X86,
-                         Architecture.X64 => PackageDependencyProcessorArchitectures.PackageDependencyProcessorArchitectures_X64,
-                         Architecture.Arm => PackageDependencyProcessorArchitectures.PackageDependencyProcessorArchitectures_Arm,
-                         Architecture.Arm64 => PackageDependencyProcessorArchitectures.PackageDependencyProcessorArchitectures_Arm64,
-                         _ => PackageDependencyProcessorArchitectures.PackageDependencyProcessorArchitectures_None
-                     },
-                     PackageDependencyLifetimeKind.PackageDependencyLifetimeKind_Process,
-                     null,
-                     CreatePackageDependencyOptions.CreatePackageDependencyOptions_None,
-                     out PWSTR package).ThrowOnFailure();
-                _ = PInvoke.AddPackageDependency(
-                    package.ToString(),
-                    0,
-                    AddPackageDependencyOptions.AddPackageDependencyOptions_PrependIfRankCollision,
-                    out _, out _).ThrowOnFailure();
+                PackageManager manager = new();
+                Package package = manager.FindPackagesForUser(string.Empty, "Microsoft.WindowsAppRuntime.2", "CN=Microsoft Corporation, O=Microsoft Corporation, L=Redmond, S=Washington, C=US").First();
+                nint handle = NativeLibrary.Load(Path.Combine(package.InstalledLocation.Path, "Microsoft.WindowsAppRuntime.dll"));
+                try
+                {
+                    _ = MddTryCreatePackageDependency(
+                         default,
+                         package.Id.FamilyName,
+                         new PACKAGE_VERSION(),
+                         PackageDependencyProcessorArchitectures.None,
+                         PackageDependencyLifetimeArtifactKind.Process,
+                         null,
+                         CreatePackageDependencyOptions.CreatePackageDependencyOptions_None,
+                         out PWSTR packageId).ThrowOnFailure();
+                    _ = MddAddPackageDependency(
+                        packageId,
+                        0,
+                        AddPackageDependencyOptions.AddPackageDependencyOptions_None,
+                        out _, out _).ThrowOnFailure();
+                }
+                finally
+                {
+                    NativeLibrary.Free(handle);
+                }
             }
             HookRegistry hookRegistry = null;
             try
@@ -110,6 +122,12 @@ namespace CoreAppUWP
 
         [LibraryImport("Microsoft.UI.Xaml.dll")]
         private static partial void XamlCheckProcessRequirements();
+
+        [LibraryImport("Microsoft.WindowsAppRuntime.dll", StringMarshalling = StringMarshalling.Utf16)]
+        private static partial HRESULT MddTryCreatePackageDependency(PSID user, string packageFamilyName, PACKAGE_VERSION minVersion, [Optional, DefaultParameterValue(PackageDependencyProcessorArchitectures.None)] PackageDependencyProcessorArchitectures architectures, [Optional, DefaultParameterValue(PackageDependencyLifetimeArtifactKind.Process)] PackageDependencyLifetimeArtifactKind lifetimeKind, string lifetimeArtifact, [Optional, DefaultParameterValue(CreatePackageDependencyOptions.CreatePackageDependencyOptions_None)] CreatePackageDependencyOptions options, out PWSTR packageDependencyId);
+
+        [LibraryImport("Microsoft.WindowsAppRuntime.dll", StringMarshalling = StringMarshalling.Utf16)]
+        private static partial HRESULT MddAddPackageDependency(PWSTR packageDependencyId, [Optional, DefaultParameterValue(0)] int rank, [Optional, DefaultParameterValue(AddPackageDependencyOptions.AddPackageDependencyOptions_None)] AddPackageDependencyOptions options, out PACKAGEDEPENDENCY_CONTEXT packageDependencyContext, out PWSTR packageFullName);
 
         private sealed partial class DefaultSafeHandle(nint invalidHandleValue, bool ownsHandle) : SafeHandle(invalidHandleValue, ownsHandle)
         {

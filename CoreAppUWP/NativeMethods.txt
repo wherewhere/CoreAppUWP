@@ -11,7 +11,13 @@ DetourTransactionBegin
 DetourTransactionCommit
 DetourUpdateThread
 
-AddPackageDependency
+AddPackageDependencyOptions
+CreatePackageDependencyOptions
+
+PACKAGE_VERSION
+PACKAGEDEPENDENCY_CONTEXT
+PSID
+
 AppPolicyGetWindowingModel
 GetCurrentPackageFullName
 GetCurrentThread
@@ -19,4 +25,3 @@ GetModuleHandle
 RegCloseKey
 RegOpenKeyEx
 RegQueryValueEx
-TryCreatePackageDependency

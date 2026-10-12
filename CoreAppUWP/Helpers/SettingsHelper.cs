@@ -67,27 +67,46 @@ namespace CoreAppUWP.Helpers
 
     public sealed class SystemTextJsonObjectSerializer : IObjectSerializer
     {
-        public string Serialize<T>(T value) => value switch
+        public string Serialize<T>(T value)
         {
-            bool => JsonSerializer.Serialize(value, SourceGenerationContext.Default.Boolean),
-            ElementTheme => JsonSerializer.Serialize(value, SourceGenerationContext.Default.ElementTheme),
-            BackdropType => JsonSerializer.Serialize(value, SourceGenerationContext.Default.BackdropType),
-            _ => JsonSerializer.Serialize(value, typeof(T), SourceGenerationContext.Default)
-        };
+            try
+            {
+                return value switch
+                {
+                    bool => JsonSerializer.Serialize(value, SourceGenerationContext.Default.Boolean),
+                    ElementTheme => JsonSerializer.Serialize(value, SourceGenerationContext.Default.ElementTheme),
+                    BackdropType => JsonSerializer.Serialize(value, SourceGenerationContext.Default.BackdropType),
+                    _ => JsonSerializer.Serialize(value, typeof(T), SourceGenerationContext.Default)
+                };
+            }
+            catch (Exception ex)
+            {
+                SettingsHelper.LoggerFactory.CreateLogger<SystemTextJsonObjectSerializer>().LogError(ex, "Failed to serialize object of type {type}. {message} (0x{hResult:X})", typeof(T), ex.GetMessage(), ex.HResult);
+                return string.Empty;
+            }
+        }
 
         public T Deserialize<T>([StringSyntax(StringSyntaxAttribute.Json)] string value)
         {
             if (string.IsNullOrEmpty(value)) { return default; }
             Type type = typeof(T);
-            return type == typeof(bool) ? Deserialize(value, SourceGenerationContext.Default.Boolean)
-                : type == typeof(ElementTheme) ? Deserialize(value, SourceGenerationContext.Default.ElementTheme)
-                : type == typeof(BackdropType) ? Deserialize(value, SourceGenerationContext.Default.BackdropType)
-                : JsonSerializer.Deserialize(value, type, SourceGenerationContext.Default) is T result ? result : default;
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            static T Deserialize<TValue>([StringSyntax(StringSyntaxAttribute.Json)] string json, JsonTypeInfo<TValue> jsonTypeInfo)
+            try
             {
-                TValue value = JsonSerializer.Deserialize(json, jsonTypeInfo);
-                return Unsafe.As<TValue, T>(ref value);
+                return type == typeof(bool) ? Deserialize(value, SourceGenerationContext.Default.Boolean)
+                    : type == typeof(ElementTheme) ? Deserialize(value, SourceGenerationContext.Default.ElementTheme)
+                    : type == typeof(BackdropType) ? Deserialize(value, SourceGenerationContext.Default.BackdropType)
+                    : JsonSerializer.Deserialize(value, type, SourceGenerationContext.Default) is T result ? result : default;
+                [MethodImpl(MethodImplOptions.AggressiveInlining)]
+                static T Deserialize<TValue>([StringSyntax(StringSyntaxAttribute.Json)] string json, JsonTypeInfo<TValue> jsonTypeInfo)
+                {
+                    TValue value = JsonSerializer.Deserialize(json, jsonTypeInfo);
+                    return Unsafe.As<TValue, T>(ref value);
+                }
+            }
+            catch (Exception ex)
+            {
+                SettingsHelper.LoggerFactory.CreateLogger<SystemTextJsonObjectSerializer>().LogError(ex, "Failed to deserialize object of type {type}. {message} (0x{hResult:X})", type, ex.GetMessage(), ex.HResult);
+                return default;
             }
         }
     }

@@ -32,7 +32,7 @@ namespace CoreAppUWP.Helpers
         public static event Action<ApplicationTheme> UISettingChanged
         {
             add => actions.Add(value);
-            remove => actions.Remove(value);
+            remove => _ = actions.Remove(value);
         }
 
         private static void InvokeUISettingChanged(ApplicationTheme value) => actions.Invoke(value);
