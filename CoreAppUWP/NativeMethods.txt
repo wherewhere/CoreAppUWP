@@ -9,8 +9,10 @@ DetourTransactionBegin
 DetourTransactionCommit
 DetourUpdateThread
 
+AddPackageDependency
 AppPolicyGetWindowingModel
 GetCurrentPackageFullName
 GetCurrentThread
 GetModuleHandle
 SetWindowPos
+TryCreatePackageDependency

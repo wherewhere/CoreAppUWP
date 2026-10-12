@@ -1,7 +1,6 @@
 ﻿using CoreAppUWP.Controls;
 using CoreAppUWP.Helpers;
 using CoreAppUWP.Pages;
-using Microsoft.Windows.ApplicationModel.DynamicDependency;
 using System;
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -57,7 +56,20 @@ namespace CoreAppUWP
             bool isPackagedApp = IsPackagedApp;
             if (!isPackagedApp)
             {
-                PackageDependency.Create("Microsoft.UI.Xaml.2.8_8wekyb3d8bbwe", default).Add();
+                _ = PInvoke.TryCreatePackageDependency(
+                    default,
+                    "Microsoft.UI.Xaml.2.8_8wekyb3d8bbwe",
+                    new PACKAGE_VERSION(),
+                    PackageDependencyProcessorArchitectures.PackageDependencyProcessorArchitectures_None,
+                    PackageDependencyLifetimeKind.PackageDependencyLifetimeKind_Process,
+                    null,
+                    CreatePackageDependencyOptions.CreatePackageDependencyOptions_None,
+                    out PWSTR package).ThrowOnFailure();
+                _ = PInvoke.AddPackageDependency(
+                    package.ToString(),
+                    0,
+                    AddPackageDependencyOptions.AddPackageDependencyOptions_None,
+                    out _, out _).ThrowOnFailure();
             }
             if (IsCoreWindow)
             {
