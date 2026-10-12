@@ -70,7 +70,7 @@ namespace CoreAppUWP.Helpers
         /// <param name="user">App data user owner.</param>
         /// <param name="objectSerializer">Serializer for converting stored values. Defaults to <see cref="SystemSerializer"/>.</param>
         /// <returns>A new instance of <see cref="ApplicationDataStorageHelper"/>.</returns>
-        public static async Task<ApplicationDataStorageHelper> GetForUserAsync(User user, IObjectSerializer objectSerializer = null)
+        public static ApplicationDataStorageHelper GetForUser(User user, IObjectSerializer objectSerializer = null)
         {
             ApplicationData appData = ApplicationData.GetForUser(user);
             return new ApplicationDataStorageHelper(appData, objectSerializer);

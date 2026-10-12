@@ -10,6 +10,7 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using Windows.ApplicationModel;
 using Windows.Management.Deployment;
+using Windows.System;
 using Windows.Win32;
 using Windows.Win32.Foundation;
 using Windows.Win32.Security;
@@ -17,6 +18,7 @@ using Windows.Win32.Storage.Packaging.Appx;
 using WinRT;
 using AddPackageDependencyOptions = Windows.Win32.Storage.Packaging.Appx.AddPackageDependencyOptions;
 using CreatePackageDependencyOptions = Windows.Win32.Storage.Packaging.Appx.CreatePackageDependencyOptions;
+using DispatcherQueue = Microsoft.UI.Dispatching.DispatcherQueue;
 using PackageDependencyProcessorArchitectures = Microsoft.Windows.ApplicationModel.DynamicDependency.PackageDependencyProcessorArchitectures;
 
 namespace CoreAppUWP
@@ -74,8 +76,15 @@ namespace CoreAppUWP
             ComWrappersSupport.InitializeComWrappers();
             if (!IsPackagedApp)
             {
-                PackageManager manager = new();
-                Package package = manager.FindPackagesForUser(string.Empty, "Microsoft.WindowsAppRuntime.2", "CN=Microsoft Corporation, O=Microsoft Corporation, L=Redmond, S=Washington, C=US").First();
+                ProcessorArchitecture architecture = RuntimeInformation.ProcessArchitecture switch
+                {
+                    Architecture.X86 => ProcessorArchitecture.X86,
+                    Architecture.X64 => ProcessorArchitecture.X64,
+                    Architecture.Arm or Architecture.Armv6 => ProcessorArchitecture.Arm,
+                    Architecture.Arm64 => (ProcessorArchitecture)12,
+                    _ => throw new NotSupportedException($"Unsupported architecture: {RuntimeInformation.ProcessArchitecture}")
+                };
+                Package package = new PackageManager().FindPackagesForUser(string.Empty, "Microsoft.WindowsAppRuntime.2", "CN=Microsoft Corporation, O=Microsoft Corporation, L=Redmond, S=Washington, C=US").First(x => x.Id.Architecture == architecture);
                 nint handle = NativeLibrary.Load(Path.Combine(package.InstalledLocation.Path, "Microsoft.WindowsAppRuntime.dll"));
                 try
                 {
